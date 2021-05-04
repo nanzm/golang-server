@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"compress/flate"
 	"compress/gzip"
+	"dora/pkg/utils"
 
 	"dora/app/dao"
 	"dora/app/dto"
 	"dora/app/middleware"
 	"dora/app/model"
 	"dora/config"
-	"dora/pkg"
 	"dora/pkg/ginutil"
 
 	"encoding/json"
@@ -223,7 +223,7 @@ func (pro *ProjectResource) SourcemapParse(c *gin.Context) {
 		return
 	}
 
-	sourcemap, err := pkg.GetStackSourceMap("tmp/sourcemap/"+u.AppId+"/decompress", u.Stack)
+	sourcemap, err := utils.GetStackSourceMap("tmp/sourcemap/"+u.AppId+"/decompress", u.Stack)
 	if err != nil {
 		ginutil.JSONServerError(c, err)
 		return

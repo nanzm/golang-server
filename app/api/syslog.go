@@ -5,8 +5,8 @@ import (
 	"dora/app/dto"
 	"dora/app/model"
 	"dora/config"
-	"dora/pkg"
 	"dora/pkg/ginutil"
+	"dora/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,7 +34,7 @@ func (s *SyslogResource) GetParseErrorList(c *gin.Context) {
 
 	var list []*model.SysLog
 	var total int64
-	err := datasource.GormInstance().Scopes(pkg.Paginate(u.Current, u.PageSize)).
+	err := datasource.GormInstance().Scopes(utils.Paginate(u.Current, u.PageSize)).
 		Find(&list).Count(&total).Order("id desc").Error
 
 	if err != nil {

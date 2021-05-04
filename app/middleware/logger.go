@@ -1,4 +1,4 @@
-package pkg
+package middleware
 
 import (
 	"github.com/fatih/color"
@@ -36,7 +36,7 @@ func GinZap(logger *zap.Logger, utc bool) gin.HandlerFunc {
 			}
 		} else {
 			var pre string
-			if c.Writer.Status() < 400 {
+			if c.Writer.Status() <= 500 {
 				pre = color.HiGreenString("%v %v %v ", c.Writer.Status(), c.Request.Method, path)
 			} else {
 				pre = color.HiRedString("%v %v %v ", c.Writer.Status(), c.Request.Method, path)

@@ -3,10 +3,10 @@ package cmd
 import (
 	"context"
 	"dora/app/boots"
+	"dora/app/middleware"
 	"dora/app/mqConsumer"
 	"dora/app/task"
 	"dora/config"
-	"dora/pkg"
 	"dora/pkg/ginutil"
 	"dora/pkg/logger"
 
@@ -94,7 +94,7 @@ func startHttpServer(conf *config.Conf) {
 	g := gin.New()
 	//gin.SetMode("release")
 
-	g.Use(pkg.GinZap(logger.L, false), pkg.RecoveryWithZap(logger.L, false))
+	g.Use(middleware.GinZap(logger.L, false), middleware.RecoveryWithZap(logger.L, false))
 
 	// session
 	store := cookie.NewStore([]byte(conf.Secret))
@@ -137,11 +137,11 @@ func gracefulStop(srv *http.Server) {
 
 	select {
 	case <-ctx.Done():
-		logger.Warn("http server exit timeout of 5 seconds.")
+		logger.Info("http server exit timeout of 5 seconds.")
 	default:
 	}
 
-	logger.Warn("http server exited.")
+	logger.Info("http server exited.")
 
 	datasource.StopNsq()
 	datasource.StopSlsLog()

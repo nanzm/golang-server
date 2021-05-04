@@ -31,7 +31,7 @@ func (pub *PublicResource) Register(router *gin.RouterGroup) {
 	// 上报
 	router.POST("/public/report", pub.TransToNsq)
 	router.POST("/report", pub.TransToNsq)
-	router.POST("/v2/report", pub.TransToNsqV2)
+	router.POST("/v2/report", pub.TransToNsq)
 
 	// 测试用
 	router.Any("/http/delay", pub.HTTPDelay)
@@ -43,52 +43,6 @@ func (pub *PublicResource) Register(router *gin.RouterGroup) {
 }
 
 func (pub *PublicResource) TransToNsq(c *gin.Context) {
-	data, err := c.GetRawData()
-	if err != nil {
-		c.String(http.StatusBadRequest, err.Error())
-		return
-	}
-
-	// 解析
-	var eventData map[string]interface{}
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-	err = json.Unmarshal(data, &eventData)
-	if err != nil {
-		c.String(http.StatusBadRequest, err.Error())
-		return
-	}
-
-	// 校验
-	if val, ok := eventData["apiKey"]; !ok || val == "" {
-		c.String(http.StatusBadRequest, "missing key \"apiKey\"")
-		return
-	}
-	if val, ok := eventData["category"]; !ok || val == "" {
-		c.String(http.StatusBadRequest, "missing key \"category\"")
-		return
-	}
-
-	// 添加ip
-	var ip = c.ClientIP()
-	eventData["ip"] = ip
-
-	// 序列化
-	marshal, err := json.Marshal(eventData)
-	if err != nil {
-		c.String(http.StatusBadRequest, err.Error())
-		return
-	}
-
-	// 给mq
-	err = datasource.NsqProducerInstance().Publish(pub.Conf.Nsq.Topic, marshal)
-	if err != nil {
-		c.String(http.StatusInternalServerError, err.Error())
-		return
-	}
-	c.String(http.StatusOK, "ok")
-}
-
-func (pub *PublicResource) TransToNsqV2(c *gin.Context) {
 	data, err := c.GetRawData()
 	if err != nil {
 		c.String(http.StatusBadRequest, err.Error())

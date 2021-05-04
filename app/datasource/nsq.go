@@ -13,6 +13,7 @@ var onceNsq sync.Once
 var nsqProducer *nsq.Producer
 var nsqConsumer *nsq.Consumer
 
+// 生产
 func NsqProducerInstance() *nsq.Producer {
 	onceNsq.Do(func() {
 		conf := config.GetConf()
@@ -24,7 +25,7 @@ func NsqProducerInstance() *nsq.Producer {
 			logger.Panic(err)
 		}
 
-		p.SetLogger(&customLog{}, nsq.LogLevelWarning)
+		p.SetLogger(&customLog{}, nsq.LogLevelError)
 
 		logger.Info("nsq producer ready")
 		nsqProducer = p
@@ -39,7 +40,7 @@ func NsqConsumerRegister(conf config.NsqConfig, handler nsq.Handler) {
 	if err != nil {
 		logger.Panic(err)
 	}
-	c.SetLogger(&customLog{}, nsq.LogLevelWarning)
+	c.SetLogger(&customLog{}, nsq.LogLevelError)
 
 	c.AddHandler(handler)
 	err = c.ConnectToNSQD(conf.Address)
@@ -51,20 +52,22 @@ func NsqConsumerRegister(conf config.NsqConfig, handler nsq.Handler) {
 	nsqConsumer = c
 }
 
-func StopNsq() {
-	logger.Println("stop nsq producer")
-	NsqProducerInstance().Stop()
-
-	if nsqConsumer != nil {
-		logger.Println("stop nsq consumer")
-		nsqConsumer.Stop()
-	}
-}
-
 type customLog struct {
 }
 
 func (c *customLog) Output(_ int, s string) error {
 	logger.Warnf("nsq: %v", s)
 	return nil
+}
+
+func StopNsq() {
+	if nsqProducer != nil {
+		logger.Println("stop nsq producer")
+		nsqProducer.Stop()
+	}
+
+	if nsqConsumer != nil {
+		logger.Println("stop nsq consumer")
+		nsqConsumer.Stop()
+	}
 }

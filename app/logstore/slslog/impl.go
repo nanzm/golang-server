@@ -3,8 +3,8 @@ package slslogComponent
 import (
 	store "dora/app/logstore/core"
 	"dora/app/logstore/response"
-	"dora/pkg"
 	"dora/pkg/logger"
+	"dora/pkg/utils"
 	"fmt"
 )
 
@@ -39,7 +39,7 @@ func (s slsQuery) LogCountByMd5(from, to int64, md5 string) (*response.LogCountB
 	if len(slsRes.Logs) > 0 {
 		input := slsRes.Logs[0]
 		result := &response.LogCountByMd5Res{}
-		err := pkg.WeekDecode(input, result)
+		err := utils.WeekDecode(input, result)
 		if err != nil {
 			logger.Error(err)
 			return nil, err
@@ -64,7 +64,7 @@ func (s slsQuery) PvUvTotal(appId string, from, to int64) (*response.PvUvTotalRe
 	if len(slsRes.Logs) > 0 {
 		input := slsRes.Logs[0]
 		result := &response.PvUvTotalRes{}
-		err := pkg.WeekDecode(input, result)
+		err := utils.WeekDecode(input, result)
 		if err != nil {
 			logger.Error(err)
 			return nil, err
@@ -95,7 +95,7 @@ func (s slsQuery) PvUvTrend(appId string, from, to, interval int64) (*response.P
 		trendList := make([]*response.PvUvTrendItemRes, 0)
 		for _, log := range slsRes.Logs {
 			trendItem := &response.PvUvTrendItemRes{}
-			err := pkg.WeekDecode(log, trendItem)
+			err := utils.WeekDecode(log, trendItem)
 			if err != nil {
 				logger.Error(err)
 				return nil, err
@@ -130,7 +130,7 @@ func (s slsQuery) SdkVersionCount(appId string, from, to int64) (*response.SdkVe
 		list := make([]*response.SdkVersionItem, 0)
 		for _, log := range slsRes.Logs {
 			item := &response.SdkVersionItem{}
-			err := pkg.WeekDecode(log, item)
+			err := utils.WeekDecode(log, item)
 			if err != nil {
 				logger.Error(err)
 				return nil, err
@@ -165,7 +165,7 @@ func (s slsQuery) CategoryCount(appId string, from, to int64) (*response.Categor
 		list := make([]*response.CategoryCountItem, 0)
 		for _, log := range slsRes.Logs {
 			item := &response.CategoryCountItem{}
-			err := pkg.WeekDecode(log, item)
+			err := utils.WeekDecode(log, item)
 			if err != nil {
 				logger.Error(err)
 				return nil, err
@@ -200,7 +200,7 @@ func (s slsQuery) PagesCount(appId string, from, to int64) (*response.PageTotalR
 		list := make([]*response.PageTotalItemRes, 0)
 		for _, log := range slsRes.Logs {
 			item := &response.PageTotalItemRes{}
-			err := pkg.WeekDecode(log, item)
+			err := utils.WeekDecode(log, item)
 			if err != nil {
 				logger.Error(err)
 				return nil, err
@@ -229,7 +229,7 @@ func (s slsQuery) ErrorCount(appId string, from, to int64) (*response.ErrorCount
 	if len(slsRes.Logs) > 0 {
 		input := slsRes.Logs[0]
 		result := &response.ErrorCountRes{}
-		err := pkg.WeekDecode(input, result)
+		err := utils.WeekDecode(input, result)
 		if err != nil {
 			logger.Error(err)
 			return nil, err
@@ -260,7 +260,7 @@ func (s slsQuery) ErrorCountTrend(appId string, from, to, interval int64) (*resp
 		trendList := make([]*response.ErrorCountTrendItemRes, 0)
 		for _, log := range slsRes.Logs {
 			trendItem := &response.ErrorCountTrendItemRes{}
-			err := pkg.WeekDecode(log, trendItem)
+			err := utils.WeekDecode(log, trendItem)
 			if err != nil {
 				logger.Error(err)
 				return nil, err
@@ -289,7 +289,7 @@ func (s slsQuery) ApiErrorCount(appId string, from, to int64) (*response.ApiErro
 	if len(slsRes.Logs) > 0 {
 		input := slsRes.Logs[0]
 		result := &response.ApiErrorCountRes{}
-		err := pkg.WeekDecode(input, result)
+		err := utils.WeekDecode(input, result)
 		if err != nil {
 			logger.Error(err)
 			return nil, err
@@ -319,7 +319,7 @@ func (s slsQuery) ApiErrorTrend(appId string, from, to int64, interval int64) (*
 		trendList := make([]*response.ApiErrorTrendItemRes, 0)
 		for _, log := range slsRes.Logs {
 			trendItem := &response.ApiErrorTrendItemRes{}
-			err := pkg.WeekDecode(log, trendItem)
+			err := utils.WeekDecode(log, trendItem)
 			if err != nil {
 				logger.Error(err)
 				return nil, err
@@ -353,7 +353,7 @@ func (s slsQuery) ApiErrorList(appId string, from, to int64) (*response.ApiError
 		trendList := make([]*response.ApiErrorItem, 0)
 		for i, log := range slsRes.Logs {
 			trendItem := &response.ApiErrorItem{Id: i}
-			err := pkg.WeekDecode(log, trendItem)
+			err := utils.WeekDecode(log, trendItem)
 			if err != nil {
 				logger.Error(err)
 				return nil, err
@@ -387,7 +387,7 @@ func (s slsQuery) PerfNavigationTimingTrend(appId string, from, to int64, interv
 		trendList := make([]*response.NavigationTimingTrendItemRes, 0)
 		for _, log := range slsRes.Logs {
 			trendItem := &response.NavigationTimingTrendItemRes{}
-			err := pkg.WeekDecode(log, trendItem)
+			err := utils.WeekDecode(log, trendItem)
 			if err != nil {
 				logger.Error(err)
 				return nil, err
@@ -416,7 +416,7 @@ func (s slsQuery) PerfNavigationTimingValues(appId string, from, to int64) (*res
 	if len(slsRes.Logs) > 0 {
 		input := slsRes.Logs[0]
 		result := &response.PerfNavigationTimingValuesRes{}
-		err := pkg.WeekDecode(input, result)
+		err := utils.WeekDecode(input, result)
 		if err != nil {
 			logger.Error(err)
 			return nil, err
@@ -446,7 +446,7 @@ func (s slsQuery) PerfDataConsumptionTrend(appId string, from, to int64, interva
 		trendList := make([]*response.PerfDataConsumptionTrendItemRes, 0)
 		for _, log := range slsRes.Logs {
 			trendItem := &response.PerfDataConsumptionTrendItemRes{}
-			err := pkg.WeekDecode(log, trendItem)
+			err := utils.WeekDecode(log, trendItem)
 			if err != nil {
 				logger.Error(err)
 				return nil, err
@@ -475,7 +475,7 @@ func (s slsQuery) PerfDataConsumptionValues(appId string, from, to int64) (*resp
 	if len(slsRes.Logs) > 0 {
 		input := slsRes.Logs[0]
 		result := &response.PerfDataConsumptionValuesRes{}
-		err := pkg.WeekDecode(input, result)
+		err := utils.WeekDecode(input, result)
 		if err != nil {
 			logger.Error(err)
 			return nil, err
@@ -505,7 +505,7 @@ func (s slsQuery) PerfMetricsTrend(appId string, from, to int64, interval int64)
 		trendList := make([]*response.PerfMetricsTrendItemRes, 0)
 		for _, log := range slsRes.Logs {
 			trendItem := &response.PerfMetricsTrendItemRes{}
-			err := pkg.WeekDecode(log, trendItem)
+			err := utils.WeekDecode(log, trendItem)
 			if err != nil {
 				logger.Error(err)
 				return nil, err
@@ -534,7 +534,7 @@ func (s slsQuery) PerfMetricsValues(appId string, from, to int64) (*response.Per
 	if len(slsRes.Logs) > 0 {
 		input := slsRes.Logs[0]
 		result := &response.PerfMetricsValuesRes{}
-		err := pkg.WeekDecode(input, result)
+		err := utils.WeekDecode(input, result)
 		if err != nil {
 			logger.Error(err)
 			return nil, err
@@ -564,7 +564,7 @@ func (s slsQuery) ResLoadFailTotalTrend(appId string, from, to, interval int64) 
 		trendList := make([]*response.ResLoadFailTotalTrendItemRes, 0)
 		for _, log := range slsRes.Logs {
 			trendItem := &response.ResLoadFailTotalTrendItemRes{}
-			err := pkg.WeekDecode(log, trendItem)
+			err := utils.WeekDecode(log, trendItem)
 			if err != nil {
 				logger.Error(err)
 				return nil, err
@@ -593,7 +593,7 @@ func (s slsQuery) ResLoadFailTotal(appId string, from, to int64) (*response.ResL
 	if len(slsRes.Logs) > 0 {
 		input := slsRes.Logs[0]
 		result := &response.ResLoadFailTotalRes{}
-		err := pkg.WeekDecode(input, result)
+		err := utils.WeekDecode(input, result)
 		if err != nil {
 			logger.Error(err)
 			return nil, err
@@ -623,7 +623,7 @@ func (s slsQuery) ResLoadFailList(appId string, from, to int64) (*response.ResLo
 		trendList := make([]*response.ResLoadFailItemRes, 0)
 		for _, log := range slsRes.Logs {
 			trendItem := &response.ResLoadFailItemRes{}
-			err := pkg.WeekDecode(log, trendItem)
+			err := utils.WeekDecode(log, trendItem)
 			if err != nil {
 				logger.Error(err)
 				return nil, err
@@ -664,7 +664,7 @@ func (s slsQuery) ProjectEventCount(appId string, from, to int64) (*response.Pro
 	if len(slsRes.Logs) > 0 {
 		input := slsRes.Logs[0]
 		result := &response.ProjectEventCountRes{}
-		err := pkg.WeekDecode(input, result)
+		err := utils.WeekDecode(input, result)
 		if err != nil {
 			logger.Error(err)
 			return nil, err
@@ -694,7 +694,7 @@ func (s slsQuery) ProjectSendMode(appId string, from, to int64) (*response.Proje
 		trendList := make([]*response.SendModeItem, 0)
 		for _, log := range slsRes.Logs {
 			trendItem := &response.SendModeItem{}
-			err := pkg.WeekDecode(log, trendItem)
+			err := utils.WeekDecode(log, trendItem)
 			if err != nil {
 				logger.Error(err)
 				return nil, err
@@ -728,7 +728,7 @@ func (s slsQuery) ProjectVersion(appId string, from, to int64) (*response.Projec
 		trendList := make([]*response.VersionItem, 0)
 		for _, log := range slsRes.Logs {
 			trendItem := &response.VersionItem{}
-			err := pkg.WeekDecode(log, trendItem)
+			err := utils.WeekDecode(log, trendItem)
 			if err != nil {
 				logger.Error(err)
 				return nil, err
@@ -762,7 +762,7 @@ func (s slsQuery) ProjectUserScreen(appId string, from, to int64) (*response.Pro
 		trendList := make([]*response.ScreenItem, 0)
 		for _, log := range slsRes.Logs {
 			trendItem := &response.ScreenItem{}
-			err := pkg.WeekDecode(log, trendItem)
+			err := utils.WeekDecode(log, trendItem)
 			if err != nil {
 				logger.Error(err)
 				return nil, err
@@ -796,7 +796,7 @@ func (s slsQuery) ProjectCategory(appId string, from, to int64) (*response.Proje
 		trendList := make([]*response.CategoryItem, 0)
 		for _, log := range slsRes.Logs {
 			trendItem := &response.CategoryItem{}
-			err := pkg.WeekDecode(log, trendItem)
+			err := utils.WeekDecode(log, trendItem)
 			if err != nil {
 				logger.Error(err)
 				return nil, err
@@ -830,7 +830,7 @@ func (s slsQuery) ProjectEnv(appId string, from, to int64) (*response.ProjectEnv
 		trendList := make([]*response.EnvItem, 0)
 		for _, log := range slsRes.Logs {
 			trendItem := &response.EnvItem{}
-			err := pkg.WeekDecode(log, trendItem)
+			err := utils.WeekDecode(log, trendItem)
 			if err != nil {
 				logger.Error(err)
 				return nil, err
