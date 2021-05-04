@@ -1,0 +1,35 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+.scannerwork
+
+# Test binary, built with `go test -c`
+*.test
+.coverprofile
+.vscode
+
+# Output
+tmp/build
+*.out
+
+# Editor auto file
+.idea
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+build
+dora.db
+tmp
+dora.yml
+test
+
+config.prod.yml
+config.yml
+
+
+dora.log

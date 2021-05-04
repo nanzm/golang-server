@@ -1,0 +1,17 @@
+[Unit]
+Description=Dora
+After=network.target
+Wants=network.target
+
+[Service]
+WorkingDirectory=/usr/local/bin
+ExecStart=/usr/local/bin/dora server
+Restart=on-abnormal
+RestartSec=5s
+KillMode=mixed
+
+StandardOutput=null
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
