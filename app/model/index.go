@@ -2,10 +2,11 @@ package model
 
 func Tables() []interface{} {
 	return []interface{}{
-		new(Organization),
+		new(SysLog),
+
+		// 项目 用户
 		new(Project),
 		new(Role),
-		new(SysLog),
 		new(User),
 		new(UserSetting),
 
@@ -18,8 +19,6 @@ func Tables() []interface{} {
 		new(Artifact),
 
 		// 告警
-		new(AlarmProject),
-		new(AlarmRule),
 		new(AlarmLog),
 	}
 }

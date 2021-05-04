@@ -84,7 +84,6 @@ func (pro *ProjectResource) Create(c *gin.Context) {
 		Type:              body.Type,
 		GitRepositoryUrl:  body.GitRepositoryUrl,
 		GitRepositoryName: body.GitRepositoryName,
-		OrganizationId:    body.OrganizationId,
 	}
 
 	d := dao.NewProjectDao()
@@ -106,7 +105,7 @@ func (pro *ProjectResource) Create(c *gin.Context) {
 	// 切换到当前项目
 	uid, _ := c.Get("uid")
 	settingDao := dao.NewUserSettingDao()
-	err = settingDao.UpdateOrCreate(uid.(uint), result.ID, result.OrganizationId)
+	err = settingDao.UpdateOrCreate(uid.(uint), result.ID)
 	if err != nil {
 		ginutil.JSONServerError(c, err)
 		return

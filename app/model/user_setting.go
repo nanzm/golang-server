@@ -1,21 +1,18 @@
 package model
 
 import (
-	"time"
-
 	"gorm.io/gorm"
+	"time"
 )
 
 type UserSetting struct {
-	ID uint `gorm:"primaryKey" json:"id"`
-
-	UserId         uint `gorm:"type:int(64);uniqueIndex;" json:"user_id"`
-	OrganizationId uint `gorm:"type:int(64);not null;" json:"organization_id"`
-	ProjectId      uint `gorm:"type:int(64);" json:"project_id"`
-
+	ID        uint           `gorm:"primaryKey" json:"id"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+
+	UserId    uint `gorm:"uniqueIndex;" json:"user_id"`
+	ProjectId uint `gorm:"" json:"project_id"`
 }
 
 func (UserSetting) TableName() string {

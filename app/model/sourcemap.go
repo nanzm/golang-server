@@ -1,25 +1,23 @@
 package model
 
 import (
-	"time"
-
 	"gorm.io/gorm"
+	"time"
 )
 
 type SourceMap struct {
-	ID uint `gorm:"primaryKey" json:"id"`
-
-	AppId      string `gorm:"type:int(64)" json:"appId"`
-	AppVersion string `gorm:"type:int(64)" json:"app_version"`
-	AppType    string `gorm:"type:int(64)" json:"app_type"`
-
-	Version string `gorm:"type:int(64)" json:"version"`
-	Path    string `gorm:"type:int(64)" json:"path"`
-	Size    string `gorm:"type:int(64)" json:"size"`
-
+	ID        uint           `gorm:"primaryKey" json:"id"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+
+	AppId      string `gorm:"" json:"appId"`
+	AppVersion string `gorm:"" json:"app_version"`
+	AppType    string `gorm:"" json:"app_type"`
+
+	Version string `gorm:"" json:"version"`
+	Path    string `gorm:"" json:"path"`
+	Size    string `gorm:"" json:"size"`
 }
 
 func (SourceMap) TableName() string {

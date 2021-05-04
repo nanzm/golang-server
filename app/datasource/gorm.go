@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -28,11 +29,20 @@ func newGorm(config config.GormConfig) *gorm.DB {
 	//	dialect = sqlite.Open(config.DSN)
 	case "mysql":
 		dialect = mysql.Open(config.DSN)
+
+	case "postgres":
+		// https://github.com/go-gorm/postgres
+		dialect = postgres.New(postgres.Config{
+			DSN:                  config.DSN,
+			PreferSimpleProtocol: true, // disables implicit prepared statement usage
+		})
 	default:
 		panic("not found database config")
 	}
 
-	db, err := gorm.Open(dialect, &gorm.Config{})
+	db, err := gorm.Open(dialect, &gorm.Config{
+		//DisableForeignKeyConstraintWhenMigrating: true,
+	})
 	if err != nil {
 		panic(err)
 	}

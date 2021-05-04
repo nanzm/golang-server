@@ -1,21 +1,19 @@
 package model
 
 import (
-	"time"
-
 	"gorm.io/gorm"
+	"time"
 )
 
 type IssueUserStatus struct {
-	ID uint `gorm:"primaryKey" json:"id"`
-
-	UserId  uint `gorm:"type:int(64)" json:"user_count"`
-	IssueId uint `gorm:"type:int(64)" json:"issue_id"`
-	Read    bool `gorm:"type:int(64)" json:"read"`
-
+	ID        uint           `gorm:"primaryKey" json:"id"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+
+	UserId  uint `gorm:"" json:"user_count"`
+	IssueId uint `gorm:"" json:"issue_id"`
+	Read    bool `gorm:"" json:"read"`
 }
 
 func (IssueUserStatus) TableName() string {

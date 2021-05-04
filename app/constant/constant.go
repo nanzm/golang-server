@@ -1,5 +1,7 @@
 package constant
 
+const RedisKeyStoreSwitch = "logStoreSwitch"
+
 const (
 	AggregatesAvg = "avg"
 	AggregatesSum = "sum"

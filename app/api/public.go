@@ -4,7 +4,6 @@ import (
 	"context"
 	"dora/app/datasource"
 	"dora/app/dto"
-	"dora/app/service"
 	"dora/config"
 	"dora/pkg/ginutil"
 	"dora/pkg/logger"
@@ -192,15 +191,15 @@ func (pub *PublicResource) SendMail(c *gin.Context) {
 }
 
 func (pub *PublicResource) DingDing(c *gin.Context) {
-	msg := c.DefaultQuery("msg", "测试 [鼓掌]")
-
-	secret := pub.Conf.DingDing[0].Secret
-	accessToken := pub.Conf.DingDing[0].AccessToken
-
-	data := service.NewDingTalkMsg(msg)
-	err := service.SendDingDing(data, secret, accessToken)
-	if err != nil {
-		ginutil.JSONError(c, http.StatusInternalServerError, err)
-	}
-	ginutil.JSONOk(c, nil)
+	//msg := c.DefaultQuery("msg", "测试 [鼓掌]")
+	//
+	//secret := pub.Conf.DingDing[0].Secret
+	//accessToken := pub.Conf.DingDing[0].AccessToken
+	//
+	//data := service.NewDingTalkMsg(msg)
+	//err := service.SendDingDing(data, secret, accessToken)
+	//if err != nil {
+	//	ginutil.JSONError(c, http.StatusInternalServerError, err)
+	//}
+	//ginutil.JSONOk(c, nil)
 }

@@ -45,7 +45,6 @@ func Register(g *gin.Engine, conf *config.Conf) {
 	setupResource(apiRouter,
 		NewDashboardResource(),
 		NewIssueResource(),
-		NewOrganizationResource(),
 		NewProjectResource(),
 		NewSyslogResource(),
 		NewUserResource(),

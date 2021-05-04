@@ -24,7 +24,7 @@ type NsqConfig struct {
 	Channel string `yaml:"channel"`
 }
 
-type AliyunConfig struct {
+type OssConfig struct {
 	Endpoint  string `yaml:"endpoint"`
 	Bucket    string `yaml:"bucket"`
 	AccessKey string `yaml:"accessKey"`
@@ -32,15 +32,13 @@ type AliyunConfig struct {
 }
 
 type SlsLog struct {
-	Endpoint          string `yaml:"endpoint"`
-	AccessKey         string `yaml:"accessKey"`
-	Secret            string `yaml:"secret"`
-	Project           string `yaml:"project"`
-	LogStore          string `yaml:"logStore"`
-	Topic             string `yaml:"topic"`
-	Source            string `yaml:"source"`
-	ConsumerGroupName string `yaml:"consumerGroupName"`
-	ConsumerName      string `yaml:"consumerName"`
+	Endpoint  string `yaml:"endpoint"`
+	AccessKey string `yaml:"accessKey"`
+	Secret    string `yaml:"secret"`
+	Project   string `yaml:"project"`
+	LogStore  string `yaml:"logStore"`
+	Topic     string `yaml:"topic"`
+	Source    string `yaml:"source"`
 }
 
 type Elastic struct {

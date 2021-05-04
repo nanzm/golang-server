@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
+
 	"dora/app/constant"
 	"dora/app/dao"
 	"dora/app/dto"
-	"dora/app/logstore"
 	"dora/pkg/logger"
-	"dora/pkg/utils"
+
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -112,64 +112,65 @@ func CornCheckAllProjectAlarm() {
 	}
 
 	for _, project := range projectList {
-		if len(project.AlarmRules) > 0 && len(project.AlarmTargets) > 0 {
-			matchRules(project)
-		}
+		//if len(project.AlarmRules) > 0 && len(project.AlarmTargets) > 0 {
+		//	matchRules(project)
+		//}
+		fmt.Println("p", project)
 	}
 }
 
 // 检查是否满足规则
 func matchRules(project dto.AlarmProject) {
-	for _, rule := range project.AlarmRules {
-
-		f, t := utils.GetFormToRecently(time.Minute * time.Duration(rule.Period))
-
-		switch rule.Measure {
-		case constant.MeasureApi:
-			res, err := logstore.GetClient().QueryMethods().ApiErrorCount(project.ProjectInfo.AppId, f, t)
-			if err != nil {
-				logger.Error(err)
-				return
-			}
-			if isAchieved(res.Count, rule.Operator, rule.Value) {
-				msg := fmt.Sprintf("项目：%v api 错误数%v分钟内数量大于%v，共发生%v次，影响%v位用户",
-					project.ProjectInfo.Name, rule.Period, rule.Value, res.Count, res.EffectUser)
-
-				logger.Warnf("告警：%v", msg)
-				triggerAlarm(msg, project)
-			}
-
-		case constant.MeasureError:
-			res, err := logstore.GetClient().QueryMethods().ErrorCount(project.ProjectInfo.AppId, f, t)
-			if err != nil {
-				logger.Error(err)
-				return
-			}
-			if isAchieved(res.Count, rule.Operator, rule.Value) {
-				msg := fmt.Sprintf("项目：%v error 错误数%v分钟内数量大于%v，共发生%v次，影响%v位用户",
-					project.ProjectInfo.Name, rule.Period, rule.Value, res.Count, res.EffectUser)
-
-				logger.Warnf("告警：%v", msg)
-				triggerAlarm(msg, project)
-			}
-
-		case constant.MeasureRes:
-			res, err := logstore.GetClient().QueryMethods().ResLoadFailTotal(project.ProjectInfo.AppId, f, t)
-			if err != nil {
-				logger.Error(err)
-				return
-			}
-			if isAchieved(res.Count, rule.Operator, rule.Value) {
-				msg := fmt.Sprintf("项目：%v res 资源加载失败数%v分钟内数量大于%v，共发生%v次，影响%v位用户",
-					project.ProjectInfo.Name, rule.Period, rule.Value, res.Count, res.EffectUser)
-
-				logger.Warnf("告警：%v", msg)
-				triggerAlarm(msg, project)
-			}
-		default:
-			logger.Errorf("未实现的告警指标， 请修改")
-		}
-	}
+	//for _, rule := range project.AlarmRules {
+	//
+	//	f, t := utils.GetFormToRecently(time.Minute * time.Duration(rule.Period))
+	//
+	//	switch rule.Measure {
+	//	case constant.MeasureApi:
+	//		res, err := logstore.GetClient().QueryMethods().ApiErrorCount(project.ProjectInfo.AppId, f, t)
+	//		if err != nil {
+	//			logger.Error(err)
+	//			return
+	//		}
+	//		if isAchieved(res.Count, rule.Operator, rule.Value) {
+	//			msg := fmt.Sprintf("项目：%v api 错误数%v分钟内数量大于%v，共发生%v次，影响%v位用户",
+	//				project.ProjectInfo.Name, rule.Period, rule.Value, res.Count, res.EffectUser)
+	//
+	//			logger.Warnf("告警：%v", msg)
+	//			triggerAlarm(msg, project)
+	//		}
+	//
+	//	case constant.MeasureError:
+	//		res, err := logstore.GetClient().QueryMethods().ErrorCount(project.ProjectInfo.AppId, f, t)
+	//		if err != nil {
+	//			logger.Error(err)
+	//			return
+	//		}
+	//		if isAchieved(res.Count, rule.Operator, rule.Value) {
+	//			msg := fmt.Sprintf("项目：%v error 错误数%v分钟内数量大于%v，共发生%v次，影响%v位用户",
+	//				project.ProjectInfo.Name, rule.Period, rule.Value, res.Count, res.EffectUser)
+	//
+	//			logger.Warnf("告警：%v", msg)
+	//			triggerAlarm(msg, project)
+	//		}
+	//
+	//	case constant.MeasureRes:
+	//		res, err := logstore.GetClient().QueryMethods().ResLoadFailTotal(project.ProjectInfo.AppId, f, t)
+	//		if err != nil {
+	//			logger.Error(err)
+	//			return
+	//		}
+	//		if isAchieved(res.Count, rule.Operator, rule.Value) {
+	//			msg := fmt.Sprintf("项目：%v res 资源加载失败数%v分钟内数量大于%v，共发生%v次，影响%v位用户",
+	//				project.ProjectInfo.Name, rule.Period, rule.Value, res.Count, res.EffectUser)
+	//
+	//			logger.Warnf("告警：%v", msg)
+	//			triggerAlarm(msg, project)
+	//		}
+	//	default:
+	//		logger.Errorf("未实现的告警指标， 请修改")
+	//	}
+	//}
 }
 
 func triggerAlarm(msg string, project dto.AlarmProject) {

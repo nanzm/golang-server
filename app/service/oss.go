@@ -11,10 +11,10 @@ type OssService interface {
 }
 
 type ossService struct {
-	cof *config.AliyunConfig
+	cof *config.OssConfig
 }
 
-func NewOssService(conf *config.AliyunConfig) OssService {
+func NewOssService(conf *config.OssConfig) OssService {
 	return &ossService{
 		cof: conf,
 	}

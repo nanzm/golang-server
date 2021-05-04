@@ -288,7 +288,6 @@ func (u *UserResource) UpdateInfo(c *gin.Context) {
 	err := datasource.GormInstance().Model(&user).Updates(model.User{
 		NickName: p.NickName,
 		Email:    p.Email,
-		Phone:    p.Phone,
 		Password: p.Password,
 	}).Error
 
@@ -396,27 +395,9 @@ func (u *UserResource) DefaultSetting(c *gin.Context) {
 
 	result := dto.UserSettingApiVO{
 		UserSettingVo:     vo,
-		UserOrganizations: nil,
 		UserOrgProjects:   nil,
 	}
 
-	// 获取当前用户的所有的 organizations
-	orgDao := dao.NewOrganizationDao()
-	userOrgList, err := orgDao.UserOrganization(uid.(uint))
-	if err != nil {
-		ginutil.JSONServerError(c, err)
-		return
-	}
-	result.UserOrganizations = userOrgList
-
-	// 获取当前用户的 organizationId 下的所有 Projects
-	projectDao := dao.NewProjectDao()
-	projects, err := projectDao.OrganizationProjectsList(vo.OrganizationId)
-	if err != nil {
-		ginutil.JSONServerError(c, err)
-		return
-	}
-	result.UserOrgProjects = projects
 
 	if result.ID == 0 {
 		ginutil.JSONOk(c, nil)
@@ -432,13 +413,13 @@ func (u *UserResource) UpdateDefaultSetting(c *gin.Context) {
 		return
 	}
 
-	get, _ := c.Get("uid")
+	//get, _ := c.Get("uid")
 
-	settingDao := dao.NewUserSettingDao()
-	err := settingDao.UpdateOrCreate(get.(uint), r.ProjectId, r.OrganizationId)
-	if err != nil {
-		ginutil.JSONError(c, http.StatusBadRequest, err)
-		return
-	}
+	//settingDao := dao.NewUserSettingDao()
+	//err := settingDao.UpdateOrCreate(get.(uint), r.ProjectId, r.OrganizationId)
+	//if err != nil {
+	//	ginutil.JSONError(c, http.StatusBadRequest, err)
+	//	return
+	//}
 	ginutil.JSONOk(c, nil)
 }

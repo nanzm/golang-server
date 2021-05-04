@@ -11,16 +11,13 @@ type Conf struct {
 	Debug  bool
 	Secret string
 
-	Aliyun  AliyunConfig
+	Gorm    GormConfig
+	Redis   RedisConfig
+	Nsq     NsqConfig
+	Oss     OssConfig
 	SlsLog  SlsLog
 	Elastic Elastic
-
-	Mail  MailConfig
-	Nsq   NsqConfig
-	Redis RedisConfig
-	Gorm  GormConfig
-
-	DingDing []struct{ Robot }
+	Mail    MailConfig
 }
 
 var conf Conf

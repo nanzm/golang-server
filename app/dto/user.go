@@ -58,12 +58,10 @@ type UpdateDefaultSettingReq struct {
 
 type UserSettingVo struct {
 	model.UserSetting
-	Organization *model.Organization `gorm:"foreignKey:organization_id;" json:"curOrganization"`
-	Project      *model.Project      `gorm:"foreignKey:project_id;" json:"curProject"`
+	Project *model.Project `gorm:"foreignKey:project_id;" json:"curProject"`
 }
 
 type UserSettingApiVO struct {
 	*UserSettingVo
-	UserOrganizations []*model.Organization `json:"userOrganizations"`
-	UserOrgProjects   []*model.Project      `json:"userOrgProjects"`
+	UserOrgProjects []*model.Project `json:"userOrgProjects"`
 }

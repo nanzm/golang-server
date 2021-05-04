@@ -16,7 +16,7 @@ func NewAlarmRuleDao() *AlarmRuleDao {
 	}
 }
 
-func (a *AlarmRuleDao) Create(data *model.AlarmRule) (*model.AlarmRule, error) {
+func (a *AlarmRuleDao) Create(data *model.AlarmStrategy) (*model.AlarmStrategy, error) {
 	err := a.db.Create(data).Error
 	if err != nil {
 		return nil, err
@@ -27,10 +27,10 @@ func (a *AlarmRuleDao) Create(data *model.AlarmRule) (*model.AlarmRule, error) {
 func (a *AlarmRuleDao) Update() {
 
 }
-
-func (a *AlarmRuleDao) Delete(alarmId uint) error {
-	err := a.db.
-		Model(model.AlarmProject{}).
-		Delete(&model.AlarmProject{ID: alarmId}).Error
-	return err
-}
+//
+//func (a *AlarmRuleDao) Delete(alarmId uint) error {
+//	err := a.db.
+//		Model(model.AlarmProject{}).
+//		Delete(&model.AlarmProject{ID: alarmId}).Error
+//	return err
+//}

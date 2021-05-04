@@ -30,7 +30,7 @@ func (d *UserSettingDao) Delete(userSettingId uint) error {
 	return err
 }
 
-func (d *UserSettingDao) UpdateOrCreate(uid uint, projectId uint, organizationId uint) error {
+func (d *UserSettingDao) UpdateOrCreate(uid uint, projectId uint) error {
 	q := model.UserSetting{}
 	err := d.db.Where("user_id = ?", uid).Find(&q).Error
 	if err != nil {
@@ -40,9 +40,8 @@ func (d *UserSettingDao) UpdateOrCreate(uid uint, projectId uint, organizationId
 	// 没有 创建
 	if q.UserId == 0 {
 		c := model.UserSetting{
-			UserId:         uid,
-			ProjectId:      projectId,
-			OrganizationId: organizationId,
+			UserId:    uid,
+			ProjectId: projectId,
 		}
 		err = d.db.Create(&c).Error
 		if err != nil {
@@ -52,7 +51,7 @@ func (d *UserSettingDao) UpdateOrCreate(uid uint, projectId uint, organizationId
 	}
 
 	// 有 更新
-	u := model.UserSetting{ProjectId: projectId, OrganizationId: organizationId}
+	u := model.UserSetting{ProjectId: projectId}
 	err = d.db.Where("user_id = ?", uid).Select("project_id", "organization_id").Updates(&u).Error
 	if err != nil {
 		return err
