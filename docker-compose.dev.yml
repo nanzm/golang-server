@@ -16,9 +16,20 @@ services:
 
   # redis
   redis:
-    image: redis:alpine
+    image: redis:latest
+    command: redis-server --requirepass dora_redis_password
     ports:
       - "6379:6379"
+    volumes:
+      - redata:/data
+
+  # sourcemap
+  sourcemap:
+    image: registry.cn-hangzhou.aliyuncs.com/nancode/dora-parser:latest
+    ports:
+      - "6667:6667"
+    volumes:
+      - sourcemapdata:/usr/src/dora-parser
 
   # 消息队列
   nsqlookupd:
@@ -27,6 +38,7 @@ services:
     ports:
       - "4160:4160"
       - "4161:4161"
+
   nsqd:
     image: nsqio/nsq
     command: /nsqd --lookupd-tcp-address=nsqlookupd:4160
@@ -35,6 +47,7 @@ services:
     ports:
       - "4150:4150"
       - "4151:4151"
+
   nsqadmin:
     image: nsqio/nsq
     command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
@@ -45,3 +58,5 @@ services:
 
 volumes:
   pgdata:
+  redata:
+  sourcemapdata:
