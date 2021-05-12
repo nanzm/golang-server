@@ -4,14 +4,13 @@ import (
 	"bytes"
 	"compress/flate"
 	"compress/gzip"
-	"dora/pkg/utils"
-
 	"dora/app/dao"
 	"dora/app/dto"
 	"dora/app/middleware"
 	"dora/app/model"
 	"dora/config"
 	"dora/pkg/ginutil"
+	"dora/pkg/utils"
 
 	"encoding/json"
 	"errors"
@@ -38,8 +37,6 @@ func NewProjectResource() Resource {
 func (pro *ProjectResource) Register(router *gin.RouterGroup) {
 	router.GET("/project", middleware.JWTAuthMiddleware(), pro.Get)
 	router.POST("/project", middleware.JWTAuthMiddleware(), pro.Create)
-
-	router.GET("/organization/projects", middleware.JWTAuthMiddleware(), pro.OrganizationProjectsList)
 
 	router.POST("/project/upload/sourcemap", pro.UploadSourcemap)
 	router.POST("/project/upload/bak", pro.UploadBackup)
@@ -71,6 +68,7 @@ func (pro *ProjectResource) Get(c *gin.Context) {
 }
 
 func (pro *ProjectResource) Create(c *gin.Context) {
+	uid, _ := c.Get("uid")
 	var body dto.CreateProject
 	if err := c.ShouldBind(&body); err != nil {
 		ginutil.JSONBadRequest(c, err)
@@ -96,14 +94,13 @@ func (pro *ProjectResource) Create(c *gin.Context) {
 		return
 	}
 
-	result, err := d.Create(&project)
+	result, err := d.Create(&project, &model.User{ID: uid.(uint)})
 	if err != nil {
 		ginutil.JSONError(c, http.StatusInternalServerError, err)
 		return
 	}
 
 	// 切换到当前项目
-	uid, _ := c.Get("uid")
 	settingDao := dao.NewUserSettingDao()
 	err = settingDao.UpdateOrCreate(uid.(uint), result.ID)
 	if err != nil {
@@ -112,22 +109,6 @@ func (pro *ProjectResource) Create(c *gin.Context) {
 	}
 
 	ginutil.JSONOk(c, result)
-}
-
-func (pro *ProjectResource) OrganizationProjectsList(c *gin.Context) {
-	var u dto.ReqOrganizationProjectsList
-	if err := c.ShouldBind(&u); err != nil {
-		ginutil.JSONBadRequest(c, err)
-		return
-	}
-
-	projectDao := dao.NewProjectDao()
-	list, err := projectDao.OrganizationProjectsList(u.OrganizationId)
-	if err != nil {
-		ginutil.JSONServerError(c, err)
-		return
-	}
-	ginutil.JSONList(c, list, len(list))
 }
 
 func (pro *ProjectResource) UploadBackup(c *gin.Context) {

@@ -395,7 +395,7 @@ func (u *UserResource) DefaultSetting(c *gin.Context) {
 
 	result := dto.UserSettingApiVO{
 		UserSettingVo:     vo,
-		UserOrgProjects:   nil,
+		UserProjects:   nil,
 	}
 
 

@@ -17,8 +17,14 @@ func NewProjectDao() *ProjectDao {
 	}
 }
 
-func (d *ProjectDao) Create(project *model.Project) (result *model.Project, error error) {
+func (d *ProjectDao) Create(project *model.Project, user *model.User) (result *model.Project, error error) {
 	err := d.db.Model(&model.Project{}).Create(project).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// 管理
+	err = d.db.Model(&project).Association("Users").Append(&user)
 	if err != nil {
 		return nil, err
 	}
@@ -83,11 +89,6 @@ func (d *ProjectDao) List(cur, size int) (
 	return list, n, s, t, nil
 }
 
-func (d *ProjectDao) OrganizationProjectsList(OrganizationId uint) (projects []*model.Project, error error) {
-	list := make([]*model.Project, 0)
-	err := d.db.Where("organization_id = ? ", OrganizationId).Find(&list).Error
-	if err != nil {
-		return nil, err
-	}
-	return list, err
+func (d *ProjectDao) UserProjectsList(uid uint) (projects []*model.Project, error error) {
+	return nil, nil
 }

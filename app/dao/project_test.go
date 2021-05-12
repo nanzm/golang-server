@@ -22,7 +22,6 @@ func TestProjectDao_Create(t *testing.T) {
 		Type:              "4",
 		GitRepositoryUrl:  "5",
 		GitRepositoryName: "6",
-		OrganizationId:    1,
 	}
 	create, err := dao.Create(&p)
 	if err != nil {
@@ -79,11 +78,4 @@ func TestProjectDao_List(t *testing.T) {
 }
 
 func TestProjectDao_OrganizationProjectsList(t *testing.T) {
-	dao := NewProjectDao()
-	list, err := dao.OrganizationProjectsList(1)
-	if err != nil {
-		panic(err)
-	}
-
-	utils.PrettyPrint(list)
 }

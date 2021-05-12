@@ -79,7 +79,7 @@ func (d *IssueDao) ListQueryTimeRange(appId string, start, end int64, cur, size 
 
 	err := d.db.Debug().Model(model.Issue{}).
 		Where("app_id = ?", appId).
-		Where("updated_at BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?)", start, end).
+		Where("updated_at BETWEEN to_timestamp(?) AND to_timestamp(?)", start, end).
 		Count(&t).Limit(s).Offset((n - 1) * s).
 		Order("updated_at desc").Find(&list).Error
 

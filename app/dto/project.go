@@ -4,7 +4,6 @@ import "mime/multipart"
 
 type CreateProject struct {
 	Name              string `json:"name" binding:"required"`
-	OrganizationId    uint   `json:"organization_id" binding:"required"`
 	Type              string `json:"type" binding:"required"`
 	Alias             string `json:"alias"`
 	GitRepositoryUrl  string `json:"git_repository_url"`

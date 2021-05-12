@@ -63,5 +63,5 @@ type UserSettingVo struct {
 
 type UserSettingApiVO struct {
 	*UserSettingVo
-	UserOrgProjects []*model.Project `json:"userOrgProjects"`
+	UserProjects []*model.Project `json:"userOrgProjects"`
 }

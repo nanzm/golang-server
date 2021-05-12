@@ -97,11 +97,11 @@ func (d *UserDao) List(cur, size int) (
 	return list, n, s, t, nil
 }
 
-func (d *UserDao) UserOrganizations(userId uint) (result *model.User, error error) {
+func (d *UserDao) UserProjects(userId uint) (result *model.User, error error) {
 	user := model.User{
 		ID: userId,
 	}
-	err := d.db.Preload("Organizations").Find(&user).Error
+	err := d.db.Preload("Projects").Find(&user).Error
 	if err != nil {
 		return nil, err
 	}

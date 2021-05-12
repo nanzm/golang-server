@@ -52,7 +52,7 @@ func (d *UserSettingDao) UpdateOrCreate(uid uint, projectId uint) error {
 
 	// 有 更新
 	u := model.UserSetting{ProjectId: projectId}
-	err = d.db.Where("user_id = ?", uid).Select("project_id", "organization_id").Updates(&u).Error
+	err = d.db.Where("user_id = ?", uid).Select("project_id").Updates(&u).Error
 	if err != nil {
 		return err
 	}
@@ -61,8 +61,7 @@ func (d *UserSettingDao) UpdateOrCreate(uid uint, projectId uint) error {
 
 func (d *UserSettingDao) Get(userId uint) (userSettingVO *dto.UserSettingVo, error error) {
 	var p dto.UserSettingVo
-	error = d.db.Where("user_id = ? ", userId).
-		Preload("Organization").Preload("Project").Find(&p).Error
+	error = d.db.Where("user_id = ? ", userId).Preload("Project").Find(&p).Error
 	if error != nil {
 		return nil, error
 	}

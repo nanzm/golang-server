@@ -14,7 +14,6 @@ func TestUserDao_Create(t *testing.T) {
 		NickName: utils.RandString(12),
 		Avatar:   utils.RandString(12),
 		Email:    utils.RandString(12),
-		Phone:    utils.RandString(12),
 		Status:   0,
 		RoleId:   2,
 	}
@@ -60,7 +59,6 @@ func TestUserDao_Update(t *testing.T) {
 		Password: "3",
 		Avatar:   "5",
 		Email:    "6",
-		Phone:    "",
 		RoleId:   1,
 	}
 	err := dao.Update(&user)
@@ -70,13 +68,13 @@ func TestUserDao_Update(t *testing.T) {
 	utils.PrettyPrint(user)
 }
 
-func TestProjectDao_UserOrganizations(t *testing.T) {
+func TestUserDao_UserProjects(t *testing.T) {
 	dao := NewUserDao()
-	organizations, err := dao.UserOrganizations(1)
+	data, err := dao.UserProjects(1)
 	if err != nil {
 		panic(err)
 	}
-	utils.PrettyPrint(organizations)
+	utils.PrettyPrint(data)
 }
 
 func TestUserDao_GetByName(t *testing.T) {
