@@ -23,7 +23,9 @@ func TestProjectDao_Create(t *testing.T) {
 		GitRepositoryUrl:  "5",
 		GitRepositoryName: "6",
 	}
-	create, err := dao.Create(&p)
+	create, err := dao.Create(&p, &model.User{
+		ID: 1,
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -77,5 +79,11 @@ func TestProjectDao_List(t *testing.T) {
 	utils.PrettyPrint(list)
 }
 
-func TestProjectDao_OrganizationProjectsList(t *testing.T) {
+func TestProjectDao_ProjectUsers(t *testing.T) {
+	dao := NewProjectDao()
+	users, err := dao.ProjectUsers(8)
+	if err != nil {
+		panic(err)
+	}
+	utils.PrettyPrint(users)
 }

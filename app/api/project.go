@@ -37,6 +37,7 @@ func NewProjectResource() Resource {
 func (pro *ProjectResource) Register(router *gin.RouterGroup) {
 	router.GET("/project", middleware.JWTAuthMiddleware(), pro.Get)
 	router.POST("/project", middleware.JWTAuthMiddleware(), pro.Create)
+	router.GET("/project/users", middleware.JWTAuthMiddleware(), pro.GetProjectUsers)
 
 	router.POST("/project/upload/sourcemap", pro.UploadSourcemap)
 	router.POST("/project/upload/bak", pro.UploadBackup)
@@ -85,6 +86,8 @@ func (pro *ProjectResource) Create(c *gin.Context) {
 	}
 
 	d := dao.NewProjectDao()
+
+	// 校验项目名 名字
 	p, err := d.GetByName(body.Name)
 	if err != nil {
 		ginutil.JSONServerError(c, err)
@@ -94,6 +97,7 @@ func (pro *ProjectResource) Create(c *gin.Context) {
 		return
 	}
 
+	// 创建
 	result, err := d.Create(&project, &model.User{ID: uid.(uint)})
 	if err != nil {
 		ginutil.JSONError(c, http.StatusInternalServerError, err)
@@ -247,4 +251,21 @@ func (pro *ProjectResource) SourcemapParse(c *gin.Context) {
 		return
 	}
 	ginutil.JSONOk(c, result)
+}
+
+func (pro *ProjectResource) GetProjectUsers(c *gin.Context) {
+	var u dto.QueryDetail
+	if err := c.ShouldBind(&u); err != nil {
+		ginutil.JSONError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	d := dao.NewProjectDao()
+	get, err := d.ProjectUsers(u.ProjectId)
+	if err != nil {
+		ginutil.JSONError(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	ginutil.JSONOk(c, get)
 }

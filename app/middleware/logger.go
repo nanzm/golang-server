@@ -37,15 +37,15 @@ func GinZap(logger *zap.Logger, utc bool) gin.HandlerFunc {
 		} else {
 			var pre string
 			if c.Writer.Status() <= 500 {
-				pre = color.HiGreenString("%v %v %v ", c.Writer.Status(), c.Request.Method, path)
+				pre = color.HiGreenString("%v", c.Writer.Status())
 			} else {
-				pre = color.HiRedString("%v %v %v ", c.Writer.Status(), c.Request.Method, path)
+				pre = color.HiRedString("%v", c.Writer.Status())
 			}
 
 			logger.Info(pre,
 				//zap.Int("status", c.Writer.Status()),
-				//zap.String("method", c.Request.Method),
-				//zap.String("path", path),
+				zap.String("method", c.Request.Method),
+				zap.String("path", path),
 				zap.String("query", query),
 				zap.String("ip", c.ClientIP()),
 				//zap.String("user-agent", c.Request.UserAgent()),

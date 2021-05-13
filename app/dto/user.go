@@ -52,16 +52,10 @@ type UserLoginVo struct {
 }
 
 type UpdateDefaultSettingReq struct {
-	OrganizationId uint `json:"organization_id"  binding:"required"`
 	ProjectId      uint `json:"project_id"  binding:"required"`
 }
 
 type UserSettingVo struct {
 	model.UserSetting
 	Project *model.Project `gorm:"foreignKey:project_id;" json:"curProject"`
-}
-
-type UserSettingApiVO struct {
-	*UserSettingVo
-	UserProjects []*model.Project `json:"userOrgProjects"`
 }

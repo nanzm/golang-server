@@ -44,9 +44,9 @@ func (u *UserResource) Register(router *gin.RouterGroup) {
 	router.POST("/user/status", middleware.JWTAuthMiddleware(), u.Status)
 	router.GET("/user/list", middleware.JWTAuthMiddleware(), u.List)
 
-	router.GET("/user/setting", middleware.JWTAuthMiddleware(), u.DefaultSetting)
-	router.POST("/user/setting/update", middleware.JWTAuthMiddleware(), u.UpdateDefaultSetting)
-
+	router.GET("/user/projects", middleware.JWTAuthMiddleware(), u.UseProjects)
+	router.GET("/user/setting", middleware.JWTAuthMiddleware(), u.Setting)
+	router.POST("/user/setting/update", middleware.JWTAuthMiddleware(), u.UpdateSetting)
 }
 
 func (u *UserResource) SingUp(c *gin.Context) {
@@ -383,7 +383,22 @@ func (u *UserResource) List(c *gin.Context) {
 	ginutil.JSONList(c, users, int(total))
 }
 
-func (u *UserResource) DefaultSetting(c *gin.Context) {
+func (u *UserResource) UseProjects(c *gin.Context) {
+	uid, exists := c.Get("uid")
+	if !exists {
+		ginutil.JSONFail(c, -1, "请重新登录")
+		return
+	}
+
+	userDao := dao.NewUserDao()
+	userInfo, err := userDao.UserProjects(uid.(uint))
+	if err != nil {
+		ginutil.JSONServerError(c, err)
+	}
+	ginutil.JSONOk(c, userInfo)
+}
+
+func (u *UserResource) Setting(c *gin.Context) {
 	uid, _ := c.Get("uid")
 
 	settingDao := dao.NewUserSettingDao()
@@ -392,34 +407,26 @@ func (u *UserResource) DefaultSetting(c *gin.Context) {
 		ginutil.JSONServerError(c, err)
 		return
 	}
-
-	result := dto.UserSettingApiVO{
-		UserSettingVo:     vo,
-		UserProjects:   nil,
-	}
-
-
-	if result.ID == 0 {
+	if vo.ID == 0 {
 		ginutil.JSONOk(c, nil)
 		return
 	}
-	ginutil.JSONOk(c, result)
+	ginutil.JSONOk(c, vo)
 }
 
-func (u *UserResource) UpdateDefaultSetting(c *gin.Context) {
+func (u *UserResource) UpdateSetting(c *gin.Context) {
 	var r dto.UpdateDefaultSettingReq
 	if err := c.ShouldBind(&r); err != nil {
 		errorTrans(c, err)
 		return
 	}
 
-	//get, _ := c.Get("uid")
-
-	//settingDao := dao.NewUserSettingDao()
-	//err := settingDao.UpdateOrCreate(get.(uint), r.ProjectId, r.OrganizationId)
-	//if err != nil {
-	//	ginutil.JSONError(c, http.StatusBadRequest, err)
-	//	return
-	//}
+	get, _ := c.Get("uid")
+	settingDao := dao.NewUserSettingDao()
+	err := settingDao.UpdateOrCreate(get.(uint), r.ProjectId)
+	if err != nil {
+		ginutil.JSONError(c, http.StatusBadRequest, err)
+		return
+	}
 	ginutil.JSONOk(c, nil)
 }

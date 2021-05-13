@@ -85,3 +85,12 @@ func TestUserDao_GetByName(t *testing.T) {
 	}
 	utils.PrettyPrint(user)
 }
+
+func TestUserDao_UserProjects1(t *testing.T) {
+	dao := NewUserDao()
+	user, err := dao.UserProjects(1)
+	if err != nil {
+		panic(err)
+	}
+	utils.PrettyPrint(user)
+}

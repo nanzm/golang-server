@@ -18,13 +18,19 @@ func NewProjectDao() *ProjectDao {
 }
 
 func (d *ProjectDao) Create(project *model.Project, user *model.User) (result *model.Project, error error) {
+	// 创建
 	err := d.db.Model(&model.Project{}).Create(project).Error
 	if err != nil {
 		return nil, err
 	}
 
-	// 管理
-	err = d.db.Model(&project).Association("Users").Append(&user)
+	// 关联用户
+	var createUser model.User
+	err = d.db.Model(&model.User{}).Where("id = ?", user.ID).Find(&createUser).Error
+	if err != nil {
+		return nil, err
+	}
+	err = d.db.Model(&project).Association("Users").Append(&createUser)
 	if err != nil {
 		return nil, err
 	}
@@ -89,6 +95,11 @@ func (d *ProjectDao) List(cur, size int) (
 	return list, n, s, t, nil
 }
 
-func (d *ProjectDao) UserProjectsList(uid uint) (projects []*model.Project, error error) {
-	return nil, nil
+func (d *ProjectDao) ProjectUsers(projectId uint) (projects []*model.Project, error error) {
+	list := make([]*model.Project, 0)
+	error = d.db.Where("id=?", projectId).Preload("Users").Find(&list).Error
+	if error != nil {
+		return nil, error
+	}
+	return list, nil
 }

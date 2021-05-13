@@ -98,10 +98,8 @@ func (d *UserDao) List(cur, size int) (
 }
 
 func (d *UserDao) UserProjects(userId uint) (result *model.User, error error) {
-	user := model.User{
-		ID: userId,
-	}
-	err := d.db.Preload("Projects").Find(&user).Error
+	user := model.User{}
+	err := d.db.Model(&model.User{}).Where("id = ?", userId).Preload("Projects").Find(&user).Error
 	if err != nil {
 		return nil, err
 	}
