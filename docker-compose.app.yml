@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  # sourcemap
+  sourcemap:
+    image: registry.cn-hangzhou.aliyuncs.com/nancode/dora-sourcemap:latest
+    ports:
+      - "6667:6667"
+    volumes:
+      - ./data/sourcemap:/usr/src/dora-sourcemap/uploads
+
+  # server
+  server:
+    image: registry.cn-hangzhou.aliyuncs.com/nancode/dora-server:latest
+    ports:
+      - "8222:8222"
+    volumes:
+      - ./data:/app/tmp
+      - ./config.yml:/app/config.yml
+    depends_on:
+      - sourcemap
+

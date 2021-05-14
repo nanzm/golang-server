@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3"
 
 services:
   # 数据库
@@ -22,14 +22,6 @@ services:
       - "6379:6379"
     volumes:
       - redata:/data
-
-  # sourcemap
-  sourcemap:
-    image: registry.cn-hangzhou.aliyuncs.com/nancode/dora-sourcemap:latest
-    ports:
-      - "6667:6667"
-    volumes:
-      - sourcemapdata:/usr/src/dora-sourcemap
 
   # 消息队列
   nsqlookupd:
