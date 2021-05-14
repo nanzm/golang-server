@@ -1,7 +1,7 @@
 FROM golang:1.14.15-alpine3.13 AS builder
 WORKDIR /app
 
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 RUN apk add --no-cache tzdata
 RUN apk add --no-cache git
 ENV TZ Asia/Shanghai
