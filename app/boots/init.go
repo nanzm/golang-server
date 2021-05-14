@@ -2,6 +2,7 @@ package boots
 
 import (
 	"dora/app/constant"
+	"dora/app/dao"
 	"dora/app/datasource"
 	"dora/app/model"
 	"dora/app/service"
@@ -65,7 +66,8 @@ func createUser() {
 	}
 
 	if user.ID == 0 {
-		admin := model.User{NickName: "demo_auto_generate", Email: "demo@dora.com", Password: "123", RoleId: 1}
+		// 创建默认用户
+		admin := model.User{NickName: "live demo", Email: "demo@dora.com", Password: "123", RoleId: 1}
 		logger.Println("-------------------------------------")
 		logger.Printf("初始化用户：%v 密码：%v", admin.Email, admin.Password)
 		logger.Println("-------------------------------------")
@@ -73,6 +75,29 @@ func createUser() {
 		if err != nil {
 			panic(err)
 		}
+
+		// 创建项目
+		project := dao.NewProjectDao()
+		pro := model.Project{
+			AppId:             "44992867-5a85-4804-849a-d525be1fa77c",
+			Name:              "demo",
+			Alias:             "live demo",
+			Type:              "browser",
+			GitRepositoryUrl:  "",
+			GitRepositoryName: "",
+		}
+		demoProject, err := project.Create(&pro, admin.ID)
+		if err != nil {
+			panic(err)
+		}
+
+		// 默认设置
+		setting := dao.NewUserSettingDao()
+		err = setting.UpdateOrCreate(admin.ID, demoProject.ID)
+		if err != nil {
+			panic(err)
+		}
+
 		return
 	}
 }

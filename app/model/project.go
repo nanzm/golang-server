@@ -18,7 +18,7 @@ type Project struct {
 	GitRepositoryUrl  string `gorm:"" json:"git_repository_url"`
 	GitRepositoryName string `gorm:"" json:"git_repository_name"`
 
-	Users []*User `gorm:"many2many:user_projects;" json:"users"`
+	Users []*User `gorm:"many2many:user_projects;" json:"users,omitempty"`
 }
 
 func (Project) TableName() string {

@@ -98,7 +98,7 @@ func (pro *ProjectResource) Create(c *gin.Context) {
 	}
 
 	// 创建
-	result, err := d.Create(&project, &model.User{ID: uid.(uint)})
+	result, err := d.Create(&project, uid.(uint))
 	if err != nil {
 		ginutil.JSONError(c, http.StatusInternalServerError, err)
 		return

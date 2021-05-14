@@ -17,7 +17,7 @@ type User struct {
 	Password string     `gorm:"comment:密码" json:"-"`
 	Status   uint       `gorm:"comment:状态" json:"status"`
 	RoleId   uint       `gorm:"comment:角色" json:"role_id"`
-	Projects []*Project `gorm:"many2many:user_projects;comment:项目" json:"projects"`
+	Projects []*Project `gorm:"many2many:user_projects;comment:项目" json:"projects,omitempty"`
 }
 
 func (User) TableName() string {

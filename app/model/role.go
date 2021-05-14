@@ -15,7 +15,7 @@ type Role struct {
 	Name    string `gorm:"comment:角色名" json:"name"`
 	Remarks string `gorm:"comment:备注" json:"remarks"`
 
-	Users []*User `gorm:"foreignKey:RoleId;references:ID" json:"users"`
+	Users []*User `gorm:"foreignKey:RoleId;references:ID" json:"users,omitempty"`
 }
 
 func (Role) TableName() string {

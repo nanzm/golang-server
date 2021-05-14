@@ -17,7 +17,7 @@ func NewProjectDao() *ProjectDao {
 	}
 }
 
-func (d *ProjectDao) Create(project *model.Project, user *model.User) (result *model.Project, error error) {
+func (d *ProjectDao) Create(project *model.Project, uid uint) (result *model.Project, error error) {
 	// 创建
 	err := d.db.Model(&model.Project{}).Create(project).Error
 	if err != nil {
@@ -26,7 +26,7 @@ func (d *ProjectDao) Create(project *model.Project, user *model.User) (result *m
 
 	// 关联用户
 	var createUser model.User
-	err = d.db.Model(&model.User{}).Where("id = ?", user.ID).Find(&createUser).Error
+	err = d.db.Model(&model.User{}).Where("id = ?", uid).Find(&createUser).Error
 	if err != nil {
 		return nil, err
 	}
