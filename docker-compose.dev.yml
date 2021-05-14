@@ -25,11 +25,11 @@ services:
 
   # sourcemap
   sourcemap:
-    image: registry.cn-hangzhou.aliyuncs.com/nancode/dora-parser:latest
+    image: registry.cn-hangzhou.aliyuncs.com/nancode/dora-sourcemap:latest
     ports:
       - "6667:6667"
     volumes:
-      - sourcemapdata:/usr/src/dora-parser
+      - sourcemapdata:/usr/src/dora-sourcemap
 
   # 消息队列
   nsqlookupd:
