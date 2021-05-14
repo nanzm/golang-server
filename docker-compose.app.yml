@@ -20,3 +20,10 @@ services:
     depends_on:
       - sourcemap
 
+  # server
+  webapp:
+    image: registry.cn-hangzhou.aliyuncs.com/nancode/dora-webapp:latest
+    ports:
+      - "8221:80"
+    depends_on:
+      - server
