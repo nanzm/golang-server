@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  # transit 根据需要扩展 可部署多个
+  transit:
+    image: registry.cn-hangzhou.aliyuncs.com/nancode/dora-transit:latest
+    ports:
+      - "8222:8222"
+    volumes:
+      - ./data:/internal/tmp
+      - ./config.yml:/internal/config.yml
+
+  # manage
+  manage:
+    image: registry.cn-hangzhou.aliyuncs.com/nancode/dora-manage:latest
+    ports:
+      - "8222:8222"
+    volumes:
+      - ./data:/internal/tmp
+      - ./config.yml:/internal/config.yml
+
+  # server
+  webapp:
+    image: registry.cn-hangzhou.aliyuncs.com/nancode/dora-webapp:latest
+    ports:
+      - "8221:80"
+    depends_on:
+      - manage

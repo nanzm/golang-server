@@ -23,16 +23,16 @@ cd /demo
 touch config.yml
 
 docker run --name dora -d -p 8221:8222 \
-      -v /demo/config.yml:/app/config.yml \ 
+      -v /demo/config.yml:/internal/config.yml \ 
       -it nancode/dora:latest
 
 docker run --name dora -d -p 8221:8222 \
-    -v /root/dora/tmp:/app/tmp \
-    -v /root/dora/config.yml:/app/config.yml \
+    -v /root/dora/tmp:/internal/tmp \
+    -v /root/dora/config.yml:/internal/config.yml \
     -it nancode/dora:latest
 
-docker run --name dora -d  --network host  -v /root/dora/tmp:/app/tmp \
-     -v /root/dora/config.yml:/app/config.yml \
+docker run --name dora -d  --network host  -v /root/dora/tmp:/internal/tmp \
+     -v /root/dora/config.yml:/internal/config.yml \
      -it registry.cn-hangzhou.aliyuncs.com/nancode/dora:latest
 
 # 更新正在运行的 container
