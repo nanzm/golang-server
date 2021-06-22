@@ -5,7 +5,6 @@ import (
 	"crypto/cipher"
 	"crypto/md5"
 	cryptoRand "crypto/rand"
-	"dora/pkg/logger"
 	"encoding/base64"
 	"encoding/binary"
 	"errors"
@@ -276,7 +275,6 @@ func SafeJsonMarshal(in interface{}) string {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 	marshal, err := json.Marshal(in)
 	if err != nil {
-		logger.Printf("err in SafeJsonMarshal: %v", err)
 		return ""
 	}
 	return string(marshal)

@@ -17,15 +17,21 @@ nsq:
   channel: ""
 
 aliyun:
+  endpoint: "oss-cn-hangzhou.aliyuncs.com"
   accesskey: ""
   secret: ""
-  endpoint: "oss-cn-hangzhou.aliyuncs.com"
   bucket: ""
 
+elastic:
+  addresses:
+  username:
+  password:
+  index:
+
 slsLog:
-  accesskey: ""
-  secret: ""
   endpoint: "cn-hangzhou.log.aliyuncs.com"
+  accessKey: ""
+  secret: ""
   project: "dora-test"
   logStore: "event-store"
   topic: "browser"
@@ -36,3 +42,6 @@ mail:
   username: ""
   password: ""
 
+dingding:
+  accessToken:
+  secret:

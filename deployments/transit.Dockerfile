@@ -15,8 +15,8 @@ COPY .. .
 RUN ls -la
 RUN env
 
-RUN ["chmod", "+x", "/internal/build.sh"]
-RUN ["sh", "/internal/build.sh"]
+RUN ["chmod", "+x", "/app/build.sh"]
+RUN ["sh", "/app/build.sh"]
 RUN cat config/version.go
 RUN go build -o dora main.go
 
@@ -25,8 +25,8 @@ FROM alpine:3.10 AS final
 WORKDIR /app
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /internal/dora /internal/
+COPY --from=builder /app/dora /app/
 COPY --from=builder /zoneinfo.zip /zoneinfo.zip
 ENV ZONEINFO /zoneinfo.zip
-ENTRYPOINT ["/internal/dora"]
+ENTRYPOINT ["/app/dora"]
 CMD ["transit"]

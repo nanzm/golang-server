@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"dora/pkg/logger"
+	"dora/pkg/utils/logger"
 	"testing"
 )
 
@@ -13,5 +13,5 @@ func TestGetStackSourceMap(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	logger.Printf("%s \n", sourceMap)
+	logx.Printf("%s \n", sourceMap)
 }

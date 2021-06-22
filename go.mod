@@ -1,6 +1,6 @@
 module dora
 
-go 1.13
+go 1.16
 
 require (
 	github.com/aliyun/aliyun-log-go-sdk v0.1.17

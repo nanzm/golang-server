@@ -7,8 +7,8 @@ services:
     ports:
       - "8222:8222"
     volumes:
-      - ./data:/internal/tmp
-      - ./config.yml:/internal/config.yml
+      - ./data:/app/tmp
+      - ./config.yml:/app/config.yml
 
   # manage
   manage:
@@ -16,8 +16,8 @@ services:
     ports:
       - "8222:8222"
     volumes:
-      - ./data:/internal/tmp
-      - ./config.yml:/internal/config.yml
+      - ./data:/app/tmp
+      - ./config.yml:/app/config.yml
 
   # server
   webapp:

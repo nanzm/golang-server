@@ -1,51 +1,134 @@
 package config
 
-import (
-	"dora/pkg/logger"
-	"sync"
+import "github.com/spf13/viper"
 
-	"github.com/spf13/viper"
-)
-
-type Conf struct {
-	Debug  bool
+type AppConfig struct {
 	Secret string
-
-	Gorm    GormConfig
-	Redis   RedisConfig
-	Nsq     NsqConfig
-	Oss     OssConfig
-	SlsLog  SlsLog
-	Elastic Elastic
-	Mail    MailConfig
 }
 
-var conf Conf
-
-func GetConf() *Conf {
-	if conf.Secret == "" {
-		logger.Panic("please run \"ParseConf\" func to load config.yml!")
+func GetApp() AppConfig {
+	return AppConfig{
+		Secret: viper.GetString("secret"),
 	}
-	return &conf
 }
 
-var onceParseConf sync.Once
+type GormConfig struct {
+	Driver string
+	DSN    string
+}
 
-//  e.g., ParseConf("./config.yml")
-func ParseConf(path string) *Conf {
-	onceParseConf.Do(func() {
-		viper.SetConfigFile(path)
+func GetGorm() GormConfig {
+	return GormConfig{
+		Driver: viper.GetString("gorm.driver"),
+		DSN:    viper.GetString("gorm.dsn"),
+	}
+}
 
-		viper.AutomaticEnv()
-		if err := viper.ReadInConfig(); err != nil {
-			logger.Errorf("err: %v", err)
-		}
-		logger.Infof("config file read success: %v", viper.ConfigFileUsed())
+type RedisConfig struct {
+	Addr     string
+	Password string
+	DB       int
+}
 
-		if err := viper.Unmarshal(&conf); err != nil {
-			logger.Panicf("unmarshal yaml config failed: %v", err)
-		}
-	})
+func GetRedis() RedisConfig {
+	return RedisConfig{
+		Addr:     viper.GetString("redis.addr"),
+		Password: viper.GetString("redis.password"),
+		DB:       viper.GetInt("redis.db"),
+	}
+}
 
-	return &conf
+type NsqConfig struct {
+	Address string
+	Topic   string
+	Channel string
+}
+
+func GetNsq() NsqConfig {
+	return NsqConfig{
+		Address: viper.GetString("nsq.address"),
+		Topic:   viper.GetString("nsq.topic"),
+		Channel: viper.GetString("nsq.channel"),
+	}
+}
+
+type SlsLog struct {
+	Endpoint  string
+	AccessKey string
+	Secret    string
+	Project   string
+	LogStore  string
+	Topic     string
+	Source    string
+}
+
+func GetSlsLog() SlsLog {
+	return SlsLog{
+		Endpoint:  viper.GetString("slsLog.endpoint"),
+		AccessKey: viper.GetString("slsLog.accessKey"),
+		Secret:    viper.GetString("slsLog.secret"),
+		Project:   viper.GetString("slsLog.project"),
+		LogStore:  viper.GetString("slsLog.logStore"),
+		Topic:     viper.GetString("slsLog.topic"),
+	}
+}
+
+type OssConfig struct {
+	Endpoint  string
+	Bucket    string
+	AccessKey string
+	Secret    string
+}
+
+func GetOss() OssConfig {
+	return OssConfig{
+		Endpoint:  viper.GetString("aliyun.endpoint"),
+		Bucket:    viper.GetString("aliyun.bucket"),
+		AccessKey: viper.GetString("aliyun.accessKey"),
+		Secret:    viper.GetString("aliyun.secret"),
+	}
+}
+
+type MailConfig struct {
+	Host     string
+	Port     string
+	Username string
+	Password string
+}
+
+func GetMail() MailConfig {
+	return MailConfig{
+		Host:     viper.GetString("mail.host"),
+		Port:     viper.GetString("mail.port"),
+		Username: viper.GetString("mail.username"),
+		Password: viper.GetString("mail.password"),
+	}
+}
+
+type Elastic struct {
+	Addresses []string
+	Username  string
+	Password  string
+	Index     string
+}
+
+func GetElastic() Elastic {
+	return Elastic{
+		Addresses: viper.GetStringSlice("elastic.addresses"),
+		Username:  viper.GetString("elastic.username"),
+		Password:  viper.GetString("elastic.password"),
+		Index:     viper.GetString("elastic.index"),
+	}
+}
+
+type DingDingRobot struct {
+	AccessToken string
+	Secret      string
+}
+
+func GetRobot() DingDingRobot {
+	return DingDingRobot{
+		AccessToken: viper.GetString("dingding.accessToken"),
+		Secret:      viper.GetString("dingding.secret"),
+	}
 }
