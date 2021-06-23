@@ -1,19 +1,21 @@
 package handler
 
 import (
-	"context"
 	"dora/config"
-	"dora/modules/datasource"
+	transitConf "dora/modules/api/transit/config"
+	"dora/modules/datasource/nsq"
 	"dora/modules/model/dto"
+	"dora/pkg/utils"
 	"dora/pkg/utils/ginutil"
 	"dora/pkg/utils/logx"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis/v8"
 	jsoniter "github.com/json-iterator/go"
 	"net/http"
 	"time"
 )
+
+var uptime = time.Now()
 
 type PublicResource struct {
 }
@@ -24,6 +26,10 @@ func NewPublicResource() ginutil.Resource {
 }
 
 func (pub *PublicResource) Register(router *gin.RouterGroup) {
+	router.Any("/", pub.Info)
+	router.HEAD("/ping", pub.Ping)
+	router.GET("/ping", pub.Ping)
+
 	// 上报
 	router.POST("/public/report", pub.TransToNsq)
 	router.POST("/report", pub.TransToNsq)
@@ -33,9 +39,22 @@ func (pub *PublicResource) Register(router *gin.RouterGroup) {
 	router.Any("/http/delay", pub.HTTPDelay)
 	router.Any("/http/error", pub.HTTPError)
 
-	router.GET("/test", pub.Test)
-	router.GET("/mail", pub.SendMail)
 	router.GET("/dingding", pub.DingDing)
+}
+
+func (pub *PublicResource) Info(c *gin.Context) {
+	c.JSON(http.StatusOK, map[string]string{
+		"name":    "dora",
+		"build":   config.Build,
+		"compile": config.Compile,
+		"version": config.Version,
+		"uptime":  utils.TimeFromNow(uptime),
+		"now":     utils.CurrentTime(),
+	})
+}
+
+func (pub *PublicResource) Ping(c *gin.Context) {
+	c.String(http.StatusOK, "pong")
 }
 
 func (pub *PublicResource) TransToNsq(c *gin.Context) {
@@ -77,8 +96,9 @@ func (pub *PublicResource) TransToNsq(c *gin.Context) {
 	}
 
 	// 给mq
-	nsgConfig := config.GetNsq()
-	err = datasource.NsqProducerInstance().Publish(nsgConfig.Topic, marshal)
+
+	nsgConfig := transitConf.GetNsq()
+	err = nsq.ProducerInstance().Publish(nsgConfig.Topic, marshal)
 	if err != nil {
 		logx.Error(err)
 		c.String(http.StatusInternalServerError, err.Error())
@@ -116,31 +136,19 @@ func (pub *PublicResource) HTTPError(c *gin.Context) {
 	c.String(http.StatusInternalServerError, http.StatusText(500))
 }
 
-func (pub *PublicResource) Test(c *gin.Context) {
-	ctx := context.Background()
-	val, err := datasource.RedisInstance().Get(ctx, "ddd").Result()
-	if err != nil {
-		if err == redis.Nil {
-			logx.Println("key does not exists")
-			return
-		}
-		panic(err)
-	}
-	logx.Println("redis ping: ", val)
-}
-
-func (pub *PublicResource) SendMail(c *gin.Context) {
-	mailCof := config.GetMail()
-	m := datasource.BuilderEmail("msg@nancode.cn", fmt.Sprintf("Dora System Robot <%s>", mailCof.Username),
-		"test", "hello world")
-	err := datasource.GetMailPool().Send(m, 3*time.Second)
-
-	if err != nil {
-		ginutil.JSONError(c, http.StatusInternalServerError, err)
-		return
-	}
-	ginutil.JSONOk(c, nil)
-}
+//
+//func (pub *PublicResource) SendMail(c *gin.Context) {
+//	mailCof := config.GetMail()
+//	m := mail.BuilderEmail("msg@nancode.cn", fmt.Sprintf("Dora System Robot <%s>", mailCof.Username),
+//		"test", "hello world")
+//	err := mail.GetMailPool().Send(m, 3*time.Second)
+//
+//	if err != nil {
+//		ginutil.JSONError(c, http.StatusInternalServerError, err)
+//		return
+//	}
+//	ginutil.JSONOk(c, nil)
+//}
 
 func (pub *PublicResource) DingDing(c *gin.Context) {
 	//msg := c.DefaultQuery("msg", "测试 [鼓掌]")

@@ -3,7 +3,8 @@ package service
 import (
 	"context"
 	"dora/config"
-	"dora/modules/datasource"
+	mail2 "dora/modules/datasource/mail"
+	redis2 "dora/modules/datasource/redis"
 	"dora/pkg/utils"
 	"fmt"
 	"time"
@@ -30,7 +31,7 @@ func (u *userService) SendEmailCaptcha(captchaType string, toEmail string) error
 
 	key := fmt.Sprintf("%s_%s", captchaType, toEmail)
 
-	result, err := datasource.RedisInstance().Get(ctx, key).Result()
+	result, err := redis2.RedisInstance().Get(ctx, key).Result()
 	if err != nil && err != redis.Nil {
 		return errors.Wrapf(err, "redisutil Get 失败 %s", key)
 	}
@@ -43,16 +44,16 @@ func (u *userService) SendEmailCaptcha(captchaType string, toEmail string) error
 		return errors.Wrap(err, "验证码 EncodeToString 报错")
 	}
 
-	err = datasource.RedisInstance().Set(ctx, key, code, 60*time.Second).Err()
+	err = redis2.RedisInstance().Set(ctx, key, code, 60*time.Second).Err()
 	if err != nil {
 		return errors.Wrapf(err, "redisutil Set 失败 %s", key)
 	}
 
 	// 发送邮箱验证码
 	mail := config.GetMail()
-	m := datasource.BuilderEmail(toEmail, fmt.Sprintf("Dora Robot <%s>", mail.Username),
+	m := mail2.BuilderEmail(toEmail, fmt.Sprintf("Dora Robot <%s>", mail.Username),
 		"Dora 登录验证码", fmt.Sprintf("您的登录验证码是：<h1>%s</h1>", code))
-	err = datasource.GetMailPool().Send(m, 3*time.Second)
+	err = mail2.GetMailPool().Send(m, 3*time.Second)
 
 	if err != nil {
 		return errors.Wrap(err, "发送失败")
@@ -64,7 +65,7 @@ func (u *userService) VerifyCaptcha(captchaType string, toEmail string, Captcha 
 	ctx := context.Background()
 
 	key := fmt.Sprintf("%s_%s", captchaType, toEmail)
-	result, err := datasource.RedisInstance().Get(ctx, key).Result()
+	result, err := redis2.RedisInstance().Get(ctx, key).Result()
 	if err != nil && err != redis.Nil {
 		return false, errors.Wrapf(err, "redisutil Get 失败 %s", key)
 	}

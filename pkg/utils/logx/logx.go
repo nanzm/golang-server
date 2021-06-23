@@ -10,9 +10,9 @@ import (
 var logger *zap.Logger
 var simpleLogger *zap.SugaredLogger
 
-func init() {
+func Init(path string) {
 	hook := lumberjack.Logger{
-		Filename:   "./dora.log", // 日志文件路径
+		Filename:   path, // 日志文件路径
 		MaxSize:    100,          // 每个日志文件保存的最大尺寸 单位：M
 		MaxBackups: 10,           // 日志文件最多保存多少个备份
 		MaxAge:     14,           // 文件最多保存多少天

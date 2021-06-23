@@ -3,10 +3,11 @@ package service
 import (
 	"context"
 	"dora/config/constant"
+	"dora/modules/datasource/gorm"
+	"dora/modules/datasource/redis"
 	"dora/modules/model/entity"
 	"dora/pkg/utils/logx"
 
-	"dora/modules/datasource"
 	"dora/modules/logstore"
 	"dora/modules/model/dao"
 	"dora/pkg/utils"
@@ -34,7 +35,7 @@ func NewIssuesService() IssuesService {
 // 定时检查 创建
 func (i *issues) CornCreateCheck() {
 	ctx := context.Background()
-	keys, err := datasource.RedisInstance().SMembers(ctx, constant.Md5ListWaitCreate).Result()
+	keys, err := redis.RedisInstance().SMembers(ctx, constant.Md5ListWaitCreate).Result()
 	if err != nil {
 		logx.Errorf("CornCreateCheck redis get err: v%", err)
 		return
@@ -63,7 +64,7 @@ func (i *issues) CornCreateCheck() {
 // 定时检查 更新
 func (i *issues) CornUpdateCheck() {
 	ctx := context.Background()
-	keys, err := datasource.RedisInstance().SMembers(ctx, constant.Md5ListWaitUpdate).Result()
+	keys, err := redis.RedisInstance().SMembers(ctx, constant.Md5ListWaitUpdate).Result()
 	if err != nil {
 		logx.Error(err)
 		return
@@ -102,11 +103,11 @@ func (i *issues) CreateIssues(slsLog map[string]string) {
 	logx.Info("创建成功 Issues :", slsLog["agg_md5"])
 
 	// 添加 md5 到已有列表
-	datasource.RedisSetAdd(constant.Md5ListHas, slsLog["agg_md5"])
+	redis.RedisSetAdd(constant.Md5ListHas, slsLog["agg_md5"])
 
 	// 删除这个 md5
 	ctx := context.Background()
-	_, err = datasource.RedisInstance().SRem(ctx, constant.Md5ListWaitCreate, slsLog["agg_md5"]).Result()
+	_, err = redis.RedisInstance().SRem(ctx, constant.Md5ListWaitCreate, slsLog["agg_md5"]).Result()
 	if err != nil {
 		logx.Error(err)
 		return
@@ -127,7 +128,7 @@ func (i *issues) UpdateIssues(md5 string) {
 
 	// 清空
 	ctx := context.Background()
-	_, err = datasource.RedisInstance().Del(ctx, constant.Md5ListWaitUpdate).Result()
+	_, err = redis.RedisInstance().Del(ctx, constant.Md5ListWaitUpdate).Result()
 	if err != nil {
 		logx.Error(err)
 		return
@@ -146,7 +147,7 @@ func (i *issues) QueryLogsGetCount(f, t int64, md5 string) (total, uCount int) {
 
 func (i *issues) GetAllMd5() []string {
 	var md5s []string
-	err := datasource.GormInstance().Model(&entity.Issue{}).Select("md5").Find(&md5s).Error
+	err := gorm.GormInstance().Model(&entity.Issue{}).Select("md5").Find(&md5s).Error
 	if err != nil {
 		return nil
 	}

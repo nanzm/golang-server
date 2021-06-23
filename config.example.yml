@@ -1,39 +1,45 @@
-secret: "mNmHeNpnFDjQGc43j1XhY38t0HeYNKPm"
+apps:
+  manage:
+    secret: ""
+    log:
+      file: "./manage.log"
+    gorm:
+      driver: "mysql"
+      dsn: "demo:demo@tcp(127.0.0.1:3306)/dora?charset=utf8mb4&parseTime=True&loc=Local"
+    redis:
+      addr: "127.0.0.1:6379"
+      password: "123456"
+      db: 0
+    mail:
+      host: "smtp.qq.com"
+      port: "587"
+      username: ""
+      password: ""
+    dingding:
+      accessToken:
+      secret:
 
-gorm:
-  driver: "mysql"
-  dsn: "demo:demo@tcp(127.0.0.1:3306)/dora?charset=utf8mb4&parseTime=True&loc=Local"
+  transit:
+    secret: ""
+    log:
+      file: "./transit.log"
+    nsq:
+      address: "127.0.0.1:4150"
+      topic: "event"
+      channel: "dev-ch"
 
-redis:
-  addr: "127.0.0.1:6379"
-  password: "123456"
-  db: 0
-
-nsq:
-  address: "127.0.0.1:4150"
-  topic: "event"
-  channel: "dev-ch"
-
-slsLog:
-  endpoint: "cn-hangzhou.log.aliyuncs.com"
-  accessKey: ""
-  secret: ""
-  project: "dora-test"
-  logStore: "event-store"
-  topic: "browser"
-
-elastic:
-  addresses:
-  username:
-  password:
-  index:
-
-mail:
-  host: "smtp.qq.com"
-  port: "587"
-  username: ""
-  password: ""
-
-dingding:
-  accessToken:
-  secret:
+logStore:
+  enable: "slsLog"
+  elastic:
+    addresses: ""
+    username: ""
+    password: ""
+    index: ""
+  slsLog:
+    accesskey: ""
+    secret: ""
+    endpoint: ""
+    project: ""
+    logStore: ""
+    topic: ""
+    source: ""

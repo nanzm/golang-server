@@ -2,7 +2,7 @@ package mqConsumer
 
 import (
 	"dora/config/constant"
-	"dora/modules/datasource"
+	"dora/modules/datasource/redis"
 	"dora/modules/logstore"
 	"dora/pkg/utils"
 	"dora/pkg/utils/logx"
@@ -32,12 +32,12 @@ func msgHandle(message *nsq.Message) error {
 	// 判断是否创建 issues
 	if md5Content != "" {
 		event["agg_md5"] = md5Content
-		if datasource.RedisSetExist(constant.Md5ListHas, md5Content) {
+		if redis.RedisSetExist(constant.Md5ListHas, md5Content) {
 			// 存在 更新
-			datasource.RedisSetAdd(constant.Md5ListWaitUpdate, md5Content)
+			redis.RedisSetAdd(constant.Md5ListWaitUpdate, md5Content)
 		} else {
 			// 不存在 创建
-			datasource.RedisSetAdd(constant.Md5ListWaitCreate, md5Content)
+			redis.RedisSetAdd(constant.Md5ListWaitCreate, md5Content)
 		}
 	}
 

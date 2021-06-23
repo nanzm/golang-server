@@ -2,7 +2,8 @@ package initialize
 
 import (
 	"dora/config/constant"
-	"dora/modules/datasource"
+	"dora/modules/datasource/gorm"
+	"dora/modules/datasource/redis"
 	"dora/modules/model/dao"
 	"dora/modules/model/entity"
 	"dora/modules/service"
@@ -18,7 +19,7 @@ func Run() {
 
 // 表同步
 func dbMigrate() {
-	err := datasource.GormInstance().AutoMigrate(
+	err := gorm.GormInstance().AutoMigrate(
 		&entity.SysLog{},
 
 		&entity.Project{},
@@ -41,7 +42,7 @@ func dbMigrate() {
 // 创建 roles
 func createRoles() {
 	var roles = make([]entity.Role, 0)
-	err := datasource.GormInstance().Limit(10).Find(&roles).Error
+	err := gorm.GormInstance().Limit(10).Find(&roles).Error
 	if err != nil {
 		panic(err)
 	}
@@ -64,7 +65,7 @@ func createRoles() {
 			Remarks: "",
 		}}
 
-	err = datasource.GormInstance().Model(&roles).Create(&data).Error
+	err = gorm.GormInstance().Model(&roles).Create(&data).Error
 	if err != nil {
 		panic(err)
 	}
@@ -74,7 +75,7 @@ func createRoles() {
 // 创建 admin
 func createUser() {
 	var user entity.User
-	err := datasource.GormInstance().Where("email = ?", "demo@dora.com").Find(&user).Error
+	err := gorm.GormInstance().Where("email = ?", "demo@dora.com").Find(&user).Error
 	if err != nil {
 		panic(err)
 	}
@@ -85,7 +86,7 @@ func createUser() {
 		logx.Println("-------------------------------------")
 		logx.Printf("初始化用户：%v 密码：%v", admin.Email, admin.Password)
 		logx.Println("-------------------------------------")
-		err = datasource.GormInstance().Create(&admin).Error
+		err = gorm.GormInstance().Create(&admin).Error
 		if err != nil {
 			panic(err)
 		}
@@ -121,7 +122,7 @@ func putMd5ListToCache() {
 	issues := service.NewIssuesService()
 	md5s := issues.GetAllMd5()
 	if len(md5s) > 0 {
-		datasource.RedisSetAdd(constant.Md5ListHas, md5s)
+		redis.RedisSetAdd(constant.Md5ListHas, md5s)
 	} else {
 		logx.Infof("none issues md5 values")
 	}

@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"dora/modules/datasource"
+	gorm2 "dora/modules/datasource/gorm"
 	"dora/modules/model/entity"
 	"gorm.io/gorm"
 )
@@ -12,7 +12,7 @@ type AlarmRuleDao struct {
 
 func NewAlarmRuleDao() *AlarmRuleDao {
 	return &AlarmRuleDao{
-		db: datasource.GormInstance(),
+		db: gorm2.GormInstance(),
 	}
 }
 

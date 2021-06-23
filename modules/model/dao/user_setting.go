@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"dora/modules/datasource"
+	gorm2 "dora/modules/datasource/gorm"
 	"dora/modules/model/dto"
 	"dora/modules/model/entity"
 	"gorm.io/gorm"
@@ -13,7 +13,7 @@ type UserSettingDao struct {
 
 func NewUserSettingDao() *UserSettingDao {
 	return &UserSettingDao{
-		db: datasource.GormInstance(),
+		db: gorm2.GormInstance(),
 	}
 }
 

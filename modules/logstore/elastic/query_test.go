@@ -1,8 +1,8 @@
 package elasticComponent
 
 import (
-	"dora/modules/datasource"
 	"dora/config"
+	"dora/modules/datasource/elastic"
 	"dora/pkg/utils"
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
@@ -30,7 +30,7 @@ func Test_elkPutErrorData(t *testing.T) {
 }
 
 func Test_elkSearch(t *testing.T) {
-	es := datasource.GetElasticClient()
+	es := elastic.GetElasticClient()
 
 	res, err := es.Search(
 		es.Search.WithIndex("dora"),

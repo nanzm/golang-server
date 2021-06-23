@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"dora/modules/datasource"
+	gorm2 "dora/modules/datasource/gorm"
 	"dora/modules/middleware"
 	"dora/modules/model/dao"
 	"dora/modules/model/dto"
@@ -125,7 +125,7 @@ func (u *UserResource) EmailCodeLogin(c *gin.Context) {
 
 	var user entity.User
 
-	err := datasource.GormInstance().First(&user, entity.User{Email: p.Email}).Error
+	err := gorm2.GormInstance().First(&user, entity.User{Email: p.Email}).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		ginutil.JSONFail(c, -1, "该账号未注册")
 		return
@@ -169,7 +169,7 @@ func (u *UserResource) Captcha(c *gin.Context) {
 
 	var user entity.User
 
-	db := datasource.GormInstance().First(&user, entity.User{
+	db := gorm2.GormInstance().First(&user, entity.User{
 		Email: p.Email,
 	})
 
@@ -238,7 +238,7 @@ func (u *UserResource) UpdateSession(c *gin.Context) {
 
 	// 去数据库查最新的
 	var user entity.User
-	first := datasource.GormInstance().First(&user, entity.User{
+	first := gorm2.GormInstance().First(&user, entity.User{
 		ID: get.(entity.User).ID,
 	})
 	if errors.Is(first.Error, gorm.ErrRecordNotFound) {
@@ -273,7 +273,7 @@ func (u *UserResource) UpdateInfo(c *gin.Context) {
 	}
 
 	var user entity.User
-	first := datasource.GormInstance().First(&user, entity.User{
+	first := gorm2.GormInstance().First(&user, entity.User{
 		ID: p.Id,
 	})
 	if errors.Is(first.Error, gorm.ErrRecordNotFound) {
@@ -282,7 +282,7 @@ func (u *UserResource) UpdateInfo(c *gin.Context) {
 	}
 
 	// 更新
-	err := datasource.GormInstance().Model(&user).Updates(entity.User{
+	err := gorm2.GormInstance().Model(&user).Updates(entity.User{
 		NickName: p.NickName,
 		Email:    p.Email,
 		Password: p.Password,
@@ -319,7 +319,7 @@ func (u *UserResource) Status(c *gin.Context) {
 	}
 
 	var user entity.User
-	first := datasource.GormInstance().First(&user, entity.User{
+	first := gorm2.GormInstance().First(&user, entity.User{
 		ID: p.Id,
 	})
 	if first.Error != nil {
@@ -328,7 +328,7 @@ func (u *UserResource) Status(c *gin.Context) {
 	}
 
 	// 更新 Status
-	err := datasource.GormInstance().Model(&user).Updates(entity.User{
+	err := gorm2.GormInstance().Model(&user).Updates(entity.User{
 		Status: p.Status,
 	}).Error
 
@@ -360,7 +360,7 @@ func (u *UserResource) List(c *gin.Context) {
 		size = p.PageSize
 	}
 
-	db := datasource.GormInstance().Limit(size).Offset((current - 1) * size)
+	db := gorm2.GormInstance().Limit(size).Offset((current - 1) * size)
 	var err error
 	cond := "%" + p.SearchStr + "%"
 	logx.Printf("%v\n", cond)

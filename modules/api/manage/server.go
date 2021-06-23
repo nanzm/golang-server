@@ -2,7 +2,7 @@ package manage
 
 import (
 	"context"
-	"dora/config"
+	"dora/modules/api/manage/config"
 	"dora/modules/api/manage/core"
 	"dora/modules/api/manage/rest"
 	"dora/modules/middleware"
@@ -31,7 +31,7 @@ func Serve() {
 	gin.SetMode(gin.ReleaseMode)
 	app := gin.New()
 	// session
-	store := cookie.NewStore([]byte(config.GetApp().Secret))
+	store := cookie.NewStore([]byte(config.GetSecret().Secret))
 	app.Use(sessions.Sessions("dora", store))
 
 	app.Use(middleware.GinZap(), middleware.Recovery(false))

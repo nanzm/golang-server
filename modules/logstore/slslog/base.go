@@ -1,7 +1,8 @@
 package slslogComponent
 
 import (
-	"dora/modules/datasource"
+	"dora/config"
+	"dora/modules/datasource/slslog"
 	"dora/pkg/utils"
 	sls "github.com/aliyun/aliyun-log-go-sdk"
 	"google.golang.org/protobuf/proto"
@@ -11,17 +12,17 @@ import (
 // sdk 存入阿里云日志服务
 func basePutLogs(mapData map[string]interface{}) error {
 	logs := generateLog(uint32(time.Now().Unix()), mapData)
-	ins := datasource.GetSlsInstance()
-	conf := ins.Conf
-	err := ins.ProducerInstance.SendLog(conf.Project, conf.LogStore, conf.Topic, conf.Source, logs)
+	ins := slslog.GetProducer()
+	conf := config.GetSlsLog()
+	err := ins.SendLog(conf.Project, conf.LogStore, conf.Topic, conf.Source, logs)
 	return err
 }
 
 // sdk 查询日志数据
 func baseQueryLogs(from int64, to int64, queryExp string) (result *sls.GetLogsResponse, err error) {
-	ins := datasource.GetSlsInstance()
-	conf := ins.Conf
-	logs, err := ins.Client.GetLogs(conf.Project, conf.LogStore, conf.Topic, from, to, queryExp, 100, int64(0), true)
+	ins := slslog.GetClient()
+	conf := config.GetSlsLog()
+	logs, err := ins.GetLogs(conf.Project, conf.LogStore, conf.Topic, from, to, queryExp, 100, int64(0), true)
 	if err != nil {
 		return nil, err
 	}

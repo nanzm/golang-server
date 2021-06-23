@@ -2,8 +2,8 @@ package handler
 
 import (
 	"context"
+	dataRedis "dora/modules/datasource/redis"
 
-	"dora/modules/datasource"
 	"dora/modules/logstore"
 	"dora/modules/middleware"
 	"dora/modules/model/dto"
@@ -66,14 +66,14 @@ func (issue *DashboardResource) QueryChartData(c *gin.Context) {
 func (issue *DashboardResource) SwitchLogStore(c *gin.Context) {
 	const StoreSwitch = "logStoreSwitch"
 
-	result, err := datasource.RedisInstance().Get(context.Background(), StoreSwitch).Result()
+	result, err := dataRedis.Instance().Get(context.Background(), StoreSwitch).Result()
 	if err != nil && err != redis.Nil {
 		ginutil.JSONServerError(c, err)
 		return
 	}
 
 	if result == "" {
-		result, err := datasource.RedisInstance().Set(context.Background(), StoreSwitch, time.Now(), time.Hour*24).Result()
+		result, err := dataRedis.Instance().Set(context.Background(), StoreSwitch, time.Now(), time.Hour*24).Result()
 		if err != nil {
 			ginutil.JSONServerError(c, err)
 			return
@@ -82,7 +82,7 @@ func (issue *DashboardResource) SwitchLogStore(c *gin.Context) {
 		return
 
 	} else {
-		result, err := datasource.RedisInstance().Del(context.Background(), StoreSwitch).Result()
+		result, err := dataRedis.Instance().Del(context.Background(), StoreSwitch).Result()
 		if err != nil {
 			ginutil.JSONServerError(c, err)
 			return

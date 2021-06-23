@@ -3,7 +3,7 @@ package elasticComponent
 import (
 	"bytes"
 	"dora/config"
-	"dora/modules/datasource"
+	"dora/modules/datasource/elastic"
 	"dora/modules/logstore/core"
 	"dora/pkg/utils"
 	"dora/pkg/utils/logx"
@@ -33,7 +33,7 @@ func (e elkLog) PutData(logData map[string]interface{}) error {
 		return err
 	}
 
-	es := datasource.GetElasticClient()
+	es := elastic.GetElasticClient()
 	result, err := es.Index(
 		e.config.Index,
 		bytes.NewReader(byteLogs),
@@ -146,7 +146,7 @@ func buildQueryTrendTpl(tpl string, appId string, from, to, interval int64) stri
 }
 
 func baseSearch(Index string, queryTpl string) ([]byte, error) {
-	es := datasource.GetElasticClient()
+	es := elastic.GetElasticClient()
 
 	res, err := es.Search(
 		es.Search.WithIndex(Index),

@@ -32,5 +32,6 @@ test
 config.prod.yml
 config.yml
 
-
+manage.log
+transit.log
 dora.log

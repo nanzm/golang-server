@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"dora/modules/datasource"
+	"dora/modules/datasource/redis"
 	"dora/pkg/utils/ginutil"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -13,7 +13,7 @@ import (
 // todo 正式环境需移除...  一分钟 100 次会影响数据采集
 func RateLimitMiddleware() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		rdb := datasource.RedisInstance()
+		rdb := redis.Instance()
 
 		ip := c.ClientIP()
 

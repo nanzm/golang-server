@@ -2,53 +2,13 @@ package config
 
 import "github.com/spf13/viper"
 
-type AppConfig struct {
-	Secret string
+type LogStore struct {
+	Enable string
 }
 
-func GetApp() AppConfig {
-	return AppConfig{
-		Secret: viper.GetString("secret"),
-	}
-}
-
-type GormConfig struct {
-	Driver string
-	DSN    string
-}
-
-func GetGorm() GormConfig {
-	return GormConfig{
-		Driver: viper.GetString("gorm.driver"),
-		DSN:    viper.GetString("gorm.dsn"),
-	}
-}
-
-type RedisConfig struct {
-	Addr     string
-	Password string
-	DB       int
-}
-
-func GetRedis() RedisConfig {
-	return RedisConfig{
-		Addr:     viper.GetString("redis.addr"),
-		Password: viper.GetString("redis.password"),
-		DB:       viper.GetInt("redis.db"),
-	}
-}
-
-type NsqConfig struct {
-	Address string
-	Topic   string
-	Channel string
-}
-
-func GetNsq() NsqConfig {
-	return NsqConfig{
-		Address: viper.GetString("nsq.address"),
-		Topic:   viper.GetString("nsq.topic"),
-		Channel: viper.GetString("nsq.channel"),
+func GetLogStore() LogStore {
+	return LogStore{
+		Enable: viper.GetString("logStore.enable"),
 	}
 }
 
@@ -64,44 +24,12 @@ type SlsLog struct {
 
 func GetSlsLog() SlsLog {
 	return SlsLog{
-		Endpoint:  viper.GetString("slsLog.endpoint"),
-		AccessKey: viper.GetString("slsLog.accessKey"),
-		Secret:    viper.GetString("slsLog.secret"),
-		Project:   viper.GetString("slsLog.project"),
-		LogStore:  viper.GetString("slsLog.logStore"),
-		Topic:     viper.GetString("slsLog.topic"),
-	}
-}
-
-type OssConfig struct {
-	Endpoint  string
-	Bucket    string
-	AccessKey string
-	Secret    string
-}
-
-func GetOss() OssConfig {
-	return OssConfig{
-		Endpoint:  viper.GetString("aliyun.endpoint"),
-		Bucket:    viper.GetString("aliyun.bucket"),
-		AccessKey: viper.GetString("aliyun.accessKey"),
-		Secret:    viper.GetString("aliyun.secret"),
-	}
-}
-
-type MailConfig struct {
-	Host     string
-	Port     string
-	Username string
-	Password string
-}
-
-func GetMail() MailConfig {
-	return MailConfig{
-		Host:     viper.GetString("mail.host"),
-		Port:     viper.GetString("mail.port"),
-		Username: viper.GetString("mail.username"),
-		Password: viper.GetString("mail.password"),
+		Endpoint:  viper.GetString("logStore.slsLog.endpoint"),
+		AccessKey: viper.GetString("logStore.slsLog.accessKey"),
+		Secret:    viper.GetString("logStore.slsLog.secret"),
+		Project:   viper.GetString("logStore.slsLog.project"),
+		LogStore:  viper.GetString("logStore.slsLog.logStore"),
+		Topic:     viper.GetString("logStore.slsLog.topic"),
 	}
 }
 
@@ -114,21 +42,9 @@ type Elastic struct {
 
 func GetElastic() Elastic {
 	return Elastic{
-		Addresses: viper.GetStringSlice("elastic.addresses"),
-		Username:  viper.GetString("elastic.username"),
-		Password:  viper.GetString("elastic.password"),
-		Index:     viper.GetString("elastic.index"),
-	}
-}
-
-type DingDingRobot struct {
-	AccessToken string
-	Secret      string
-}
-
-func GetRobot() DingDingRobot {
-	return DingDingRobot{
-		AccessToken: viper.GetString("dingding.accessToken"),
-		Secret:      viper.GetString("dingding.secret"),
+		Addresses: viper.GetStringSlice("logStore.elastic.addresses"),
+		Username:  viper.GetString("logStore.elastic.username"),
+		Password:  viper.GetString("logStore.elastic.password"),
+		Index:     viper.GetString("logStore.elastic.index"),
 	}
 }

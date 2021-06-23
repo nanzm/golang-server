@@ -1,7 +1,7 @@
-package datasource
+package gorm
 
 import (
-	"dora/config"
+	"dora/modules/api/manage/config"
 	"dora/pkg/utils/logx"
 	"sync"
 
@@ -13,7 +13,7 @@ import (
 var onceGorm sync.Once
 var db *gorm.DB
 
-func GormInstance() *gorm.DB {
+func Instance() *gorm.DB {
 	onceGorm.Do(func() {
 		conf := config.GetGorm()
 		db = newGorm(conf)
@@ -50,9 +50,9 @@ func newGorm(config config.GormConfig) *gorm.DB {
 	return db
 }
 
-func StopDataBase() {
+func TearDown() {
 	logx.Println("stop gorm database")
-	s, err := GormInstance().DB()
+	s, err := Instance().DB()
 	if err != nil {
 		logx.Error(err)
 		return

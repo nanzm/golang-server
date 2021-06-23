@@ -1,20 +1,29 @@
 package core
 
 import (
+	"dora/modules/api/manage/config"
 	"dora/modules/api/manage/schedule"
-	"dora/modules/datasource"
+	"dora/modules/datasource/gorm"
+	"dora/modules/datasource/mail"
+	"dora/modules/datasource/redis"
+	"dora/modules/datasource/slslog"
 	"dora/modules/initialize"
+	"dora/pkg/utils/logx"
 )
 
-func Setup()  {
+func Setup() {
+	// log
+	conf := config.GetLog()
+	logx.Init(conf.File)
+
 	// mail
-	datasource.GetMailPool()
+	mail.GetPool()
 
 	// redis
-	datasource.RedisInstance()
+	redis.Instance()
 
 	// database
-	datasource.GormInstance()
+	gorm.Instance()
 
 	// 启动初始化
 	initialize.Run()
@@ -25,9 +34,9 @@ func Setup()  {
 	schedule.Cron()
 }
 
-func TearDown()  {
-	datasource.StopSlsLog()
-	datasource.StopRedisClient()
-	datasource.StopDataBase()
-	datasource.StopMailPool()
+func TearDown() {
+	slslog.ClientTearDown()
+	redis.StopClient()
+	gorm.TearDown()
+	mail.StopMailPool()
 }

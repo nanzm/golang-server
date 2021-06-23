@@ -1,4 +1,4 @@
-package datasource
+package elastic
 
 import (
 	"dora/config"

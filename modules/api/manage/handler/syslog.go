@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"dora/modules/datasource"
+	"dora/modules/datasource/gorm"
 	"dora/modules/model/dto"
 	"dora/modules/model/entity"
 	"dora/pkg/utils"
@@ -31,7 +31,7 @@ func (s *SyslogResource) GetParseErrorList(c *gin.Context) {
 
 	var list []*entity.SysLog
 	var total int64
-	err := datasource.GormInstance().Scopes(utils.Paginate(u.Current, u.PageSize)).
+	err := gorm.GormInstance().Scopes(utils.Paginate(u.Current, u.PageSize)).
 		Find(&list).Count(&total).Order("id desc").Error
 
 	if err != nil {

@@ -1,7 +1,7 @@
-package datasource
+package mail
 
 import (
-	"dora/config"
+	"dora/modules/api/manage/config"
 	"dora/pkg/utils/logx"
 	"net/smtp"
 	"net/textproto"
@@ -13,7 +13,7 @@ import (
 var mailPool *email.Pool
 var once sync.Once
 
-func GetMailPool() *email.Pool {
+func GetPool() *email.Pool {
 	once.Do(func() {
 		conf := config.GetMail()
 		mailPool = setUp(conf)
@@ -46,5 +46,5 @@ func BuilderEmail(to, from, subject, body string) *email.Email {
 
 func StopMailPool() {
 	logx.Println("stop mail pool")
-	GetMailPool().Close()
+	GetPool().Close()
 }
