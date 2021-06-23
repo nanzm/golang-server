@@ -50,11 +50,6 @@ func newGorm(config config.GormConfig) *gorm.DB {
 	return db
 }
 
-func Migrate(db *gorm.DB, models []interface{}) error {
-	err := db.AutoMigrate(models...)
-	return err
-}
-
 func StopDataBase() {
 	logx.Println("stop gorm database")
 	s, err := GormInstance().DB()

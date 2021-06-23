@@ -1,13 +1,8 @@
 package service
 
 import (
-	"dora/config"
 	"testing"
 )
-
-func init() {
-	config.ParseConf("../../config.yml")
-}
 
 func TestSendDingDingMsg(t *testing.T) {
 	//conf := config.GetConf()

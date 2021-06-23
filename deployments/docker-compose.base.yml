@@ -2,38 +2,50 @@ version: "3"
 
 services:
   # 数据库
-  postgres:
-    image: postgres:12
-    ports:
-      - "5432:5432"
+  mysql:
+    image: mysql:5.7.34
+    container_name: doar-mysql
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci # 设置utf8字符集
     environment:
-      POSTGRES_DB: dora
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: dora_postgres_password
-      PG_DATA: /var/lib/postgresql/data
+      - TZ=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=123456 # root密码
+      - MYSQL_DATABASE=dora
+      - MYSQL_USER=demo
+      - MYSQL_PASSWORD=demo
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - /etc/localtime:/etc/localtime:ro
+      - ./mysql/data:/var/lib/mysql/data
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
 
   # redis
   redis:
-    image: redis:latest
-    command: redis-server --requirepass dora_redis_password
+    image: redis:6.2
+    container_name: doar-redis
+    command: redis-server --requirepass 123456
     ports:
       - "6379:6379"
+    environment:
+      - TZ=Asia/Shanghai
     volumes:
-      - redata:/data
+      - /etc/localtime:/etc/localtime:ro
+      - ./redis/data:/data
 
   # 消息队列
   nsqlookupd:
     image: nsqio/nsq
-    command: /nsqlookupd
+    container_name: doar-nsqlookupd
+    command: /nsqlookupd --log-level warn
     ports:
       - "4160:4160"
       - "4161:4161"
 
   nsqd:
     image: nsqio/nsq
-    command: /nsqd --lookupd-tcp-address=nsqlookupd:4160
+    container_name: doar-nsqd
+    command: /nsqd --lookupd-tcp-address=nsqlookupd:4160 --log-level warn
     depends_on:
       - nsqlookupd
     ports:
@@ -42,13 +54,10 @@ services:
 
   nsqadmin:
     image: nsqio/nsq
-    command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
+    container_name: doar-nsqadmin
+    command: /nsqadmin --lookupd-http-address=nsqlookupd:4161 --log-level warn
     depends_on:
       - nsqlookupd
     ports:
       - "4171:4171"
 
-volumes:
-  pgdata:
-  redata:
-  sourcemapdata:

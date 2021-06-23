@@ -18,7 +18,21 @@ func Run() {
 
 // 表同步
 func dbMigrate() {
-	err := datasource.Migrate(datasource.GormInstance(), entity.Tables())
+	err := datasource.GormInstance().AutoMigrate(
+		&entity.SysLog{},
+
+		&entity.Project{},
+		&entity.Role{},
+		&entity.User{},
+		&entity.UserSetting{},
+
+		&entity.Issue{},
+		&entity.IssueUserStatus{},
+		&entity.SourceMap{},
+
+		&entity.Artifact{},
+		&entity.AlarmLog{},
+	)
 	if err != nil {
 		panic(err)
 	}

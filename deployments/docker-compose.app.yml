@@ -5,7 +5,7 @@ services:
   transit:
     image: registry.cn-hangzhou.aliyuncs.com/nancode/dora-transit:latest
     ports:
-      - "8222:8222"
+      - "8221:8221"
     volumes:
       - ./data:/app/tmp
       - ./config.yml:/app/config.yml
@@ -19,10 +19,10 @@ services:
       - ./data:/app/tmp
       - ./config.yml:/app/config.yml
 
-  # server
+  # webapp
   webapp:
     image: registry.cn-hangzhou.aliyuncs.com/nancode/dora-webapp:latest
     ports:
-      - "8221:80"
+      - "8333:8333"
     depends_on:
       - manage

@@ -6,13 +6,14 @@ import (
 )
 
 type UserSetting struct {
-	ID        uint           `gorm:"primaryKey" json:"id"`
+	ID uint `gorm:"primaryKey" json:"id"`
+
+	UserId    uint `gorm:"uniqueIndex;" json:"user_id"`
+	ProjectId uint `gorm:"type:int;" json:"project_id"`
+
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
-
-	UserId    uint `gorm:"uniqueIndex;" json:"user_id"`
-	ProjectId uint `gorm:"" json:"project_id"`
 }
 
 func (UserSetting) TableName() string {

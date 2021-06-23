@@ -1,63 +1,33 @@
-## QuickStart
+# dora-server
+## 启动依赖
+```shell
+# 一键启动 mysql redis nsq  
+make base-up
 
-### 依赖
-mysql 
-redis
-nsq
-aliyun sls
-qq mail
+# 查看 logs
+make base-logs
 
-### config
+# 关闭
+make base-down
 
-```yml
-# 配置示例
-config.example.yml
+# 清除数据
+make data-clean
 ```
 
-### Docker
+## 本地运行
+> 配置示例 config.example.yml
+```shell
+# 创建配置文件
+cp config.example.yml config.yml
 
-```bash
+# 填入你的 mail、 slsLog 或 elastic 配置
+vi config.yml
+```
+```shell
+# transit 服务
+go run cmd/transit/main.go
 
-# 创建配置文件并启动应用
-cd /demo
-touch config.yml
-
-docker run --name dora -d -p 8221:8222 \
-      -v /demo/config.yml:/app/config.yml \ 
-      -it nancode/dora:latest
-
-docker run --name dora -d -p 8221:8222 \
-    -v /root/dora/tmp:/app/tmp \
-    -v /root/dora/config.yml:/app/config.yml \
-    -it nancode/dora:latest
-
-docker run --name dora -d  --network host  -v /root/dora/tmp:/app/tmp \
-     -v /root/dora/config.yml:/app/config.yml \
-     -it registry.cn-hangzhou.aliyuncs.com/nancode/dora:latest
-
-# 更新正在运行的 container
-docker run --rm \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    containrrr/watchtower -cR \
-    dora --debug
+# manage 服务
+go run cmd/manage/main.go
 ```
 
-### plan
-
-sdk -> mq -> 阿里云sls -> mysql
-
-```
-用户模块
-监控模块
-打点模块
-
-# 非重点模块延后
-```
-
-## Contributing
-
-## Author
-
-- [nan](https://github.com/nanzm)
-
-## License

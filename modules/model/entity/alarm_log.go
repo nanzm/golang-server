@@ -6,13 +6,14 @@ import (
 )
 
 type AlarmLog struct {
-	ID        uint           `gorm:"primaryKey" json:"id"`
+	ID uint `gorm:"primaryKey" json:"id"`
+
+	AlarmProjectId uint   `gorm:"comment:告警id" json:"alarm_project_id"`
+	Log            string `gorm:"type:text;comment:日志" json:"log"`
+
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
-
-	AlarmProjectId uint   `gorm:"comment:告警id" json:"alarm_project_id"`
-	Log            string `gorm:"comment:日志" json:"log"`
 }
 
 // 告警对象

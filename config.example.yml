@@ -1,32 +1,18 @@
-debug: false
-
-secret: "secret"
+secret: "mNmHeNpnFDjQGc43j1XhY38t0HeYNKPm"
 
 gorm:
-  driver: "postgres"
-  dsn: "host=localhost user=postgres password=dora_postgres_password dbname=dora-dev port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+  driver: "mysql"
+  dsn: "demo:demo@tcp(127.0.0.1:3306)/dora?charset=utf8mb4&parseTime=True&loc=Local"
 
 redis:
   addr: "127.0.0.1:6379"
-  password: ""
+  password: "123456"
   db: 0
 
 nsq:
-  address:
-  topic: ""
-  channel: ""
-
-aliyun:
-  endpoint: "oss-cn-hangzhou.aliyuncs.com"
-  accesskey: ""
-  secret: ""
-  bucket: ""
-
-elastic:
-  addresses:
-  username:
-  password:
-  index:
+  address: "127.0.0.1:4150"
+  topic: "event"
+  channel: "dev-ch"
 
 slsLog:
   endpoint: "cn-hangzhou.log.aliyuncs.com"
@@ -35,6 +21,12 @@ slsLog:
   project: "dora-test"
   logStore: "event-store"
   topic: "browser"
+
+elastic:
+  addresses:
+  username:
+  password:
+  index:
 
 mail:
   host: "smtp.qq.com"

@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 type Resource interface {
 	Register(router *gin.RouterGroup)
 }
@@ -20,7 +19,6 @@ func SetupResource(rg *gin.RouterGroup, resources ...Resource) {
 		resource.Register(rg)
 	}
 }
-
 
 func GetOrigin(c *gin.Context) string {
 	scheme := "http"
@@ -46,7 +44,7 @@ func GracefulShutdown(ctx context.Context, server *http.Server) {
 	defer cancel()
 
 	if err := server.Shutdown(timeout); err != nil {
-		logx.Fatal("Server Shutdown:", err)
+		logx.Fatal("server shutdown:", err)
 	}
-	logx.Infof("Server exiting，关闭耗时：", time.Since(now))
+	logx.Infof("graceful shutdown server cost：%vs", time.Since(now))
 }

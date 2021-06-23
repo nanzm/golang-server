@@ -8,8 +8,8 @@ import (
 
 
 func init() {
-	//configPath := "/Users/neil/Desktop/dora-platform/dora-server/config.example.yml"
-	configPath := ".config.yml"
+	//configPath := "/Users/neil/Desktop/dora-platform/dora-server/config.yml"
+	configPath := "config.yml"
 
 	// file exist
 	exists, err := fs.FileExists(configPath)

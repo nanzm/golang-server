@@ -1,6 +1,7 @@
 package manage
 
 import (
+	"context"
 	"dora/config"
 	"dora/modules/api/manage/core"
 	"dora/modules/api/manage/rest"
@@ -11,18 +12,24 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
-func Serve() *http.Server {
+func Serve() {
+	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
+	defer cancel()
+
 	core.Setup()
 	defer core.TearDown()
 
 	if err := ginutil.InitTrans("zh"); err != nil {
 		logx.Fatal(err)
 	}
-	app := gin.New()
+
 	gin.SetMode(gin.ReleaseMode)
+	app := gin.New()
 	// session
 	store := cookie.NewStore([]byte(config.GetApp().Secret))
 	app.Use(sessions.Sessions("dora", store))
@@ -45,5 +52,5 @@ func Serve() *http.Server {
 		}
 	}()
 
-	return svr
+	ginutil.GracefulShutdown(ctx, svr)
 }

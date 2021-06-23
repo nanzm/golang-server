@@ -1,35 +1,23 @@
-.PHONY: up down mod lint tag build
-# custom define
-PROJECT := dora
-MAINFILE := main.go
+.PHONY:
 
-up: ## 
-	docker-compose -f ./docker-compose.dev.yml up -d
+base-up:
+	cd deployments  && docker-compose -f ./docker-compose.base.yml up -d
 
-down: ## 
-	docker-compose -f ./docker-compose.dev.yml down
+base-down:
+	cd deployments  && docker-compose -f ./docker-compose.base.yml down
 
-build:
-	docker build . -t nancode/dora-server
+base-logs:
+	cd deployments  && docker-compose -f ./docker-compose.base.yml logs
 
-tag:
-	docker tag nancode/dora-server registry.cn-hangzhou.aliyuncs.com/nancode/dora-server:latest
+base-ps:
+	cd deployments  && docker-compose -f ./docker-compose.base.yml ps
 
-push:
-	docker push registry.cn-hangzhou.aliyuncs.com/nancode/dora-server:latest
+data-clean:
+	cd deployments  && rm -rf redis/data && rm -rf mysql/data
 
-mod: ## Get the dependencies
-	@go mod download
+build-transit:
+	docker build -f deployments/transit.Dockerfile -t nancode/dora-transit
 
-lint: ## Lint Golang files
-	@golangci-lint --version
-	@golangci-lint run -D errcheck
+build-manage:
+	docker build -f deployments/manage.Dockerfile -t nancode/dora-manage
 
-test: ## Run tests with coverage
-	go test ./... -v
-
-coverage-html: ## show coverage by the html
-	go tool cover -html=.coverprofile
-
-generate:
-	go generate ./...

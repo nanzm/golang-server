@@ -20,6 +20,8 @@ tmp/build
 .idea
 # Dependency directories (remove the comment below to include it)
 # vendor/
+deployments/mysql/data
+deployments/redis/data
 data
 build
 dora.db
