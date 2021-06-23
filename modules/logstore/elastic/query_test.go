@@ -2,7 +2,7 @@ package elasticComponent
 
 import (
 	"dora/config"
-	"dora/modules/datasource/elastic"
+	"dora/modules/logstore/datasource/elastic"
 	"dora/pkg/utils"
 	"encoding/json"
 	"github.com/stretchr/testify/assert"

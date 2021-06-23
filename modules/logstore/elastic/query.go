@@ -3,8 +3,8 @@ package elasticComponent
 import (
 	"bytes"
 	"dora/config"
-	"dora/modules/datasource/elastic"
 	"dora/modules/logstore/core"
+	"dora/modules/logstore/datasource/elastic"
 	"dora/pkg/utils"
 	"dora/pkg/utils/logx"
 	"errors"

@@ -2,7 +2,7 @@ package slslogComponent
 
 import (
 	"dora/config"
-	"dora/modules/datasource/slslog"
+	"dora/modules/logstore/datasource/slslog"
 	"dora/pkg/utils"
 	sls "github.com/aliyun/aliyun-log-go-sdk"
 	"google.golang.org/protobuf/proto"

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"dora/modules/api/manage"
+	"dora/app/manage"
 )
 
 // dora manage

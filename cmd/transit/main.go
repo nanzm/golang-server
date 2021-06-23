@@ -1,7 +1,7 @@
 package main
 
 import (
-	"dora/modules/api/transit"
+	"dora/app/transit"
 )
 
 // dora cmd transit
