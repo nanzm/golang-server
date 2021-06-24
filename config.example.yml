@@ -1,4 +1,4 @@
-apps:
+app:
   manage:
     secret: ""
     log:
