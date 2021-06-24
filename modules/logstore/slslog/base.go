@@ -10,11 +10,19 @@ import (
 )
 
 // sdk 存入阿里云日志服务
-func basePutLogs(mapData map[string]interface{}) error {
-	logs := generateLog(uint32(time.Now().Unix()), mapData)
+func basePutLog(mapData map[string]interface{}) error {
+	logs := fmtLog(mapData)
 	ins := slslog.GetProducer()
 	conf := config.GetSlsLog()
 	err := ins.SendLog(conf.Project, conf.LogStore, conf.Topic, conf.Source, logs)
+	return err
+}
+
+func basePutLogList(mapData []map[string]interface{}) error {
+	logs := fmtLogList(mapData)
+	ins := slslog.GetProducer()
+	conf := config.GetSlsLog()
+	err := ins.SendLogList(conf.Project, conf.LogStore, conf.Topic, conf.Source, logs)
 	return err
 }
 
@@ -29,46 +37,40 @@ func baseQueryLogs(from int64, to int64, queryExp string) (result *sls.GetLogsRe
 	return logs, nil
 }
 
-func generateLog(logTime uint32, addLogMap map[string]interface{}) *sls.Log {
+func fmtLog(event map[string]interface{}) *sls.Log {
 	var content []*sls.LogContent
-	for key, value := range addLogMap {
+	for key, value := range event {
 		content = append(content, &sls.LogContent{
 			Key:   proto.String(key),
 			Value: proto.String(utils.SafeJsonMarshal(value)),
 		})
 	}
+
+	current := uint32(time.Now().Unix())
 	return &sls.Log{
-		Time:     proto.Uint32(logTime),
+		Time:     proto.Uint32(current),
 		Contents: content,
 	}
 }
 
-//func cleanLogs(logs []*sls.Log) []*sls.Log {
-//	result := make([]*sls.Log, 0, len(logs))
-//	temp := map[string]struct{}{}
-//
-//	for _, item := range logs {
-//		md5 := getAggMd5Val(item.Contents)
-//
-//		// 忽略没有 md5
-//		if md5 == "" {
-//			continue
-//		}
-//
-//		// 去重
-//		if _, ok := temp[md5]; !ok {
-//			temp[md5] = struct{}{}
-//			result = append(result, item)
-//		}
-//	}
-//	return result
-//}
-//
-//func getAggMd5Val(c []*sls.LogContent) string {
-//	for _, content := range c {
-//		if *content.Key == "agg_md5" {
-//			return *content.Value
-//		}
-//	}
-//	return ""
-//}
+func fmtLogList(eventList []map[string]interface{}) []*sls.Log {
+	list := make([]*sls.Log, 0)
+
+	for _, event := range eventList {
+		var content []*sls.LogContent
+		for key, value := range event {
+			content = append(content, &sls.LogContent{
+				Key:   proto.String(key),
+				Value: proto.String(utils.SafeJsonMarshal(value)),
+			})
+		}
+
+		current := uint32(time.Now().Unix())
+		list = append(list, &sls.Log{
+			Time:     proto.Uint32(current),
+			Contents: content,
+		})
+	}
+	return list
+
+}

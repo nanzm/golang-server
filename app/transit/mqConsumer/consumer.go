@@ -18,7 +18,7 @@ func Consumer() nsq.Handler {
 // 消费队列消息 ————> 放入 日志服务
 func msgHandle(message *nsq.Message) error {
 	// 解析成 map
-	event, err := utils.StringToMap(message.Body)
+	event, err := utils.StringToMapList(message.Body)
 	if err != nil {
 		logx.Error(err)
 		return err
@@ -41,7 +41,7 @@ func msgHandle(message *nsq.Message) error {
 
 	// 存入日志服务
 	client := logstore.GetSlsClient()
-	err = client.PutData(event)
+	err = client.PutListData(event)
 	if err != nil {
 		return err
 	}
@@ -54,16 +54,4 @@ func msgHandle(message *nsq.Message) error {
 	//}
 
 	return nil
-}
-
-func md5AggData(event map[string]interface{}) string {
-	if val, ok := event["agg"]; ok {
-		s := utils.SafeJsonMarshal(val)
-		if s == "" {
-			return ""
-		} else {
-			return utils.Md5([]byte(s))
-		}
-	}
-	return ""
 }

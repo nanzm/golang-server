@@ -1,7 +1,7 @@
 package nsq
 
 import (
-	"dora/app/transit/config"
+	"dora/config"
 	"dora/pkg/utils/logx"
 	"github.com/nsqio/go-nsq"
 )
@@ -9,7 +9,8 @@ import (
 var nsqConsumer *nsq.Consumer
 
 // 消费
-func ConsumerRegister(conf config.NsqConfig, handler nsq.Handler) {
+func ConsumerRegister(handler nsq.Handler) {
+	conf := config.GetNsq()
 	con := nsq.NewConfig()
 	c, err := nsq.NewConsumer(conf.Topic, conf.Channel, con)
 	if err != nil {

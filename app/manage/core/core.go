@@ -1,11 +1,11 @@
 package core
 
 import (
-	"dora/app/manage/config"
 	"dora/app/manage/datasource/gorm"
 	"dora/app/manage/datasource/mail"
 	"dora/app/manage/datasource/redis"
 	"dora/app/manage/schedule"
+	"dora/config"
 	"dora/modules/initialize"
 	"dora/modules/logstore/datasource/slslog"
 	"dora/pkg/utils/logx"
@@ -13,7 +13,7 @@ import (
 
 func Setup() {
 	// log
-	conf := config.GetLog()
+	conf := config.GetManageLog()
 	logx.Init(conf.File)
 
 	// mail

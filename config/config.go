@@ -1,15 +1,15 @@
 package config
 
-import "github.com/spf13/viper"
+type LogConfig struct {
+	File string
+}
+
+type SecretConfig struct {
+	Secret string
+}
 
 type LogStore struct {
 	Enable string
-}
-
-func GetLogStore() LogStore {
-	return LogStore{
-		Enable: viper.GetString("logStore.enable"),
-	}
 }
 
 type SlsLog struct {
@@ -22,17 +22,6 @@ type SlsLog struct {
 	Source    string
 }
 
-func GetSlsLog() SlsLog {
-	return SlsLog{
-		Endpoint:  viper.GetString("logStore.slsLog.endpoint"),
-		AccessKey: viper.GetString("logStore.slsLog.accessKey"),
-		Secret:    viper.GetString("logStore.slsLog.secret"),
-		Project:   viper.GetString("logStore.slsLog.project"),
-		LogStore:  viper.GetString("logStore.slsLog.logStore"),
-		Topic:     viper.GetString("logStore.slsLog.topic"),
-	}
-}
-
 type Elastic struct {
 	Addresses []string
 	Username  string
@@ -40,11 +29,38 @@ type Elastic struct {
 	Index     string
 }
 
-func GetElastic() Elastic {
-	return Elastic{
-		Addresses: viper.GetStringSlice("logStore.elastic.addresses"),
-		Username:  viper.GetString("logStore.elastic.username"),
-		Password:  viper.GetString("logStore.elastic.password"),
-		Index:     viper.GetString("logStore.elastic.index"),
-	}
+type GormConfig struct {
+	Driver string
+	DSN    string
+}
+
+type RedisConfig struct {
+	Addr     string
+	Password string
+	DB       int
+}
+
+type OssConfig struct {
+	Endpoint  string
+	Bucket    string
+	AccessKey string
+	Secret    string
+}
+
+type MailConfig struct {
+	Host     string
+	Port     string
+	Username string
+	Password string
+}
+
+type DingDingRobot struct {
+	AccessToken string
+	Secret      string
+}
+
+type NsqConfig struct {
+	Address string
+	Topic   string
+	Channel string
 }

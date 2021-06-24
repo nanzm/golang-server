@@ -4,6 +4,7 @@ import "dora/modules/logstore/response"
 
 type Api interface {
 	PutData(logData map[string]interface{}) error
+	PutListData(listLogData []map[string]interface{}) error
 
 	DefaultQuery(appId string, from, to, interval int64, dataType string) (result interface{}, err error)
 	QueryMethods() QueryMethods

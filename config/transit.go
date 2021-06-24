@@ -2,30 +2,16 @@ package config
 
 import "github.com/spf13/viper"
 
-type SecretConfig struct {
-	Secret string
-}
-
-func GetSecret() SecretConfig {
+func GetTransitSecret() SecretConfig {
 	return SecretConfig{
 		Secret: viper.GetString("app.transit.secret"),
 	}
 }
 
-type LogConfig struct {
-	File string
-}
-
-func GetLog() LogConfig {
+func GetTransitLog() LogConfig {
 	return LogConfig{
 		File: viper.GetString("app.transit.log.file"),
 	}
-}
-
-type NsqConfig struct {
-	Address string
-	Topic   string
-	Channel string
 }
 
 func GetNsq() NsqConfig {

@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-var logger *zap.Logger
+var Zap *zap.Logger
 var simpleLogger *zap.SugaredLogger
 
 func Init(path string) {
@@ -59,8 +59,8 @@ func Init(path string) {
 	)
 
 	// 构造日志
-	logger = zap.New(core, zap.AddCaller())
-	simpleLogger = logger.WithOptions(zap.AddCallerSkip(1)).Sugar()
+	Zap = zap.New(core, zap.AddCaller())
+	simpleLogger = Zap.WithOptions(zap.AddCallerSkip(1)).Sugar()
 }
 
 // 兼容

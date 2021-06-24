@@ -1,7 +1,7 @@
 package nsq
 
 import (
-	"dora/app/transit/config"
+	"dora/config"
 	"dora/pkg/utils/logx"
 	"github.com/nsqio/go-nsq"
 	"sync"

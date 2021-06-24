@@ -2,9 +2,9 @@ package transit
 
 import (
 	"context"
-	"dora/app/transit/config"
 	"dora/app/transit/core"
 	"dora/app/transit/rest"
+	"dora/config"
 	"dora/modules/middleware"
 	"dora/pkg/utils/ginutil"
 	"dora/pkg/utils/logx"
@@ -33,7 +33,7 @@ func Serve() {
 	app.Use(middleware.GinZap(), middleware.Recovery(false))
 
 	// session
-	store := cookie.NewStore([]byte(config.GetSecret().Secret))
+	store := cookie.NewStore([]byte(config.GetTransitSecret().Secret))
 	app.Use(sessions.Sessions("dora", store))
 
 	rest.Register(app)

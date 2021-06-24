@@ -1,7 +1,7 @@
 package service
 
 import (
-	"dora/app/manage/config"
+	"dora/config"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"io"
 )

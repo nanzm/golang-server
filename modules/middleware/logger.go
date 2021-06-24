@@ -32,7 +32,7 @@ func GinZap() gin.HandlerFunc {
 				pre = color.HiRedString("%v", c.Writer.Status())
 			}
 
-			logx.Info(pre,
+			logx.Zap.Info(pre,
 				//zap.Int("status", c.Writer.Status()),
 				zap.String("method", c.Request.Method),
 				zap.String("path", path),

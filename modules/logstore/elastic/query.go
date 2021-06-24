@@ -52,6 +52,10 @@ func (e elkLog) PutData(logData map[string]interface{}) error {
 	return nil
 }
 
+func (e elkLog) PutListData(logData []map[string]interface{}) error {
+	return nil
+}
+
 func (e elkLog) DefaultQuery(appId string, from, to, interval int64, dataType string) (interface{}, error) {
 	m := NewElasticQuery()
 	switch dataType {

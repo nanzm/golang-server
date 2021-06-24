@@ -15,7 +15,12 @@ func NewSlsLogStore() store.Api {
 }
 
 func (s slsLog) PutData(logData map[string]interface{}) error {
-	err := basePutLogs(logData)
+	err := basePutLog(logData)
+	return err
+}
+
+func (s slsLog) PutListData(logData []map[string]interface{}) error {
+	err := basePutLogList(logData)
 	return err
 }
 

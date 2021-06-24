@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"dora/pkg/utils/logger"
+	"dora/pkg/utils/logx"
 	"testing"
 )
 

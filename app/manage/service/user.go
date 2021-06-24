@@ -2,9 +2,9 @@ package service
 
 import (
 	"context"
-	manageConf "dora/app/manage/config"
 	mailRes "dora/app/manage/datasource/mail"
 	dataRedis "dora/app/manage/datasource/redis"
+	"dora/config"
 	"dora/pkg/utils"
 	"fmt"
 	"time"
@@ -50,7 +50,7 @@ func (u *userService) SendEmailCaptcha(captchaType string, toEmail string) error
 	}
 
 	// 发送邮箱验证码
-	conf := manageConf.GetMail()
+	conf := config.GetMail()
 	m := mailRes.BuilderEmail(toEmail, fmt.Sprintf("Dora Robot <%s>", conf.Username),
 		"Dora 登录验证码", fmt.Sprintf("您的登录验证码是：<h1>%s</h1>", code))
 	err = mailRes.GetPool().Send(m, 3*time.Second)

@@ -1,7 +1,7 @@
 package mail
 
 import (
-	"dora/app/manage/config"
+	"dora/config"
 	"dora/pkg/utils/logx"
 	"net/smtp"
 	"net/textproto"

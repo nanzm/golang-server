@@ -2,29 +2,17 @@ package config
 
 import "github.com/spf13/viper"
 
-type SecretConfig struct {
-	Secret string
-}
 
-func GetSecret() SecretConfig {
+func GetManageSecret() SecretConfig {
 	return SecretConfig{
 		Secret: viper.GetString("app.manage.secret"),
 	}
 }
 
-type LogConfig struct {
-	File string
-}
-
-func GetLog() LogConfig {
+func GetManageLog() LogConfig {
 	return LogConfig{
 		File: viper.GetString("app.manage.log.file"),
 	}
-}
-
-type GormConfig struct {
-	Driver string
-	DSN    string
 }
 
 func GetGorm() GormConfig {
@@ -34,25 +22,12 @@ func GetGorm() GormConfig {
 	}
 }
 
-type RedisConfig struct {
-	Addr     string
-	Password string
-	DB       int
-}
-
 func GetRedis() RedisConfig {
 	return RedisConfig{
 		Addr:     viper.GetString("app.manage.redis.addr"),
 		Password: viper.GetString("app.manage.redis.password"),
 		DB:       viper.GetInt("app.manage.redis.db"),
 	}
-}
-
-type OssConfig struct {
-	Endpoint  string
-	Bucket    string
-	AccessKey string
-	Secret    string
 }
 
 func GetOss() OssConfig {
@@ -64,13 +39,6 @@ func GetOss() OssConfig {
 	}
 }
 
-type MailConfig struct {
-	Host     string
-	Port     string
-	Username string
-	Password string
-}
-
 func GetMail() MailConfig {
 	return MailConfig{
 		Host:     viper.GetString("app.manage.mail.host"),
@@ -78,11 +46,6 @@ func GetMail() MailConfig {
 		Username: viper.GetString("app.manage.mail.username"),
 		Password: viper.GetString("app.manage.mail.password"),
 	}
-}
-
-type DingDingRobot struct {
-	AccessToken string
-	Secret      string
 }
 
 func GetRobot() DingDingRobot {

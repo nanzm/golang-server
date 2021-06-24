@@ -1,7 +1,7 @@
 package gorm
 
 import (
-	"dora/app/manage/config"
+	"dora/config"
 	"dora/pkg/utils/logx"
 	"sync"
 

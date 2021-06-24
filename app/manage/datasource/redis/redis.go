@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"dora/app/manage/config"
+	"dora/config"
 	"dora/pkg/utils/logx"
 
 	"context"
