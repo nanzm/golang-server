@@ -1,5 +1,6 @@
 .PHONY:
 
+# --- mysql redis nsq  ---------------------------------------------------------
 base-up:
 	cd deployments  && docker-compose -f ./docker-compose.base.yml up -d
 
@@ -15,6 +16,18 @@ base-ps:
 data-clean:
 	cd deployments  && rm -rf redis/data && rm -rf mysql/data
 
+
+# --- elasticsearch ---------------------------------------------------------
+elastic-up:
+	cd deployments  && docker-compose -f ./elasticstack.yml up -d
+
+elastic-down:
+	cd deployments  && docker-compose -f ./elasticstack.yml down
+
+elastic-logs:
+	cd deployments  && docker-compose -f ./elasticstack.yml logs
+
+# --- app ---------------------------------------------------------
 build-transit:
 	docker build -f deployments/transit.Dockerfile -t nancode/dora-transit
 
