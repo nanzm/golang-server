@@ -2,7 +2,7 @@ package elasticComponent
 
 import (
 	"dora/config"
-	store "dora/modules/logstore/core"
+	"dora/modules/logstore/core"
 	"dora/modules/logstore/response"
 	"dora/pkg/utils/logx"
 	"github.com/tidwall/gjson"
@@ -10,6 +10,12 @@ import (
 
 type elasticQuery struct {
 	config config.Elastic
+}
+
+func NewElasticQuery() core.Api {
+	return &elasticQuery{
+		config: config.GetElastic(),
+	}
 }
 
 func (e elasticQuery) GetLogByMd5(from, to int64, md5 string) (*response.LogsResponse, error) {
@@ -117,8 +123,54 @@ func (e elasticQuery) PerfDataConsumptionValues(appId string, from, to int64) (*
 	panic("implement me")
 }
 
-func (e elasticQuery) PerfMetricsTrend(appId string, from, to int64, interval int64) (*response.PerfMetricsTrendRes, error) {
-	panic("implement me")
+func (e elasticQuery) PerfMetricsBucket(appId string, from, to int64) (*response.PerfMetricsBucket, error) {
+	res, err := baseSearch(e.config.Index, buildQueryTpl(performanceBucket, appId, from, to))
+	if err != nil {
+		logx.Error(err)
+		return nil, err
+	}
+
+	result := &response.PerfMetricsBucket{}
+
+	metrics := gjson.Get(string(res), "aggregations")
+	metrics.ForEach(func(key, value gjson.Result) bool {
+
+		resultItem := make([]*response.PerfMetricsBucketItem, 0)
+
+		metrics := gjson.Get(value.Raw, "buckets")
+		metrics.ForEach(func(i, j gjson.Result) bool {
+			name := gjson.Get(j.Raw, "key").String()
+			count := gjson.Get(j.Raw, "doc_count").Value()
+
+			resultItem = append(resultItem, &response.PerfMetricsBucketItem{
+				Key: name,
+				Val: int(count.(float64)),
+			})
+			return true
+		})
+
+		if key.Str == "fp" {
+			result.Fp = resultItem
+		}
+		if key.Str == "fcp" {
+			result.Fcp = resultItem
+		}
+		if key.Str == "lcp" {
+			result.Lcp = resultItem
+		}
+		if key.Str == "fid" {
+			result.Fid = resultItem
+		}
+		if key.Str == "cls" {
+			result.Cls = resultItem
+		}
+		if key.Str == "ttfb" {
+			result.Ttfb = resultItem
+		}
+		return true
+	})
+
+	return result, err
 }
 
 func (e elasticQuery) PerfMetricsValues(appId string, from, to int64) (*response.PerfMetricsValuesRes, error) {
@@ -171,12 +223,6 @@ func (e elasticQuery) ProjectCategory(appId string, from, to int64) (*response.P
 
 func (e elasticQuery) ProjectEnv(appId string, from, to int64) (*response.ProjectEnvRes, error) {
 	panic("implement me")
-}
-
-func NewElasticQuery() store.QueryMethods {
-	return &elasticQuery{
-		config: config.GetElastic(),
-	}
 }
 
 //

@@ -40,7 +40,7 @@ func msgHandle(message *nsq.Message) error {
 	//}
 
 	// 存入日志服务
-	client := logstore.GetSlsClient()
+	client := logstore.GetClient()
 	err = client.PutListData(event)
 	if err != nil {
 		return err

@@ -163,9 +163,23 @@ type PerfDataConsumptionValuesRes struct {
 }
 
 // 性能
-type PerfMetricsTrendRes struct {
+type PerfMetricsTrend struct {
 	Total int                        `json:"total"`
 	List  []*PerfMetricsTrendItemRes `json:"list"`
+}
+
+type PerfMetricsBucketItem struct {
+	Key string `json:"key"`
+	Val int    `json:"value"`
+}
+
+type PerfMetricsBucket struct {
+	Fp   []*PerfMetricsBucketItem `json:"fp"`
+	Fcp  []*PerfMetricsBucketItem `json:"fcp"`
+	Lcp  []*PerfMetricsBucketItem `json:"lcp"`
+	Fid  []*PerfMetricsBucketItem `json:"fid"`
+	Cls  []*PerfMetricsBucketItem `json:"cls"`
+	Ttfb []*PerfMetricsBucketItem `json:"ttfb"`
 }
 
 type PerfMetricsTrendItemRes struct {

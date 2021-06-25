@@ -4,6 +4,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"log"
 	"os"
 )
 
@@ -13,10 +14,10 @@ var simpleLogger *zap.SugaredLogger
 func Init(path string) {
 	hook := lumberjack.Logger{
 		Filename:   path, // 日志文件路径
-		MaxSize:    100,          // 每个日志文件保存的最大尺寸 单位：M
-		MaxBackups: 10,           // 日志文件最多保存多少个备份
-		MaxAge:     14,           // 文件最多保存多少天
-		Compress:   true,         // 是否压缩
+		MaxSize:    100,  // 每个日志文件保存的最大尺寸 单位：M
+		MaxBackups: 10,   // 日志文件最多保存多少个备份
+		MaxAge:     14,   // 文件最多保存多少天
+		Compress:   true, // 是否压缩
 	}
 
 	colorEncoder := zapcore.EncoderConfig{
@@ -63,62 +64,70 @@ func Init(path string) {
 	simpleLogger = Zap.WithOptions(zap.AddCallerSkip(1)).Sugar()
 }
 
+func getSimpleLogger() *zap.SugaredLogger {
+	if simpleLogger == nil {
+		log.Fatal("please run Init before use!")
+		return nil
+	}
+	return simpleLogger
+}
+
 // 兼容
 func Println(args ...interface{}) {
-	simpleLogger.Info(args...)
+	getSimpleLogger().Info(args...)
 }
 
 // 兼容
 func Printf(template string, args ...interface{}) {
-	simpleLogger.Infof(template, args...)
+	getSimpleLogger().Infof(template, args...)
 }
 
 // debug
 func Debugf(template string, args ...interface{}) {
-	simpleLogger.Debugf(template, args...)
+	getSimpleLogger().Debugf(template, args...)
 }
 
 // info
 func Infof(template string, args ...interface{}) {
-	simpleLogger.Infof(template, args...)
+	getSimpleLogger().Infof(template, args...)
 }
 
 func Info(args ...interface{}) {
-	simpleLogger.Info(args...)
+	getSimpleLogger().Info(args...)
 }
 
 // warn
 func Warnf(template string, args ...interface{}) {
-	simpleLogger.Warnf(template, args...)
+	getSimpleLogger().Warnf(template, args...)
 }
 
 func Warn(args ...interface{}) {
-	simpleLogger.Warn(args...)
+	getSimpleLogger().Warn(args...)
 }
 
 // error
 func Error(args ...interface{}) {
-	simpleLogger.Error(args...)
+	getSimpleLogger().Error(args...)
 }
 
 func Errorf(template string, args ...interface{}) {
-	simpleLogger.Errorf(template, args...)
+	getSimpleLogger().Errorf(template, args...)
 }
 
 // panic
 func Panic(args ...interface{}) {
-	simpleLogger.Panic(args...)
+	getSimpleLogger().Panic(args...)
 }
 
 func Panicf(template string, args ...interface{}) {
-	simpleLogger.Panicf(template, args...)
+	getSimpleLogger().Panicf(template, args...)
 }
 
 // fatal
 func Fatal(args ...interface{}) {
-	simpleLogger.Fatal(args...)
+	getSimpleLogger().Fatal(args...)
 }
 
 func Fatalf(template string, args ...interface{}) {
-	simpleLogger.Fatalf(template, args...)
+	getSimpleLogger().Fatalf(template, args...)
 }

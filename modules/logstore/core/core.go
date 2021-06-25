@@ -1,16 +1,16 @@
-package store
+package core
 
 import "dora/modules/logstore/response"
 
-type Api interface {
+type Client interface {
 	PutData(logData map[string]interface{}) error
 	PutListData(listLogData []map[string]interface{}) error
 
 	DefaultQuery(appId string, from, to, interval int64, dataType string) (result interface{}, err error)
-	QueryMethods() QueryMethods
+	QueryMethods() Api
 }
 
-type QueryMethods interface {
+type Api interface {
 	GetLogByMd5(from, to int64, md5 string) (*response.LogsResponse, error)
 	LogCountByMd5(from, to int64, md5 string) (*response.LogCountByMd5Res, error)
 
@@ -39,7 +39,7 @@ type QueryMethods interface {
 	PerfDataConsumptionValues(appId string, from, to int64) (*response.PerfDataConsumptionValuesRes, error)
 
 	// 性能
-	PerfMetricsTrend(appId string, from, to int64, interval int64) (*response.PerfMetricsTrendRes, error)
+	PerfMetricsBucket(appId string, from, to int64) (*response.PerfMetricsBucket, error)
 	PerfMetricsValues(appId string, from, to int64) (*response.PerfMetricsValuesRes, error)
 
 	// 资源加载失败

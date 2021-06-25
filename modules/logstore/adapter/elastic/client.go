@@ -5,10 +5,10 @@ import (
 	"dora/config"
 	"dora/modules/logstore/core"
 	"dora/modules/logstore/datasource/elastic"
-	"dora/pkg/utils"
 	"dora/pkg/utils/logx"
 	"errors"
 	"fmt"
+	"github.com/elastic/go-elasticsearch/v7"
 	jsoniter "github.com/json-iterator/go"
 	"io/ioutil"
 	"strconv"
@@ -17,23 +17,23 @@ import (
 
 type elkLog struct {
 	config config.Elastic
+	client *elasticsearch.Client
 }
 
-func NewElkLogStore() store.Api {
+func NewElkLogStore() core.Client {
 	return &elkLog{
 		config: config.GetElastic(),
+		client: elastic.GetClient(),
 	}
 }
 
 func (e elkLog) PutData(logData map[string]interface{}) error {
-	data := utils.ReplaceKeyPrefix(logData, "_", "d_")
-
-	byteLogs, err := jsoniter.Marshal(data)
+	byteLogs, err := jsoniter.Marshal(logData)
 	if err != nil {
 		return err
 	}
 
-	es := elastic.GetElasticClient()
+	es := elastic.GetClient()
 	result, err := es.Index(
 		e.config.Index,
 		bytes.NewReader(byteLogs),
@@ -52,7 +52,14 @@ func (e elkLog) PutData(logData map[string]interface{}) error {
 	return nil
 }
 
-func (e elkLog) PutListData(logData []map[string]interface{}) error {
+func (e elkLog) PutListData(logList []map[string]interface{}) error {
+	// todo bulk 批量插入api
+	for _, log := range logList {
+		err := e.PutData(log)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -100,7 +107,7 @@ func (e elkLog) DefaultQuery(appId string, from, to, interval int64, dataType st
 	case "perfDataConsumptionValues":
 		return m.PerfDataConsumptionValues(appId, from, to)
 	case "perfMetrics":
-		return m.PerfMetricsTrend(appId, from, to, interval)
+		return m.PerfMetricsBucket(appId, from, to)
 	case "perfMetricsValues":
 		return m.PerfMetricsValues(appId, from, to)
 
@@ -121,7 +128,7 @@ func (e elkLog) DefaultQuery(appId string, from, to, interval int64, dataType st
 	return nil, errors.New("暂无该指标")
 }
 
-func (e elkLog) QueryMethods() store.QueryMethods {
+func (e elkLog) QueryMethods() core.Api {
 	return NewElasticQuery()
 	//return nil
 }
@@ -150,8 +157,10 @@ func buildQueryTrendTpl(tpl string, appId string, from, to, interval int64) stri
 }
 
 func baseSearch(Index string, queryTpl string) ([]byte, error) {
-	es := elastic.GetElasticClient()
+	//fmt.Printf("%v \n", queryTpl)
+	es := elastic.GetClient()
 
+	fmt.Println("------------------------------------")
 	res, err := es.Search(
 		es.Search.WithIndex(Index),
 		es.Search.WithBody(strings.NewReader(queryTpl)),

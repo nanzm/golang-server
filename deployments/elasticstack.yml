@@ -15,8 +15,8 @@ services:
       - "bootstrap.memory_lock=true"
       - "xpack.security.enabled=false"
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-    expose:
-      - "9200"
+    ports:
+      - "9200:9200"
     ulimits:
       memlock: -1
       nproc: 65535

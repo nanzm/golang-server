@@ -24,7 +24,7 @@ func Test_elkPutErrorData(t *testing.T) {
 }
 
 func Test_elkSearch(t *testing.T) {
-	es := elastic.GetElasticClient()
+	es := elastic.GetClient()
 
 	res, err := es.Search(
 		es.Search.WithIndex("dora"),

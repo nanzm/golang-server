@@ -1,14 +1,23 @@
 package slslogComponent
 
 import (
+	"dora/config"
 	store "dora/modules/logstore/core"
 	"dora/modules/logstore/response"
 	"dora/pkg/utils"
 	"dora/pkg/utils/logx"
 	"fmt"
+	sls "github.com/aliyun/aliyun-log-go-sdk"
 )
 
 type slsQuery struct {
+	config config.SlsLog
+	client sls.ClientInterface
+}
+func NewSlsQuery() store.Api {
+	return &slsQuery{
+
+	}
 }
 
 func (s slsQuery) GetLogByMd5(from, to int64, md5 string) (*response.LogsResponse, error) {
@@ -485,37 +494,37 @@ func (s slsQuery) PerfDataConsumptionValues(appId string, from, to int64) (*resp
 	return nil, nil
 }
 
-func (s slsQuery) PerfMetricsTrend(appId string, from, to int64, interval int64) (*response.PerfMetricsTrendRes, error) {
-	exp, err := buildQueryTrendExp(appId, interval, PerfMetrics)
-	if err != nil {
-		return nil, err
-	}
-	slsRes, err := baseQueryLogs(from, to, exp)
-	if err != nil {
-		logx.Printf("query log err : %v", err)
-		return nil, err
-	}
-
-	if len(slsRes.Logs) > 0 {
-		result := &response.PerfMetricsTrendRes{
-			Total: len(slsRes.Logs),
-		}
-
-		// 遍历
-		trendList := make([]*response.PerfMetricsTrendItemRes, 0)
-		for _, log := range slsRes.Logs {
-			trendItem := &response.PerfMetricsTrendItemRes{}
-			err := utils.WeekDecode(log, trendItem)
-			if err != nil {
-				logx.Error(err)
-				return nil, err
-			}
-			trendList = append(trendList, trendItem)
-		}
-
-		result.List = trendList
-		return result, nil
-	}
+func (s slsQuery) PerfMetricsBucket(appId string, from, to int64) (*response.PerfMetricsBucket, error) {
+	//exp, err := buildQueryTrendExp(appId, interval, PerfMetrics)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//slsRes, err := baseQueryLogs(from, to, exp)
+	//if err != nil {
+	//	logx.Printf("query log err : %v", err)
+	//	return nil, err
+	//}
+	//
+	//if len(slsRes.Logs) > 0 {
+	//	result := &response.PerfMetricsBucket{
+	//		Total: len(slsRes.Logs),
+	//	}
+	//
+	//	// 遍历
+	//	trendList := make([]*response.PerfMetricsTrendItemRes, 0)
+	//	for _, log := range slsRes.Logs {
+	//		trendItem := &response.PerfMetricsTrendItemRes{}
+	//		err := utils.WeekDecode(log, trendItem)
+	//		if err != nil {
+	//			logx.Error(err)
+	//			return nil, err
+	//		}
+	//		trendList = append(trendList, trendItem)
+	//	}
+	//
+	//	result.List = trendList
+	//	return result, nil
+	//}
 	return nil, nil
 }
 
@@ -844,6 +853,3 @@ func (s slsQuery) ProjectEnv(appId string, from, to int64) (*response.ProjectEnv
 	return nil, nil
 }
 
-func NewSlsQuery() store.QueryMethods {
-	return &slsQuery{}
-}

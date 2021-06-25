@@ -1,4 +1,4 @@
-package core
+package boot
 
 import (
 	"dora/app/manage/datasource/gorm"

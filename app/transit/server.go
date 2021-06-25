@@ -2,7 +2,7 @@ package transit
 
 import (
 	"context"
-	"dora/app/transit/core"
+	"dora/app/transit/boot"
 	"dora/app/transit/rest"
 	"dora/config"
 	"dora/modules/middleware"
@@ -21,8 +21,8 @@ func Serve() {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 	defer cancel()
 
-	core.Setup()
-	defer core.TearDown()
+	boot.Setup()
+	defer boot.TearDown()
 
 	if err := ginutil.InitTrans("zh"); err != nil {
 		logx.Fatal(err)

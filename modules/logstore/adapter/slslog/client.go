@@ -1,26 +1,46 @@
 package slslogComponent
 
 import (
+	"dora/config"
 	"dora/modules/logstore/core"
+	"dora/modules/logstore/datasource/slslog"
+	"dora/pkg/utils"
 	"errors"
+	sls "github.com/aliyun/aliyun-log-go-sdk"
+	"github.com/aliyun/aliyun-log-go-sdk/producer"
+	"google.golang.org/protobuf/proto"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type slsLog struct {
+	config config.SlsLog
+	producer *producer.Producer
+	client sls.ClientInterface
 }
 
-func NewSlsLogStore() store.Api {
-	return &slsLog{}
+func NewSlsLogStore() core.Client {
+	return &slsLog{
+		config: config.GetSlsLog(),
+		producer: slslog.GetProducer(),
+		client: slslog.GetClient(),
+	}
 }
 
-func (s slsLog) PutData(logData map[string]interface{}) error {
-	err := basePutLog(logData)
+func (s slsLog) PutData(logItem map[string]interface{}) error {
+	logs := fmtLog(logItem)
+	ins := slslog.GetProducer()
+	conf := config.GetSlsLog()
+	err := ins.SendLog(conf.Project, conf.LogStore, conf.Topic, conf.Source, logs)
 	return err
 }
 
-func (s slsLog) PutListData(logData []map[string]interface{}) error {
-	err := basePutLogList(logData)
+func (s slsLog) PutListData(logList []map[string]interface{}) error {
+	logs := fmtLogList(logList)
+	ins := slslog.GetProducer()
+	conf := config.GetSlsLog()
+	err := ins.SendLogList(conf.Project, conf.LogStore, conf.Topic, conf.Source, logs)
 	return err
 }
 
@@ -68,7 +88,7 @@ func (s slsLog) DefaultQuery(appId string, from, to, interval int64, dataType st
 	case "perfDataConsumptionValues":
 		return m.PerfDataConsumptionValues(appId, from, to)
 	case "perfMetrics":
-		return m.PerfMetricsTrend(appId, from, to, interval)
+		return m.PerfMetricsBucket(appId, from, to)
 	case "perfMetricsValues":
 		return m.PerfMetricsValues(appId, from, to)
 
@@ -89,7 +109,7 @@ func (s slsLog) DefaultQuery(appId string, from, to, interval int64, dataType st
 	return nil, errors.New("暂无该指标")
 }
 
-func (s slsLog) QueryMethods() store.QueryMethods {
+func (s slsLog) QueryMethods() core.Api {
 	return NewSlsQuery()
 }
 
@@ -108,4 +128,53 @@ func buildQueryTrendExp(appId string, interval int64, queryTpl string) (tpl stri
 	// 替换
 	res := r.Replace(queryTpl)
 	return res, nil
+}
+
+// sdk 查询日志数据
+func baseQueryLogs(from int64, to int64, queryExp string) (result *sls.GetLogsResponse, err error) {
+	ins := slslog.GetClient()
+	conf := config.GetSlsLog()
+	logs, err := ins.GetLogs(conf.Project, conf.LogStore, conf.Topic, from, to, queryExp, 100, int64(0), true)
+	if err != nil {
+		return nil, err
+	}
+	return logs, nil
+}
+
+func fmtLog(event map[string]interface{}) *sls.Log {
+	var content []*sls.LogContent
+	for key, value := range event {
+		content = append(content, &sls.LogContent{
+			Key:   proto.String(key),
+			Value: proto.String(utils.SafeJsonMarshal(value)),
+		})
+	}
+
+	current := uint32(time.Now().Unix())
+	return &sls.Log{
+		Time:     proto.Uint32(current),
+		Contents: content,
+	}
+}
+
+func fmtLogList(eventList []map[string]interface{}) []*sls.Log {
+	list := make([]*sls.Log, 0)
+
+	for _, event := range eventList {
+		var content []*sls.LogContent
+		for key, value := range event {
+			content = append(content, &sls.LogContent{
+				Key:   proto.String(key),
+				Value: proto.String(utils.SafeJsonMarshal(value)),
+			})
+		}
+
+		current := uint32(time.Now().Unix())
+		list = append(list, &sls.Log{
+			Time:     proto.Uint32(current),
+			Contents: content,
+		})
+	}
+	return list
+
 }

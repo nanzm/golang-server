@@ -35,6 +35,8 @@ func initProducer(c config.SlsLog) *producer.Producer {
 }
 
 func TearDownProducer() {
-	GetProducer().SafeClose()
-	logx.Println("slsLog producer closed!")
+	if producerIns != nil {
+		producerIns.SafeClose()
+		logx.Println("slsLog producer closed!")
+	}
 }

@@ -1,10 +1,10 @@
-package core
+package boot
 
 import (
 	"dora/app/transit/datasource/nsq"
 	"dora/app/transit/mqConsumer"
 	"dora/config"
-	"dora/modules/logstore/datasource/slslog"
+	"dora/modules/logstore"
 	"dora/pkg/utils/logx"
 )
 
@@ -14,7 +14,7 @@ func Setup() {
 	logx.Init(conf.File)
 
 	// logStore
-	slslog.GetProducer()
+	logstore.GetClient()
 
 	// nsq
 	nsq.ProducerInstance()
@@ -24,6 +24,5 @@ func Setup() {
 func TearDown() {
 	nsq.ProducerTearDown()
 	nsq.ConsumerTearDown()
-
-	slslog.TearDownProducer()
+	logstore.TearDown()
 }
