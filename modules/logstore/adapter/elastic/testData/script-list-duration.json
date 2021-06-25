@@ -1,0 +1,42 @@
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "match": {
+            "appId": "wdssfar2312312dsad"
+          }
+        },
+        {
+          "match": {
+            "type": "performance"
+          }
+        },
+        {
+          "match": {
+            "subType": "resource"
+          }
+        },
+        {
+          "match": {
+            "performance.initiatorType": "script"
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "script": {
+      "terms": {
+        "field": "performance.name.keyword"
+      },
+      "aggs": {
+        "duration": {
+          "median_absolute_deviation": {
+            "field": "performance.duration"
+          }
+        }
+      }
+    }
+  }
+}
