@@ -82,6 +82,8 @@ func (e elkLog) DefaultQuery(appId string, from, to, interval int64, dataType st
 		return m.ErrorCount(appId, from, to)
 	case "errorCountTrend":
 		return m.ErrorCountTrend(appId, from, to, interval)
+
+	//	api
 	case "apiErrorCount":
 		return m.ApiErrorCount(appId, from, to)
 	case "apiErrorTrend":

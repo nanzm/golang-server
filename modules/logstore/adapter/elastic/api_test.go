@@ -106,3 +106,30 @@ func Test_elasticQuery_SdkVersionCount(t *testing.T) {
 
 	utils.PrettyPrint(re)
 }
+
+func Test_elasticQuery_ApiErrorCount(t *testing.T) {
+	re, err := NewElasticQuery().ApiErrorCount("wdssfar2312312dsad", 1624177745000, 1625041745000)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	utils.PrettyPrint(re)
+}
+
+func Test_elasticQuery_ApiErrorTrend(t *testing.T) {
+	re, err := NewElasticQuery().ApiErrorTrend("wdssfar2312312dsad", 1624177745000, 1625041745000,60)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	utils.PrettyPrint(re)
+}
+
+func Test_elasticQuery_ApiErrorList(t *testing.T) {
+	re, err := NewElasticQuery().ApiErrorList("wdssfar2312312dsad", 1624177745000, 1625041745000)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	utils.PrettyPrint(re)
+}

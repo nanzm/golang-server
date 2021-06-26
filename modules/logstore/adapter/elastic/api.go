@@ -12,7 +12,6 @@ type elasticQuery struct {
 	config config.Elastic
 }
 
-
 func NewElasticQuery() core.Api {
 	return &elasticQuery{
 		config: config.GetElastic(),
@@ -160,15 +159,87 @@ func (e elasticQuery) ErrorCountTrend(appId string, from, to, interval int64) (*
 }
 
 func (e elasticQuery) ApiErrorCount(appId string, from, to int64) (*response.ApiErrorCountRes, error) {
-	panic("implement me")
+	res, err := baseSearch(e.config.Index, buildQueryTpl(apiErrorCount, appId, from, to))
+	if err != nil {
+		logx.Error(err)
+		return nil, err
+	}
+
+	c := gjson.Get(string(res), "aggregations.count.value").Num
+	u := gjson.Get(string(res), "aggregations.effectUser.value").Num
+
+	result := &response.ApiErrorCountRes{
+		Count:      int(c),
+		EffectUser: int(u),
+	}
+	return result, nil
 }
 
 func (e elasticQuery) ApiErrorTrend(appId string, from, to int64, interval int64) (*response.ApiErrorTrendRes, error) {
-	panic("implement me")
+	res, err := baseSearch(e.config.Index, buildQueryTrendTpl(apiErrorTrend, appId, from, to, interval))
+	if err != nil {
+		logx.Error(err)
+		return nil, err
+	}
+
+	logs := make([]*response.ApiErrorTrendItemRes, 0)
+
+	// 遍历
+	buckets := gjson.Get(string(res), "aggregations.trend.buckets")
+	buckets.ForEach(func(key, value gjson.Result) bool {
+		count := gjson.Get(value.Raw, "doc_count").Num
+		eUser := gjson.Get(value.Raw, "uv.value").Num
+		ts := gjson.Get(value.Raw, "key_as_string").String()
+		item := &response.ApiErrorTrendItemRes{
+			Count:      int(count),
+			EffectUser: int(eUser),
+			Ts:         ts,
+		}
+		logs = append(logs, item)
+		return true
+	})
+
+	result := &response.ApiErrorTrendRes{
+		Total: len(logs),
+		List:  logs,
+	}
+	return result, nil
 }
 
 func (e elasticQuery) ApiErrorList(appId string, from, to int64) (*response.ApiErrorListRes, error) {
-	panic("implement me")
+	res, err := baseSearch(e.config.Index, buildQueryTpl(apiErrorList, appId, from, to))
+	if err != nil {
+		logx.Error(err)
+		return nil, err
+	}
+
+	logs := make([]*response.ApiErrorItem, 0)
+
+	buckets := gjson.Get(string(res), "aggregations.url.buckets")
+	buckets.ForEach(func(key, value gjson.Result) bool {
+		url := gjson.Get(value.Raw, "key").String()
+		method := gjson.Get(value.Raw, "method.buckets.#.key").String()
+		et := gjson.Get(value.Raw, "type.buckets.#.key").String()
+		count := gjson.Get(value.Raw, "count.value").Num
+		effectUser := gjson.Get(value.Raw, "effectUser.value").Num
+
+		item := &response.ApiErrorItem{
+			Id:         value.Index,
+			Url:        url,
+			Method:     method,
+			ErrorType:  et,
+			Count:      int(count),
+			EffectUser: int(effectUser),
+		}
+		logs = append(logs, item)
+		return true
+	})
+
+	result := &response.ApiErrorListRes{
+		Total: len(logs),
+		List:  logs,
+	}
+	return result, nil
 }
 
 func (e elasticQuery) PerfMetricsBucket(appId string, from, to int64) (*response.PerfMetricsBucket, error) {

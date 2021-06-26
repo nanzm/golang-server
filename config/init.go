@@ -2,10 +2,10 @@ package config
 
 import (
 	"dora/pkg/utils/fs"
-	"dora/pkg/utils/logx"
+	"errors"
 	"github.com/spf13/viper"
+	"log"
 )
-
 
 func init() {
 	configPath := "/Users/neil/Desktop/dora-platform/dora-server/config.yml"
@@ -14,15 +14,17 @@ func init() {
 	// file exist
 	exists, err := fs.FileExists(configPath)
 	if err != nil {
-		logx.Fatal(err)
+		log.Fatal(err)
 	}
 
 	// load env file for local test
-	if exists {
-		viper.SetConfigFile(configPath)
-		if err := viper.ReadInConfig(); err != nil {
-			logx.Fatal(err)
-		}
+	if !exists {
+		log.Fatal(errors.New("config path is wrong"))
+	}
+
+	viper.SetConfigFile(configPath)
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatal(err)
 	}
 
 	// load all Environment variables

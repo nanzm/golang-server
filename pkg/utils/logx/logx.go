@@ -66,7 +66,7 @@ func Init(path string) {
 
 func getSimpleLogger() *zap.SugaredLogger {
 	if simpleLogger == nil {
-		log.Fatal("please run Init before use!")
+		log.Fatal("please init before use logx")
 		return nil
 	}
 	return simpleLogger
