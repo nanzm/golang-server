@@ -417,3 +417,44 @@ const performanceBucket = `{
     }
   }
 }`
+
+const sdkVersionList = `{
+  "size": 0,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "match": {
+            "appId": "<APPID>"
+          }
+        },
+        {
+          "range": {
+            "ts": {
+              "gte": <FORM>,
+              "lte": <TO>
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggregations": {
+    "sdk": {
+      "terms": {
+        "field": "sdk.keyword",
+        "size": 50,
+        "order": {
+          "count": "desc"
+        }
+      },
+      "aggregations": {
+        "count": {
+          "value_count": {
+            "field": "appId.keyword"
+          }
+        }
+      }
+    }
+  }
+}`

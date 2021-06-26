@@ -30,17 +30,10 @@ type Api interface {
 	ApiErrorTrend(appId string, from, to int64, interval int64) (*response.ApiErrorTrendRes, error)
 	ApiErrorList(appId string, from, to int64) (*response.ApiErrorListRes, error)
 
-	// 网络
-	PerfNavigationTimingTrend(appId string, from, to int64, interval int64) (*response.PerfNavigationTimingTrendRes, error)
-	PerfNavigationTimingValues(appId string, from, to int64) (*response.PerfNavigationTimingValuesRes, error)
-
-	// 资源加载
-	PerfDataConsumptionTrend(appId string, from, to int64, interval int64) (*response.PerfDataConsumptionTrendRes, error)
-	PerfDataConsumptionValues(appId string, from, to int64) (*response.PerfDataConsumptionValuesRes, error)
-
 	// 性能
 	PerfMetricsBucket(appId string, from, to int64) (*response.PerfMetricsBucket, error)
-	PerfMetricsValues(appId string, from, to int64) (*response.PerfMetricsValuesRes, error)
+	PerfXhrTiming(appId string, from, to int64) (*response.PerfDataConsumptionTrendRes, error)
+	PerfScriptTiming(appId string, from, to int64) (*response.PerfDataConsumptionTrendRes, error)
 
 	// 资源加载失败
 	ResLoadFailTotalTrend(appId string, from, to, interval int64) (*response.ResLoadFailTotalTrendRes, error)

@@ -14,6 +14,9 @@ type slsQuery struct {
 	config config.SlsLog
 	client sls.ClientInterface
 }
+
+
+
 func NewSlsQuery() store.Api {
 	return &slsQuery{
 
@@ -376,124 +379,6 @@ func (s slsQuery) ApiErrorList(appId string, from, to int64) (*response.ApiError
 	return nil, nil
 }
 
-func (s slsQuery) PerfNavigationTimingTrend(appId string, from, to int64, interval int64) (*response.PerfNavigationTimingTrendRes, error) {
-	exp, err := buildQueryTrendExp(appId, interval, PerfNavigationTimingTrend)
-	if err != nil {
-		return nil, err
-	}
-	slsRes, err := baseQueryLogs(from, to, exp)
-	if err != nil {
-		logx.Printf("query log err : %v", err)
-		return nil, err
-	}
-
-	if len(slsRes.Logs) > 0 {
-		result := &response.PerfNavigationTimingTrendRes{
-			Total: len(slsRes.Logs),
-		}
-
-		// 遍历
-		trendList := make([]*response.NavigationTimingTrendItemRes, 0)
-		for _, log := range slsRes.Logs {
-			trendItem := &response.NavigationTimingTrendItemRes{}
-			err := utils.WeekDecode(log, trendItem)
-			if err != nil {
-				logx.Error(err)
-				return nil, err
-			}
-			trendList = append(trendList, trendItem)
-		}
-
-		result.List = trendList
-		return result, nil
-	}
-	return nil, nil
-}
-
-func (s slsQuery) PerfNavigationTimingValues(appId string, from, to int64) (*response.PerfNavigationTimingValuesRes, error) {
-	exp, err := buildQueryExp(appId, PerfNavigationTimingValues)
-	if err != nil {
-		return nil, err
-	}
-
-	slsRes, err := baseQueryLogs(from, to, exp)
-	if err != nil {
-		logx.Printf("query log err : %v", err)
-		return nil, err
-	}
-
-	if len(slsRes.Logs) > 0 {
-		input := slsRes.Logs[0]
-		result := &response.PerfNavigationTimingValuesRes{}
-		err := utils.WeekDecode(input, result)
-		if err != nil {
-			logx.Error(err)
-			return nil, err
-		}
-		return result, nil
-	}
-	return nil, nil
-}
-
-func (s slsQuery) PerfDataConsumptionTrend(appId string, from, to int64, interval int64) (*response.PerfDataConsumptionTrendRes, error) {
-	exp, err := buildQueryTrendExp(appId, interval, PerfDataConsumption)
-	if err != nil {
-		return nil, err
-	}
-	slsRes, err := baseQueryLogs(from, to, exp)
-	if err != nil {
-		logx.Printf("query log err : %v", err)
-		return nil, err
-	}
-
-	if len(slsRes.Logs) > 0 {
-		result := &response.PerfDataConsumptionTrendRes{
-			Total: len(slsRes.Logs),
-		}
-
-		// 遍历
-		trendList := make([]*response.PerfDataConsumptionTrendItemRes, 0)
-		for _, log := range slsRes.Logs {
-			trendItem := &response.PerfDataConsumptionTrendItemRes{}
-			err := utils.WeekDecode(log, trendItem)
-			if err != nil {
-				logx.Error(err)
-				return nil, err
-			}
-			trendList = append(trendList, trendItem)
-		}
-
-		result.List = trendList
-		return result, nil
-	}
-	return nil, nil
-}
-
-func (s slsQuery) PerfDataConsumptionValues(appId string, from, to int64) (*response.PerfDataConsumptionValuesRes, error) {
-	exp, err := buildQueryExp(appId, PerfDataConsumptionValues)
-	if err != nil {
-		return nil, err
-	}
-
-	slsRes, err := baseQueryLogs(from, to, exp)
-	if err != nil {
-		logx.Printf("query log err : %v", err)
-		return nil, err
-	}
-
-	if len(slsRes.Logs) > 0 {
-		input := slsRes.Logs[0]
-		result := &response.PerfDataConsumptionValuesRes{}
-		err := utils.WeekDecode(input, result)
-		if err != nil {
-			logx.Error(err)
-			return nil, err
-		}
-		return result, nil
-	}
-	return nil, nil
-}
-
 func (s slsQuery) PerfMetricsBucket(appId string, from, to int64) (*response.PerfMetricsBucket, error) {
 	//exp, err := buildQueryTrendExp(appId, interval, PerfMetrics)
 	//if err != nil {
@@ -526,6 +411,14 @@ func (s slsQuery) PerfMetricsBucket(appId string, from, to int64) (*response.Per
 	//	return result, nil
 	//}
 	return nil, nil
+}
+
+func (s slsQuery) PerfXhrTiming(appId string, from, to int64) (*response.PerfDataConsumptionTrendRes, error) {
+	panic("implement me")
+}
+
+func (s slsQuery) PerfScriptTiming(appId string, from, to int64) (*response.PerfDataConsumptionTrendRes, error) {
+	panic("implement me")
 }
 
 func (s slsQuery) PerfMetricsValues(appId string, from, to int64) (*response.PerfMetricsValuesRes, error) {

@@ -12,6 +12,7 @@ type elasticQuery struct {
 	config config.Elastic
 }
 
+
 func NewElasticQuery() core.Api {
 	return &elasticQuery{
 		config: config.GetElastic(),
@@ -76,18 +77,29 @@ func (e elasticQuery) PvUvTrend(appId string, from, to, interval int64) (*respon
 }
 
 func (e elasticQuery) SdkVersionCount(appId string, from, to int64) (*response.SdkVersionCountRes, error) {
-	_, err := baseSearch(e.config.Index, buildQueryTpl(pvUvTotal, appId, from, to))
+	res, err := baseSearch(e.config.Index, buildQueryTpl(sdkVersionList, appId, from, to))
 	if err != nil {
 		logx.Error(err)
 		return nil, err
 	}
 
-	//pv := gjson.Get(string(res), "aggregations.pv.value").Num
-	//uv := gjson.Get(string(res), "aggregations.uv.value").Num
+	logs := make([]*response.SdkVersionItem, 0)
+	buckets := gjson.Get(string(res), "aggregations.sdk.buckets")
+	buckets.ForEach(func(key, value gjson.Result) bool {
+		version := gjson.Get(value.Raw, "key").String()
+		count := gjson.Get(value.Raw, "count.value").Num
+
+		item := &response.SdkVersionItem{
+			Version: version,
+			Count:   int(count),
+		}
+		logs = append(logs, item)
+		return true
+	})
 
 	result := &response.SdkVersionCountRes{
 		Total: 0,
-		List:  nil,
+		List:  logs,
 	}
 	return result, nil
 }
@@ -104,8 +116,6 @@ func (e elasticQuery) PagesCount(appId string, from, to int64) (*response.PageTo
 	}
 
 	logs := make([]*response.PageTotalItemRes, 0)
-
-	// 遍历
 	buckets := gjson.Get(string(res), "aggregations.url.buckets")
 	buckets.ForEach(func(key, value gjson.Result) bool {
 		url := gjson.Get(value.Raw, "key").String()
@@ -161,22 +171,6 @@ func (e elasticQuery) ApiErrorList(appId string, from, to int64) (*response.ApiE
 	panic("implement me")
 }
 
-func (e elasticQuery) PerfNavigationTimingTrend(appId string, from, to int64, interval int64) (*response.PerfNavigationTimingTrendRes, error) {
-	panic("implement me")
-}
-
-func (e elasticQuery) PerfNavigationTimingValues(appId string, from, to int64) (*response.PerfNavigationTimingValuesRes, error) {
-	panic("implement me")
-}
-
-func (e elasticQuery) PerfDataConsumptionTrend(appId string, from, to int64, interval int64) (*response.PerfDataConsumptionTrendRes, error) {
-	panic("implement me")
-}
-
-func (e elasticQuery) PerfDataConsumptionValues(appId string, from, to int64) (*response.PerfDataConsumptionValuesRes, error) {
-	panic("implement me")
-}
-
 func (e elasticQuery) PerfMetricsBucket(appId string, from, to int64) (*response.PerfMetricsBucket, error) {
 	res, err := baseSearch(e.config.Index, buildQueryTpl(performanceBucket, appId, from, to))
 	if err != nil {
@@ -227,7 +221,11 @@ func (e elasticQuery) PerfMetricsBucket(appId string, from, to int64) (*response
 	return result, err
 }
 
-func (e elasticQuery) PerfMetricsValues(appId string, from, to int64) (*response.PerfMetricsValuesRes, error) {
+func (e elasticQuery) PerfXhrTiming(appId string, from, to int64) (*response.PerfDataConsumptionTrendRes, error) {
+	panic("implement me")
+}
+
+func (e elasticQuery) PerfScriptTiming(appId string, from, to int64) (*response.PerfDataConsumptionTrendRes, error) {
 	panic("implement me")
 }
 

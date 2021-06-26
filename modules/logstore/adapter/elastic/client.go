@@ -98,18 +98,8 @@ func (e elkLog) DefaultQuery(appId string, from, to, interval int64, dataType st
 		return m.ResLoadFailList(appId, from, to)
 
 	// 性能
-	case "perfNavigationTiming":
-		return m.PerfNavigationTimingTrend(appId, from, to, interval)
-	case "perfNavigationTimingValues":
-		return m.PerfNavigationTimingValues(appId, from, to)
-	case "perfDataConsumption":
-		return m.PerfDataConsumptionTrend(appId, from, to, interval)
-	case "perfDataConsumptionValues":
-		return m.PerfDataConsumptionValues(appId, from, to)
 	case "perfMetrics":
 		return m.PerfMetricsBucket(appId, from, to)
-	case "perfMetricsValues":
-		return m.PerfMetricsValues(appId, from, to)
 
 	case "projectEventCount":
 		return m.ProjectEventCount(appId, from, to)

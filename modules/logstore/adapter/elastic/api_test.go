@@ -98,3 +98,11 @@ func Test_elasticQuery_PerfMetricsTrend(t *testing.T) {
 	utils.PrettyPrint(result)
 }
 
+func Test_elasticQuery_SdkVersionCount(t *testing.T) {
+	re, err := NewElasticQuery().SdkVersionCount("wdssfar2312312dsad", 1624177745000, 1625041745000)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	utils.PrettyPrint(re)
+}
