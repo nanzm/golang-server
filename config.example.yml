@@ -3,43 +3,44 @@ app:
     secret: ""
     log:
       file: "./manage.log"
-    gorm:
-      driver: "mysql"
-      dsn: "demo:demo@tcp(127.0.0.1:3306)/dora?charset=utf8mb4&parseTime=True&loc=Local"
-    redis:
-      addr: "127.0.0.1:6379"
-      password: "123456"
-      db: 0
-    mail:
-      host: "smtp.qq.com"
-      port: "587"
-      username: ""
-      password: ""
-    dingding:
-      accessToken:
-      secret:
-
   transit:
     secret: ""
     log:
       file: "./transit.log"
-    nsq:
-      address: "127.0.0.1:4150"
-      topic: "event"
-      channel: "dev-ch"
 
-logStore:
-  enable: "slsLog"
-  elastic:
-    addresses: ""
+datasource:
+  nsq:
+    address: "127.0.0.1:4150"
+    topic: "event"
+    channel: "dev-ch"
+  logStore:
+    enable: "slsLog"
+    elastic:
+      addresses: ""
+      username: ""
+      password: ""
+      index: ""
+    slsLog:
+      accesskey: ""
+      secret: ""
+      endpoint: ""
+      project: ""
+      logStore: ""
+      topic: ""
+      source: ""
+  gorm:
+    driver: "mysql"
+    dsn: "demo:demo@tcp(127.0.0.1:3306)/dora?charset=utf8mb4&parseTime=True&loc=Local"
+  redis:
+    addr: "127.0.0.1:6379"
+    password: "123456"
+    db: 0
+  mail:
+    host: "smtp.qq.com"
+    port: "587"
     username: ""
     password: ""
-    index: ""
-  slsLog:
-    accesskey: ""
-    secret: ""
-    endpoint: ""
-    project: ""
-    logStore: ""
-    topic: ""
-    source: ""
+  dingding:
+    accessToken:
+    secret:
+
