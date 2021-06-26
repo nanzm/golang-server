@@ -7,7 +7,7 @@ import (
 )
 
 func TestGetElasticClient(t *testing.T) {
-	es := GetElasticClient()
+	es := GetClient()
 	info, err := es.Info()
 	if err != nil {
 		t.Fatal(err)
@@ -16,7 +16,7 @@ func TestGetElasticClient(t *testing.T) {
 }
 
 func TestPut(t *testing.T) {
-	es := GetElasticClient()
+	es := GetClient()
 
 	cp := `{
   "mappings": {

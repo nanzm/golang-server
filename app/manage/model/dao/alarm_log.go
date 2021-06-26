@@ -1,9 +1,9 @@
 package dao
 
 import (
-	dataGorm "dora/app/manage/datasource/gorm"
 	"dora/app/manage/model/dto"
 	"dora/app/manage/model/entity"
+	dataGorm "dora/modules/datasource/gorm"
 	"gorm.io/gorm"
 )
 

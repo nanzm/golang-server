@@ -2,10 +2,10 @@ package logstore
 
 import (
 	"dora/config"
+	"dora/modules/datasource/slslog"
 	elasticComponent "dora/modules/logstore/adapter/elastic"
 	slsLogComponent "dora/modules/logstore/adapter/slslog"
 	"dora/modules/logstore/core"
-	"dora/modules/logstore/datasource/slslog"
 	"dora/pkg/utils/logx"
 )
 

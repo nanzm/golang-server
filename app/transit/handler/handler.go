@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"dora/app/transit/datasource/nsq"
 	"dora/config"
+	"dora/modules/datasource/nsq"
 	"dora/pkg/utils"
 	"dora/pkg/utils/ginutil"
 	"github.com/gin-gonic/gin"

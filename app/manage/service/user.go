@@ -2,9 +2,9 @@ package service
 
 import (
 	"context"
-	mailRes "dora/app/manage/datasource/mail"
-	dataRedis "dora/app/manage/datasource/redis"
 	"dora/config"
+	mailRes "dora/modules/datasource/mail"
+	dataRedis "dora/modules/datasource/redis"
 	"dora/pkg/utils"
 	"fmt"
 	"time"

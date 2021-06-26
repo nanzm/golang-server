@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"dora/app/manage/datasource/redis"
+	"dora/modules/datasource/redis"
 	"dora/pkg/utils/ginutil"
 	"fmt"
 	"github.com/gin-gonic/gin"

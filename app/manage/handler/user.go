@@ -1,11 +1,11 @@
 package handler
 
 import (
-	gorm2 "dora/app/manage/datasource/gorm"
 	"dora/app/manage/model/dao"
 	"dora/app/manage/model/dto"
 	"dora/app/manage/model/entity"
 	"dora/app/manage/service"
+	gorm2 "dora/modules/datasource/gorm"
 	"dora/modules/middleware"
 	"dora/pkg/utils"
 	"dora/pkg/utils/ginutil"

@@ -1,9 +1,9 @@
 package boot
 
 import (
-	"dora/app/transit/datasource/nsq"
 	"dora/app/transit/mqConsumer"
 	"dora/config"
+	"dora/modules/datasource/nsq"
 	"dora/modules/logstore"
 	"dora/pkg/utils/logx"
 )

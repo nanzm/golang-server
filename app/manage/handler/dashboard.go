@@ -2,7 +2,7 @@ package handler
 
 import (
 	"context"
-	dataRedis "dora/app/manage/datasource/redis"
+	dataRedis "dora/modules/datasource/redis"
 
 	"dora/app/manage/model/dto"
 	"dora/modules/logstore"

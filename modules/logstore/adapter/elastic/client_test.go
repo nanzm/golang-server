@@ -1,7 +1,7 @@
 package elasticComponent
 
 import (
-	"dora/modules/logstore/datasource/elastic"
+	"dora/modules/datasource/elastic"
 	"dora/pkg/utils"
 	"encoding/json"
 	"log"

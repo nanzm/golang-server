@@ -1,13 +1,13 @@
 package boot
 
 import (
-	"dora/app/manage/datasource/gorm"
-	"dora/app/manage/datasource/mail"
-	"dora/app/manage/datasource/redis"
 	"dora/app/manage/schedule"
 	"dora/config"
+	"dora/modules/datasource/gorm"
+	"dora/modules/datasource/mail"
+	"dora/modules/datasource/redis"
+	"dora/modules/datasource/slslog"
 	"dora/modules/initialize"
-	"dora/modules/logstore/datasource/slslog"
 	"dora/pkg/utils/logx"
 )
 

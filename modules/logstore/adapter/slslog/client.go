@@ -2,8 +2,8 @@ package slslogComponent
 
 import (
 	"dora/config"
+	"dora/modules/datasource/slslog"
 	"dora/modules/logstore/core"
-	"dora/modules/logstore/datasource/slslog"
 	"dora/pkg/utils"
 	"errors"
 	sls "github.com/aliyun/aliyun-log-go-sdk"
@@ -22,9 +22,9 @@ type slsLog struct {
 
 func NewSlsLogStore() core.Client {
 	return &slsLog{
-		config: config.GetSlsLog(),
+		config:   config.GetSlsLog(),
 		producer: slslog.GetProducer(),
-		client: slslog.GetClient(),
+		client:   slslog.GetClient(),
 	}
 }
 

@@ -2,10 +2,10 @@ package service
 
 import (
 	"context"
-	"dora/app/manage/datasource/gorm"
-	"dora/app/manage/datasource/redis"
 	"dora/app/manage/model/entity"
 	"dora/config/constant"
+	"dora/modules/datasource/gorm"
+	"dora/modules/datasource/redis"
 	"dora/pkg/utils/logx"
 
 	"dora/app/manage/model/dao"
