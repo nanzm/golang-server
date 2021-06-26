@@ -27,6 +27,15 @@ elastic-down:
 elastic-logs:
 	cd deployments  && docker-compose -f ./elasticstack.yml logs
 
+
+# --- app ---------------------------------------------------------
+dev-transit:
+	go run cmd/transit/main.go
+
+dev-manage:
+	go run cmd/manage/main.go
+
+
 # --- app ---------------------------------------------------------
 build-transit:
 	docker build -f deployments/transit.Dockerfile -t nancode/dora-transit

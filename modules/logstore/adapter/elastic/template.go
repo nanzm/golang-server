@@ -4,37 +4,37 @@ const pvUvTotal = `{
   "size": 0,
   "query": {
     "bool": {
-      "must": [
+      "filter": [
         {
           "match": {
-            "d_appId": "fca5deec-a9db-4dac-a4db-b0f4610d16a5"
+            "appId": "<APPID>"
           }
         },
         {
           "match": {
-            "category": "view"
+            "type": "visit"
           }
         },
         {
           "range": {
-            "d_ts": {
-              "gte": "<FORM>",
-              "lte": "<TO>"
+            "ts": {
+              "gte": <FORM>,
+              "lte": <TO>
             }
           }
         }
       ]
     }
   },
-  "aggs": {
+  "aggregations": {
     "uv": {
       "cardinality": {
-        "field": "d_uuid"
+        "field": "uid.keyword"
       }
     },
     "pv": {
       "value_count": {
-        "field": "category"
+        "field": "type.keyword"
       }
     }
   }
@@ -44,44 +44,45 @@ const pvUvTotalTrend = `{
   "size": 0,
   "query": {
     "bool": {
-      "must": [
+      "filter": [
         {
           "match": {
-            "d_appId": "fca5deec-a9db-4dac-a4db-b0f4610d16a5"
+            "appId": "<APPID>"
           }
         },
         {
           "match": {
-            "category": "view"
+            "type": "visit"
           }
         },
         {
           "range": {
-            "d_ts": {
-              "gte": "<FORM>",
-              "lte": "<TO>"
+            "ts": {
+              "gte": <FORM>,
+              "lte": <TO>
             }
           }
         }
       ]
     }
   },
-  "aggs": {
+  "aggregations": {
     "pv": {
       "value_count": {
-        "field": "category"
+        "field": "type.keyword"
       }
     },
-    "pvTrend": {
+    "trend": {
       "date_histogram": {
-        "field": "d_ts",
-        "fixed_interval": "<INTERVAL>m",
+        "field": "ts",
+        "interval": "<INTERVAL>m",
+        "time_zone": "+08:00",
         "format": "yyyy-MM-dd HH:mm:ss"
       },
-      "aggs": {
+      "aggregations": {
         "uv": {
           "cardinality": {
-            "field": "d_uuid"
+            "field": "uid.keyword"
           }
         }
       }
@@ -89,50 +90,50 @@ const pvUvTotalTrend = `{
   }
 }`
 
-const entryPage = `{
+const urlPVUv = `{
   "size": 0,
   "query": {
     "bool": {
-      "must": [
+      "filter": [
         {
           "match": {
-            "d_appId": "fca5deec-a9db-4dac-a4db-b0f4610d16a5"
+            "appId": "<APPID>"
           }
         },
         {
           "match": {
-            "category": "view"
+            "type": "visit"
           }
         },
         {
           "range": {
-            "d_ts": {
-              "gte": "<FORM>",
-              "lte": "<TO>"
+            "ts": {
+              "gte": <FORM>,
+              "lte": <TO>
             }
           }
         }
       ]
     }
   },
-  "aggs": {
-    "entryPage": {
+  "aggregations": {
+    "url": {
       "terms": {
-        "field": "d_url",
+        "field": "href.keyword",
         "size": 50,
         "order": {
           "pv": "desc"
         }
       },
-      "aggs": {
+      "aggregations": {
         "pv": {
           "value_count": {
-            "field": "category"
+            "field": "type.keyword"
           }
         },
         "uv": {
           "cardinality": {
-            "field": "d_uuid"
+            "field": "uid.keyword"
           }
         }
       }
@@ -144,37 +145,37 @@ const errorCount = `{
   "size": 0,
   "query": {
     "bool": {
-      "must": [
+      "filter": [
         {
           "match": {
-            "d_appId": "fca5deec-a9db-4dac-a4db-b0f4610d16a5"
+            "appId": "<APPID>"
           }
         },
         {
           "match": {
-            "category": "error"
+            "type": "error"
           }
         },
         {
           "range": {
-            "d_ts": {
-              "gte": "<FORM>",
-              "lte": "<TO>"
+            "ts": {
+              "gte": <FORM>,
+              "lte": <TO>
             }
           }
         }
       ]
     }
   },
-  "aggs": {
-    "uv": {
-      "cardinality": {
-        "field": "d_uuid"
+  "aggregations": {
+    "count": {
+      "value_count": {
+        "field": "type.keyword"
       }
     },
-    "pv": {
-      "value_count": {
-        "field": "category"
+    "effectUser": {
+      "cardinality": {
+        "field": "uid.keyword"
       }
     }
   }
@@ -184,10 +185,10 @@ const performanceBucket = `{
   "size": 0,
   "query": {
     "bool": {
-      "must": [
+      "filter": [
         {
           "match": {
-            "appId": "fca5deec-a9db-4dac-a4db-b0f4610d16a5"
+            "appId": "<APPID>"
           }
         },
         {
@@ -203,15 +204,15 @@ const performanceBucket = `{
         {
           "range": {
             "ts": {
-              "gte": "<FORM>",
-              "lte": "<TO>"
+              "gte": <FORM>,
+              "lte": <TO>
             }
           }
         }
       ]
     }
   },
-  "aggs": {
+  "aggregations": {
     "fp": {
       "range": {
         "field": "performance.fp",

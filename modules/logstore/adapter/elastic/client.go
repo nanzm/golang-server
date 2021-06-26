@@ -135,7 +135,7 @@ func (e elkLog) QueryMethods() core.Api {
 
 func buildQueryTpl(tpl string, appId string, from, to int64) string {
 	r := strings.NewReplacer(
-		"fca5deec-a9db-4dac-a4db-b0f4610d16a5", appId,
+		"<APPID>", appId,
 		"<FORM>", strconv.Itoa(int(from)),
 		"<TO>", strconv.Itoa(int(to)),
 	)
@@ -146,7 +146,7 @@ func buildQueryTpl(tpl string, appId string, from, to int64) string {
 
 func buildQueryTrendTpl(tpl string, appId string, from, to, interval int64) string {
 	r := strings.NewReplacer(
-		"fca5deec-a9db-4dac-a4db-b0f4610d16a5", appId,
+		"<APPID>", appId,
 		"<FORM>", strconv.Itoa(int(from)),
 		"<TO>", strconv.Itoa(int(to)),
 		"<INTERVAL>", strconv.Itoa(int(interval)),
@@ -157,10 +157,9 @@ func buildQueryTrendTpl(tpl string, appId string, from, to, interval int64) stri
 }
 
 func baseSearch(Index string, queryTpl string) ([]byte, error) {
-	//fmt.Printf("%v \n", queryTpl)
+	fmt.Printf("%v \n", queryTpl)
 	es := elastic.GetClient()
 
-	fmt.Println("------------------------------------")
 	res, err := es.Search(
 		es.Search.WithIndex(Index),
 		es.Search.WithBody(strings.NewReader(queryTpl)),

@@ -9,7 +9,7 @@ type JSONResponse struct {
 	Code      int         `json:"code"`
 	Data      interface{} `json:"data"`
 	Message   string      `json:"message"`
-	Error     string      `json:"error"`
+	Error     string      `json:"error,omitempty"`
 	Validator interface{} `json:"validate,omitempty"`
 }
 
