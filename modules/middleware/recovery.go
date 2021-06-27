@@ -30,7 +30,7 @@ func Recovery(stack bool) gin.HandlerFunc {
 
 				httpRequest, _ := httputil.DumpRequest(c.Request, false)
 				if brokenPipe {
-					logx.Error(c.Request.URL.Path,
+					logx.Zap.Error(c.Request.URL.Path,
 						zap.Any("error", err),
 						zap.String("request", string(httpRequest)),
 					)
@@ -41,14 +41,14 @@ func Recovery(stack bool) gin.HandlerFunc {
 				}
 
 				if stack {
-					logx.Error("[Recovery from panic]",
+					logx.Zap.Error("[Recovery from panic]",
 						zap.Time("time", time.Now()),
 						zap.Any("error", err),
 						zap.String("request", string(httpRequest)),
 						zap.String("stack", string(debug.Stack())),
 					)
 				} else {
-					logx.Error("[Recovery from panic]",
+					logx.Zap.Error("[Recovery from panic]",
 						zap.Time("time", time.Now()),
 						zap.Any("error", err),
 						zap.String("request", string(httpRequest)),

@@ -22,6 +22,45 @@ func (e elasticQuery) GetLogByMd5(from, to int64, md5 string) (*response.LogsRes
 	panic("implement me")
 }
 
+func (e elasticQuery) GetErrorList(appId string, from, to int64) (*response.ErrorListRes, error) {
+	res, err := baseSearch(e.config.Index, buildQueryTpl(errorList, appId, from, to))
+	if err != nil {
+		logx.Error(err)
+		return nil, err
+	}
+
+	logs := make([]*response.ErrorItem, 0)
+
+	buckets := gjson.Get(string(res), "aggregations.md5.buckets")
+	buckets.ForEach(func(key, value gjson.Result) bool {
+		md5 := gjson.Get(value.Raw, "key").String()
+		msg := gjson.Get(value.Raw, "msg.buckets.0.key").String()
+		errorStr := gjson.Get(value.Raw, "error.buckets.0.key").String()
+		count := gjson.Get(value.Raw, "count.value").Num
+		effectUser := gjson.Get(value.Raw, "effectUser.value").Num
+		times := gjson.Get(value.Raw, "ts.buckets.#.key").Array()
+		first, last := GetFirstAndLastTime(times)
+
+		item := &response.ErrorItem{
+			Md5:        md5,
+			Msg:        msg,
+			Error:      errorStr,
+			Count:      int(count),
+			EffectUser: int(effectUser),
+			FirstAt:    first,
+			LastAt:     last,
+		}
+		logs = append(logs, item)
+		return true
+	})
+
+	result := &response.ErrorListRes{
+		Total: len(logs),
+		List:  logs,
+	}
+	return result, nil
+}
+
 func (e elasticQuery) LogCountByMd5(from, to int64, md5 string) (*response.LogCountByMd5Res, error) {
 	panic("implement me")
 }
@@ -55,7 +94,6 @@ func (e elasticQuery) PvUvTrend(appId string, from, to, interval int64) (*respon
 	// 遍历
 	buckets := gjson.Get(string(res), "aggregations.trend.buckets")
 	buckets.ForEach(func(key, value gjson.Result) bool {
-		// {"key_as_string":"2021-03-30 09:30:00","key":1617096600000,"doc_count":4,"uv":{"value":1}}
 		pv := gjson.Get(value.Raw, "doc_count").Num
 		uv := gjson.Get(value.Raw, "uv.value").Num
 		ts := gjson.Get(value.Raw, "key_as_string").String()
@@ -155,7 +193,35 @@ func (e elasticQuery) ErrorCount(appId string, from, to int64) (*response.ErrorC
 }
 
 func (e elasticQuery) ErrorCountTrend(appId string, from, to, interval int64) (*response.ErrorCountTrendRes, error) {
-	panic("implement me")
+	res, err := baseSearch(e.config.Index, buildQueryTrendTpl(errorCountTrend, appId, from, to, interval))
+	if err != nil {
+		logx.Error(err)
+		return nil, err
+	}
+
+	logs := make([]*response.ErrorCountTrendItemRes, 0)
+
+	// 遍历
+	buckets := gjson.Get(string(res), "aggregations.trend.buckets")
+	buckets.ForEach(func(key, value gjson.Result) bool {
+		count := gjson.Get(value.Raw, "doc_count").Num
+		eUser := gjson.Get(value.Raw, "uv.value").Num
+		ts := gjson.Get(value.Raw, "key_as_string").String()
+
+		item := &response.ErrorCountTrendItemRes{
+			Count:      int(count),
+			EffectUser: int(eUser),
+			Ts:         ts,
+		}
+		logs = append(logs, item)
+		return true
+	})
+
+	result := &response.ErrorCountTrendRes{
+		Total: len(logs),
+		List:  logs,
+	}
+	return result, nil
 }
 
 func (e elasticQuery) ApiErrorCount(appId string, from, to int64) (*response.ApiErrorCountRes, error) {
@@ -347,110 +413,3 @@ func (e elasticQuery) ProjectCategory(appId string, from, to int64) (*response.P
 func (e elasticQuery) ProjectEnv(appId string, from, to int64) (*response.ProjectEnvRes, error) {
 	panic("implement me")
 }
-
-//
-//func (e elasticQuery) GetLogByMd5(from, to int64, md5 string) (*store.LogsResponse, error) {
-//	return nil, errors.New("be under construction")
-//}
-//
-//func (e elasticQuery) CountLogByMd5(from, to int64, md5 string) (*store.LogsResponse, error) {
-//	return nil, errors.New("be under construction")
-//}
-//
-//func (e elasticQuery) PvUvTotal(appId string, from, to int64) (*store.LogsResponse, error) {
-//	res, err := baseSearch(e.config.Index, buildQueryTpl(pvUvTotal, appId, from, to))
-//	if err != nil {
-//		logx.Error(err)
-//		return nil, err
-//	}
-//
-//	pv := gjson.Get(string(res), "aggregations.pv.value")
-//	uv := gjson.Get(string(res), "aggregations.uv.value")
-//
-//	result := &store.LogsResponse{
-//		Count: 1,
-//		Logs:  []map[string]string{{"total": pv.String(), "user": uv.String()}},
-//	}
-//	return result, nil
-//}
-//
-//func (e elasticQuery) PvUvTrend(appId string, from, to, interval int64) (*store.LogsResponse, error) {
-//	res, err := baseSearch(e.config.Index, buildQueryTrendTpl(pvUvTotalTrend, appId, from, to, interval))
-//	if err != nil {
-//		logx.Error(err)
-//		return nil, err
-//	}
-//
-//	logs := make([]map[string]string, 0)
-//
-//	// 遍历
-//	buckets := gjson.Get(string(res), "aggregations.pvTrend.buckets")
-//	buckets.ForEach(func(key, value gjson.Result) bool {
-//		item := make(map[string]string)
-//		// {"key_as_string":"2021-03-30 09:30:00","key":1617096600000,"doc_count":4,"uv":{"value":1}}
-//		item["ts"] = gjson.Get(value.Raw, "key_as_string").String()
-//		item["pv"] = gjson.Get(value.Raw, "doc_count").String()
-//		item["uv"] = gjson.Get(value.Raw, "uv.value").String()
-//		logs = append(logs, item)
-//		return true // keep iterating
-//	})
-//
-//	result := &store.LogsResponse{
-//		Count: int64(len(logs)),
-//		Logs:  logs,
-//	}
-//	return result, nil
-//}
-//
-//func (e elasticQuery) SdkVersionCount(appId string, from, to int64) (*store.LogsResponse, error) {
-//	return nil, errors.New("be under construction")
-//}
-//
-//func (e elasticQuery) CategoryCount(appId string, from, to int64) (*store.LogsResponse, error) {
-//	return nil, errors.New("be under construction")
-//}
-//
-//func (e elasticQuery) EntryPage(appId string, from, to int64) (*store.LogsResponse, error) {
-//	res, err := baseSearch(e.config.Index, buildQueryTpl(entryPage, appId, from, to))
-//	if err != nil {
-//		logx.Error(err)
-//		return nil, err
-//	}
-//
-//	logs := make([]map[string]string, 0)
-//
-//	// 遍历
-//	buckets := gjson.Get(string(res), "aggregations.entryPage.buckets")
-//	buckets.ForEach(func(key, value gjson.Result) bool {
-//		item := make(map[string]string)
-//		// {"key_as_string":"2021-03-30 09:30:00","key":1617096600000,"doc_count":4,"uv":{"value":1}}
-//		item["url"] = gjson.Get(value.Raw, "key").String()
-//		item["c"] = gjson.Get(value.Raw, "pv.value").String()
-//		item["u"] = gjson.Get(value.Raw, "uv.value").String()
-//		logs = append(logs, item)
-//		return true // keep iterating
-//	})
-//
-//	result := &store.LogsResponse{
-//		Count: int64(len(logs)),
-//		Logs:  logs,
-//	}
-//	return result, nil
-//}
-//
-//func (e elasticQuery) ErrorCount(appId string, from, to int64) (*store.LogsResponse, error) {
-//	res, err := baseSearch(e.config.Index, buildQueryTpl(errorCount, appId, from, to))
-//	if err != nil {
-//		logx.Error(err)
-//		return nil, err
-//	}
-//
-//	pv := gjson.Get(string(res), "aggregations.pv.value")
-//	uv := gjson.Get(string(res), "aggregations.uv.value")
-//
-//	result := &store.LogsResponse{
-//		Count: 1,
-//		Logs:  []map[string]string{{"total": pv.String(), "user": uv.String()}},
-//	}
-//	return result, nil
-//}

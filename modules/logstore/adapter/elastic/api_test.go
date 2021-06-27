@@ -47,6 +47,15 @@ func Test_elasticQuery_ErrorCount(t *testing.T) {
 	utils.PrettyPrint(re)
 }
 
+func Test_elasticQuery_ErrorCountTrend(t *testing.T) {
+	re, err := NewElasticQuery().ErrorCountTrend("wdssfar2312312dsad", 1624177745000, 1625041745000, 60)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	utils.PrettyPrint(re)
+}
+
 func Test_elasticQuery_PerfMetricsTrend(t *testing.T) {
 	//_, err := NewElasticQuery().PerfMetricsBucket("wdssfar2312312dsad", 1617097374, 1617183785)
 	//if err != nil {
@@ -127,6 +136,15 @@ func Test_elasticQuery_ApiErrorTrend(t *testing.T) {
 
 func Test_elasticQuery_ApiErrorList(t *testing.T) {
 	re, err := NewElasticQuery().ApiErrorList("wdssfar2312312dsad", 1624177745000, 1625041745000)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	utils.PrettyPrint(re)
+}
+
+func Test_elasticQuery_GetErrorList(t *testing.T) {
+	re, err := NewElasticQuery().GetErrorList("wdssfar2312312dsad", 1624177745000, 1625041745000)
 	if err != nil {
 		t.Fatal(err)
 	}

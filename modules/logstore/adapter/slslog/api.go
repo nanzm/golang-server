@@ -15,11 +15,8 @@ type slsQuery struct {
 	client sls.ClientInterface
 }
 
-
-
 func NewSlsQuery() store.Api {
 	return &slsQuery{
-
 	}
 }
 
@@ -59,6 +56,10 @@ func (s slsQuery) LogCountByMd5(from, to int64, md5 string) (*response.LogCountB
 		return result, nil
 	}
 	return nil, nil
+}
+
+func (s slsQuery) GetErrorList(appId string, from, to int64) (*response.ErrorListRes, error) {
+	panic("implement me")
 }
 
 func (s slsQuery) PvUvTotal(appId string, from, to int64) (*response.PvUvTotalRes, error) {
@@ -745,4 +746,3 @@ func (s slsQuery) ProjectEnv(appId string, from, to int64) (*response.ProjectEnv
 	}
 	return nil, nil
 }
-

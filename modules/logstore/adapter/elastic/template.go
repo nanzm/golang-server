@@ -181,6 +181,119 @@ const errorCount = `{
   }
 }`
 
+const errorCountTrend = `{
+  "size": 0,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "match": {
+            "appId": "<APPID>"
+          }
+        },
+        {
+          "match": {
+            "type": "error"
+          }
+        },
+        {
+          "range": {
+            "ts": {
+              "gte": <FORM>,
+              "lte": <TO>
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggregations": {
+    "trend": {
+      "date_histogram": {
+        "field": "ts",
+        "interval": "<INTERVAL>m",
+        "time_zone": "+08:00",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      },
+      "aggregations": {
+        "count": {
+          "value_count": {
+            "field": "type.keyword"
+          }
+        },
+        "effectUser": {
+          "cardinality": {
+            "field": "uid.keyword"
+          }
+        }
+      }
+    }
+  }
+}`
+
+const errorList=`{
+  "size": 0,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "match": {
+            "appId": "<APPID>"
+          }
+        },
+        {
+          "match": {
+            "type": "error"
+          }
+        },
+        {
+          "range": {
+            "ts": {
+              "gte": <FORM>,
+              "lte": <TO>
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggregations": {
+    "md5": {
+      "terms": {
+        "field": "md5.keyword",
+        "size": 100
+      },
+      "aggregations": {
+        "msg": {
+          "terms": {
+            "field": "error.msg.keyword"
+          }
+        },
+        "error": {
+          "terms": {
+            "field": "error.error.keyword"
+          }
+        },
+        "count": {
+          "value_count": {
+            "field": "type.keyword"
+          }
+        },
+        "effectUser": {
+          "cardinality": {
+            "field": "uid.keyword"
+          }
+        },
+        "ts": {
+          "terms": {
+            "field": "ts"
+          }
+        }
+      }
+    }
+  }
+}`
+
 const performanceBucket = `{
   "size": 0,
   "query": {
@@ -606,7 +719,7 @@ const apiErrorTrend = `{
     "trend": {
       "date_histogram": {
         "field": "ts",
-        "interval": "60m",
+        "interval": "<INTERVAL>m",
         "time_zone": "+08:00",
         "format": "yyyy-MM-dd HH:mm:ss"
       },

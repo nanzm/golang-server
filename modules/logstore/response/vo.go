@@ -28,6 +28,22 @@ type PvUvTrendItemRes struct {
 	Ts string `json:"ts"`
 }
 
+type ErrorItem struct {
+	Md5        string `json:"md5"`
+	Msg        string `json:"msg"`
+	Error      string `json:"error"`
+	Count      int    `json:"count"`
+	EffectUser int    `json:"effectUser"`
+	FirstAt    int    `json:"firstAt"`
+	LastAt     int    `json:"lastAt"`
+}
+
+// 统计 md 的次数
+type ErrorListRes struct {
+	Total int          `json:"total"`
+	List  []*ErrorItem `json:"list"`
+}
+
 // sdk 版本
 type SdkVersionCountRes struct {
 	Total int               `json:"total"`

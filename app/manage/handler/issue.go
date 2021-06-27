@@ -4,6 +4,7 @@ import (
 	"dora/app/manage/model/dao"
 	"dora/app/manage/model/dto"
 	"dora/app/manage/service"
+	"dora/modules/logstore"
 	"dora/modules/middleware"
 	"dora/pkg/utils/ginutil"
 
@@ -35,23 +36,12 @@ func (issue *IssueResource) List(c *gin.Context) {
 		return
 	}
 
-	d := dao.NewIssueDao()
-	list, current, size, total, err := d.
-		ListQueryTimeRange(u.AppId, u.Start, u.End, u.Current, u.PageSize)
-
-	// 遍历查询 count
-	issuesService := service.NewIssuesService()
-	for _, issue := range list {
-		count, uCount := issuesService.QueryLogsGetCount(u.Start, u.End, issue.Md5)
-		issue.EventCount = count
-		issue.UserCount = uCount
-	}
-
+	list, err := logstore.GetClient().QueryMethods().GetErrorList(u.AppId, u.Start, u.End)
 	if err != nil {
 		ginutil.JSONError(c, http.StatusInternalServerError, err)
 		return
 	}
-	ginutil.JSONListPages(c, list, current, size, total)
+	ginutil.JSONListPages(c, list.List, 1, 100, int64(list.Total))
 }
 
 func (issue *IssueResource) DetailByMd5(c *gin.Context) {
