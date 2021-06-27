@@ -11,8 +11,8 @@ type Client interface {
 }
 
 type Api interface {
-	GetLogByMd5(from, to int64, md5 string) (*response.LogsResponse, error)
-	LogCountByMd5(from, to int64, md5 string) (*response.LogCountByMd5Res, error)
+	GetLogByMd5(appId string, from, to int64, md5 string) (*response.LogsResponse, error)
+	LogCountByMd5(appId string, from, to int64, md5 string) (*response.LogCountByMd5Res, error)
 	GetErrorList(appId string, from, to int64) (*response.ErrorListRes, error)
 
 	PvUvTotal(appId string, from, to int64) (*response.PvUvTotalRes, error)

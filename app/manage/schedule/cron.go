@@ -9,7 +9,7 @@ import (
 func Cron() {
 	c := cron.New(cron.WithSeconds())
 	registerAlarmCheck(c)
-	registerIssuesCheck(c)
+	//registerIssuesCheck(c)
 
 	c.Start()
 

@@ -5,7 +5,10 @@ import (
 	"dora/modules/logstore/core"
 	"dora/modules/logstore/response"
 	"dora/pkg/utils/logx"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
+	"strconv"
+	"strings"
 )
 
 type elasticQuery struct {
@@ -18,7 +21,42 @@ func NewElasticQuery() core.Api {
 	}
 }
 
-func (e elasticQuery) GetLogByMd5(from, to int64, md5 string) (*response.LogsResponse, error) {
+func (e elasticQuery) GetLogByMd5(appId string, from, to int64, md5 string) (*response.LogsResponse, error) {
+	r := strings.NewReplacer(
+		"<APPID>", appId,
+		"<FORM>", strconv.Itoa(int(from)),
+		"<TO>", strconv.Itoa(int(to)),
+		"<MD5>", md5,
+	)
+	tpl := r.Replace(getLogsByMd5)
+
+	res, err := baseSearch(e.config.Index, tpl)
+	if err != nil {
+		logx.Error(err)
+		return nil, err
+	}
+
+	// 转
+	count := gjson.Get(string(res), "aggregations.count.value").Num
+	effectUser := gjson.Get(string(res), "aggregations.effectUser.value").Num
+
+	l := gjson.Get(string(res), "hits.hits").String()
+
+	var logs []map[string]interface{}
+	err = jsoniter.Unmarshal([]byte(l), &logs)
+	if err != nil {
+		return nil, err
+	}
+
+	result := &response.LogsResponse{
+		Count:      int(count),
+		EffectUser: int(effectUser),
+		Logs:       logs,
+	}
+	return result, nil
+}
+
+func (e elasticQuery) LogCountByMd5(appId string, from, to int64, md5 string) (*response.LogCountByMd5Res, error) {
 	panic("implement me")
 }
 
@@ -59,10 +97,6 @@ func (e elasticQuery) GetErrorList(appId string, from, to int64) (*response.Erro
 		List:  logs,
 	}
 	return result, nil
-}
-
-func (e elasticQuery) LogCountByMd5(from, to int64, md5 string) (*response.LogCountByMd5Res, error) {
-	panic("implement me")
 }
 
 func (e elasticQuery) PvUvTotal(appId string, from, to int64) (*response.PvUvTotalRes, error) {

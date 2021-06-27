@@ -36,7 +36,7 @@ func (issue *DashboardResource) QueryEventsByMd5(c *gin.Context) {
 	}
 
 	s := logstore.GetClient()
-	md5Log, err := s.QueryMethods().GetLogByMd5(u.Start, u.End, u.Md5)
+	md5Log, err := s.QueryMethods().GetLogByMd5(u.AppId, u.Start, u.End, u.Md5)
 	if err != nil {
 		ginutil.JSONBadRequest(c, err)
 		return

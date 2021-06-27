@@ -1,8 +1,9 @@
 package response
 
 type LogsResponse struct {
-	Count int64               `json:"count"`
-	Logs  []map[string]string `json:"logs"`
+	Count      int                      `json:"count"`
+	EffectUser int                      `json:"effectUser"`
+	Logs       []map[string]interface{} `json:"logs"`
 }
 
 // 统计 md 的次数

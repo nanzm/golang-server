@@ -20,23 +20,22 @@ func NewSlsQuery() store.Api {
 	}
 }
 
-func (s slsQuery) GetLogByMd5(from, to int64, md5 string) (*response.LogsResponse, error) {
-	queryExp := fmt.Sprintf("* and agg_md5: %s", md5)
-
-	r, err := baseQueryLogs(from, to, queryExp)
-	if err != nil {
-		logx.Printf("query log err : %v", err)
-		return nil, err
-	}
-
-	result := &response.LogsResponse{
-		Count: r.Count,
-		Logs:  r.Logs,
-	}
-	return result, err
+func (s slsQuery) GetLogByMd5(appId string, from, to int64, md5 string) (*response.LogsResponse, error) {
+	//queryExp := fmt.Sprintf("* and agg_md5: %s", md5)
+	//
+	//_, err := baseQueryLogs(from, to, queryExp)
+	//if err != nil {
+	//	logx.Printf("query log err : %v", err)
+	//	return nil, err
+	//}
+	//
+	//result := &response.LogsResponse{
+	//}
+	//return result, err
+	return nil,nil
 }
 
-func (s slsQuery) LogCountByMd5(from, to int64, md5 string) (*response.LogCountByMd5Res, error) {
+func (s slsQuery) LogCountByMd5(appId string, from, to int64, md5 string) (*response.LogCountByMd5Res, error) {
 	queryExp := fmt.Sprintf(`* and agg_md5: %s | SELECT COUNT(*) as count, approx_distinct("_uuid") as effect_user`, md5)
 
 	slsRes, err := baseQueryLogs(from, to, queryExp)

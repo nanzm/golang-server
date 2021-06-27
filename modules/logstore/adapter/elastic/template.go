@@ -845,3 +845,48 @@ const sdkVersionList = `{
     }
   }
 }`
+
+const getLogsByMd5=`{
+  "size": 100,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "match": {
+            "appId": "<APPID>"
+          }
+        },
+        {
+          "match": {
+            "md5": "<MD5>"
+          }
+        },
+        {
+          "match": {
+            "type": "error"
+          }
+        },
+        {
+          "range": {
+            "ts": {
+              "gte": <FORM>,
+              "lte": <TO>
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggregations": {
+    "count": {
+      "value_count": {
+        "field": "type.keyword"
+      }
+    },
+    "effectUser": {
+      "cardinality": {
+        "field": "uid.keyword"
+      }
+    }
+  }
+}`

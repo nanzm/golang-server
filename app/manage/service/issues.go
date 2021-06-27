@@ -9,7 +9,6 @@ import (
 	"dora/pkg/utils/logx"
 
 	"dora/app/manage/model/dao"
-	"dora/modules/logstore"
 	"dora/pkg/utils"
 
 	sls "github.com/aliyun/aliyun-log-go-sdk"
@@ -34,31 +33,31 @@ func NewIssuesService() IssuesService {
 
 // 定时检查 创建
 func (i *issues) CornCreateCheck() {
-	ctx := context.Background()
-	keys, err := redis.Instance().SMembers(ctx, constant.Md5ListWaitCreate).Result()
-	if err != nil {
-		logx.Errorf("CornCreateCheck redis get err: v%", err)
-		return
-	}
-
-	if len(keys) > 0 {
-		f, t := utils.GetDayFromNowRange(30)
-		// 依次查出
-		for _, md5 := range keys {
-			logs, e := logstore.GetClient().QueryMethods().GetLogByMd5(f, t, md5)
-			if e != nil {
-				logx.Errorf("CornCreateCheck err: v%", e)
-				return
-			}
-
-			// 查到对应的 log 创建 issues
-			if len(logs.Logs) > 0 {
-				i.CreateIssues(logs.Logs[0])
-			} else {
-				logx.Warn("该 md5 未找到对应的 log 无法创建 issues: ", md5)
-			}
-		}
-	}
+	//ctx := context.Background()
+	//keys, err := redis.Instance().SMembers(ctx, constant.Md5ListWaitCreate).Result()
+	//if err != nil {
+	//	logx.Errorf("CornCreateCheck redis get err: v%", err)
+	//	return
+	//}
+	//
+	//if len(keys) > 0 {
+	//	f, t := utils.GetDayFromNowRange(30)
+	//	// 依次查出
+	//	for _, md5 := range keys {
+	//		logs, e := logstore.GetClient().QueryMethods().GetLogByMd5(f, t, md5)
+	//		if e != nil {
+	//			logx.Errorf("CornCreateCheck err: v%", e)
+	//			return
+	//		}
+	//
+	//		// 查到对应的 log 创建 issues
+	//		if len(logs.Logs) > 0 {
+	//			i.CreateIssues(logs.Logs[0])
+	//		} else {
+	//			logx.Warn("该 md5 未找到对应的 log 无法创建 issues: ", md5)
+	//		}
+	//	}
+	//}
 }
 
 // 定时检查 更新
@@ -137,12 +136,13 @@ func (i *issues) UpdateIssues(md5 string) {
 
 // 根据 md5 查询日志出现多少次、uv 等
 func (i *issues) QueryLogsGetCount(f, t int64, md5 string) (total, uCount int) {
-	s := logstore.GetClient()
-	md5Log, err := s.QueryMethods().LogCountByMd5(f, t, md5)
-	if err != nil || md5Log == nil {
-		return 0, 0
-	}
-	return md5Log.Count, md5Log.EffectUser
+	//s := logstore.GetClient()
+	//md5Log, err := s.QueryMethods().LogCountByMd5(f, t, md5)
+	//if err != nil || md5Log == nil {
+	//	return 0, 0
+	//}
+	//return md5Log.Count, md5Log.EffectUser
+	return 0, 0
 }
 
 func (i *issues) GetAllMd5() []string {

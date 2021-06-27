@@ -1,9 +1,7 @@
 package handler
 
 import (
-	"dora/app/manage/model/dao"
 	"dora/app/manage/model/dto"
-	"dora/app/manage/service"
 	"dora/modules/logstore"
 	"dora/modules/middleware"
 	"dora/pkg/utils/ginutil"
@@ -51,19 +49,13 @@ func (issue *IssueResource) DetailByMd5(c *gin.Context) {
 		return
 	}
 
-	d := dao.NewIssueDao()
-	get, err := d.QueryByMd5(u.Md5)
+	result, err := logstore.GetClient().QueryMethods().GetLogByMd5(u.AppId, u.Start, u.End, u.Md5)
 	if err != nil {
-		ginutil.JSONServerError(c, err)
+		ginutil.JSONError(c, http.StatusInternalServerError, err)
 		return
 	}
 
-	issuesService := service.NewIssuesService()
-	count, uCount := issuesService.QueryLogsGetCount(u.Start, u.End, u.Md5)
-	get.EventCount = count
-	get.UserCount = uCount
-
-	ginutil.JSONOk(c, get)
+	ginutil.JSONOk(c, result)
 }
 
 func (issue *IssueResource) Ignore(c *gin.Context) {
