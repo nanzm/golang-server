@@ -7,10 +7,7 @@ import (
 	"log"
 )
 
-func init() {
-	configPath := "/Users/neil/Desktop/dora-platform/dora-server/config.yml"
-	//configPath := "config.yml"
-
+func MustLoad(configPath string) {
 	// file exist
 	exists, err := fs.FileExists(configPath)
 	if err != nil {
