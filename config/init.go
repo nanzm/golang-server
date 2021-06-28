@@ -16,7 +16,7 @@ func MustLoad(configPath string) {
 
 	// load env file for local test
 	if !exists {
-		log.Fatal(errors.New("config path is wrong"))
+		log.Fatal(errors.New("config path is not exists"))
 	}
 
 	viper.SetConfigFile(configPath)

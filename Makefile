@@ -35,11 +35,17 @@ dev-transit:
 dev-manage:
 	go run cmd/manage/main.go
 
-
 # --- app ---------------------------------------------------------
 build-transit:
-	docker build -f deployments/transit.Dockerfile -t nancode/dora-transit
+	go build -o transit cmd/transit/main.go
 
 build-manage:
-	docker build -f deployments/manage.Dockerfile -t nancode/dora-manage
+	go build -o manage cmd/manage/main.go
+
+# --- app ---------------------------------------------------------
+docker-transit:
+	docker build -f ./deployments/transit.Dockerfile -t nancode/dora-transit .
+
+docker-manage:
+	docker build -f ./deployments/manage.Dockerfile -t nancode/dora-manage .
 
