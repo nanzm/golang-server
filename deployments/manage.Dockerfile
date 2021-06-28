@@ -1,4 +1,4 @@
-FROM golang:1.16.5-alpine3.13 AS builder
+FROM golang:1.16 AS builder
 
 ENV CGO_ENABLED 0
 ENV GOOS linux
@@ -8,7 +8,6 @@ WORKDIR /source
 COPY go.mod .
 COPY go.sum .
 RUN GOPROXY="https://goproxy.io,direct" go mod download
-
 
 COPY . .
 RUN ["chmod", "+x", "/source/build.sh"]
