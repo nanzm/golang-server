@@ -3,26 +3,39 @@ version: "3"
 services:
   # transit 根据需要扩展 可部署多个
   transit:
-    image: registry.cn-hangzhou.aliyuncs.com/nancode/dora-transit:latest
+    image: nancode/dora-transit:latest
+    container_name: transit
+    command: /cmd/transit -f /cmd/etc/config.yml
     ports:
       - "8221:8221"
     volumes:
-      - ./data:/app/tmp
-      - ./config.yml:/app/config.yml
+      - ./etc:/cmd/etc
+    networks:
+      - default
+      - dora_net
 
   # manage
   manage:
-    image: registry.cn-hangzhou.aliyuncs.com/nancode/dora-manage:latest
+    image: nancode/dora-manage:latest
+    container_name: manage
+    command: /cmd/manage -f /cmd/etc/config.yml
     ports:
       - "8222:8222"
     volumes:
-      - ./data:/app/tmp
-      - ./config.yml:/app/config.yml
+      - ./etc:/cmd/etc
+    networks:
+      - default
+      - dora_net
 
   # webapp
   webapp:
-    image: registry.cn-hangzhou.aliyuncs.com/nancode/dora-webapp:latest
+    image: nancode/dora-webapp:latest
+    container_name: webapp
     ports:
-      - "8333:8333"
+      - "8223:80"
     depends_on:
       - manage
+
+networks:
+  dora_net:
+    external: true

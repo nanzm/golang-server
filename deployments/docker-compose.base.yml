@@ -4,7 +4,7 @@ services:
   # 数据库
   mysql:
     image: mysql:5.7.34
-    container_name: doar-mysql
+    container_name: dora-mysql
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci # 设置utf8字符集
     environment:
       - TZ=Asia/Shanghai
@@ -19,11 +19,14 @@ services:
       - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "3306:3306"
+    networks:
+      - default
+      - dora_net
 
   # redis
   redis:
     image: redis:6.2
-    container_name: doar-redis
+    container_name: dora-redis
     command: redis-server --requirepass 123456
     ports:
       - "6379:6379"
@@ -32,32 +35,69 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./redis/data:/data
+    networks:
+      - default
+      - dora_net
 
   # 消息队列
   nsqlookupd:
     image: nsqio/nsq
-    container_name: doar-nsqlookupd
+    container_name: dora-nsqlookupd
     command: /nsqlookupd --log-level warn
     ports:
       - "4160:4160"
       - "4161:4161"
+    networks:
+      - default
+      - dora_net
 
   nsqd:
     image: nsqio/nsq
-    container_name: doar-nsqd
+    container_name: dora-nsqd
     command: /nsqd --lookupd-tcp-address=nsqlookupd:4160 --log-level warn
     depends_on:
       - nsqlookupd
     ports:
       - "4150:4150"
       - "4151:4151"
+    networks:
+      - default
+      - dora_net
 
-  nsqadmin:
-    image: nsqio/nsq
-    container_name: doar-nsqadmin
-    command: /nsqadmin --lookupd-http-address=nsqlookupd:4161 --log-level warn
-    depends_on:
-      - nsqlookupd
+#  nsqadmin:
+#    image: nsqio/nsq
+#    container_name: dora-nsqadmin
+#    command: /nsqadmin --lookupd-http-address=nsqlookupd:4161 --log-level warn
+#    depends_on:
+#      - nsqlookupd
+#    ports:
+#      - "4171:4171"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${VERSION:-7.0.0}
+    container_name: dora-elasticsearch
+    volumes:
+      - ./elastic/data:/usr/share/elasticsearch/data:delegated
+    environment:
+      - "cluster.name=go-elasticsearch-instrumentation"
+      - "cluster.routing.allocation.disk.threshold_enabled=false"
+      - "discovery.type=single-node"
+      - "bootstrap.memory_lock=true"
+      - "xpack.security.enabled=false"
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
     ports:
-      - "4171:4171"
+      - "9200:9200"
+    ulimits:
+      memlock: -1
+      nproc: 65535
+      nofile: 65535
+    healthcheck:
+      test: curl --max-time 60 --retry 60 --retry-delay 1 --retry-connrefused --show-error --silent http://localhost:9200
+    networks:
+      - default
+      - dora_net
+
+networks:
+  dora_net:
+    external: true
 

@@ -1,0 +1,37 @@
+app:
+  manage:
+    secret: "Y1hMAIHoHUvCZJ4pCz21"
+    log:
+      file: "./manage.log"
+  transit:
+    secret: "FN4yVZIb9xyMzi97ab36"
+    log:
+      file: "./transit.log"
+
+datasource:
+  nsq:
+    address: "nsqd:4150"
+    topic: "event"
+    channel: "dev-ch"
+  logStore:
+    enable: "elastic"
+    elastic:
+      addresses: "http://elasticsearch:9200"
+      username: ""
+      password: ""
+      index: "dora-test"
+  gorm:
+    driver: "mysql"
+    dsn: "demo:demo@tcp(mysql:3306)/dora?charset=utf8mb4&parseTime=True&loc=Local"
+  redis:
+    addr: "redis:6379"
+    password: "123456"
+    db: 0
+  mail:
+    host: "smtp.qq.com"
+    port: "587"
+    username: ""
+    password: ""
+  dingding:
+    accessToken:
+    secret:

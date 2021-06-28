@@ -29,8 +29,8 @@ tmp
 dora.yml
 test
 
-config.prod.yml
 config.yml
+!deployments/etc/config.yml
 
 manage.log
 transit.log
