@@ -7,10 +7,6 @@ import (
 
 func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
-		// 为了测试
-		//time.Sleep(200 * time.Millisecond)
-
 		origin := c.Request.Header.Get("Origin")
 		c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")

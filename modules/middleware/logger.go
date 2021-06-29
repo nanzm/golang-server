@@ -26,8 +26,12 @@ func GinZap() gin.HandlerFunc {
 			}
 		} else {
 			var pre string
-			if c.Writer.Status() <= 500 {
+			if c.Writer.Status() <= 400 {
 				pre = color.HiGreenString("%v", c.Writer.Status())
+
+			} else if c.Writer.Status() <= 500 {
+				pre = color.HiYellowString("%v", c.Writer.Status())
+
 			} else {
 				pre = color.HiRedString("%v", c.Writer.Status())
 			}

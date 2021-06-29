@@ -10,7 +10,6 @@ import (
 	"time"
 )
 
-// todo 正式环境需移除...  一分钟 100 次会影响数据采集
 func RateLimitMiddleware() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		rdb := redis.Instance()
