@@ -77,20 +77,7 @@ const elasticMapping = `{
         }
       },
       "buser": {
-        "properties": {
-          "age": {
-            "type": "long"
-          },
-          "userName": {
-            "type": "text",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
-              }
-            }
-          }
-        }
+        "type": "flattened"
       },
       "cip": {
         "type": "text",
