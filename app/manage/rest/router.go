@@ -13,6 +13,7 @@ func Register(g *gin.Engine) {
 
 	api := g.Group("/api")
 	ginutil.SetupResource(api,
+		handler.NewPublicResource(),
 		handler.NewDashboardResource(),
 		handler.NewIssueResource(),
 		handler.NewProjectResource(),

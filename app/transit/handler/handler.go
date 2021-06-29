@@ -31,7 +31,7 @@ func (pub *PublicResource) Register(router *gin.RouterGroup) {
 
 func (pub *PublicResource) Info(c *gin.Context) {
 	c.JSON(http.StatusOK, map[string]string{
-		"name":    "dora",
+		"name":    "dora-transit",
 		"build":   config.Build,
 		"compile": config.Compile,
 		"version": config.Version,
