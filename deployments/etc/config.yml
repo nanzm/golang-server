@@ -19,7 +19,7 @@ datasource:
       addresses: "http://elasticsearch:9200"
       username: ""
       password: ""
-      index: "dora-test"
+      index: "dora"
   gorm:
     driver: "mysql"
     dsn: "demo:demo@tcp(mysql:3306)/dora?charset=utf8mb4&parseTime=True&loc=Local"

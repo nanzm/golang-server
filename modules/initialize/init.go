@@ -3,18 +3,19 @@ package initialize
 import (
 	"dora/app/manage/model/dao"
 	"dora/app/manage/model/entity"
-	"dora/app/manage/service"
-	"dora/config/constant"
+	"dora/config"
+	"dora/modules/datasource/elastic"
 	"dora/modules/datasource/gorm"
-	"dora/modules/datasource/redis"
 	"dora/pkg/utils/logx"
+	"fmt"
+	"strings"
 )
 
 func Run() {
 	dbMigrate()
 	createRoles()
 	createUser()
-	putMd5ListToCache()
+	createDocMapping()
 }
 
 // 表同步
@@ -117,13 +118,30 @@ func createUser() {
 	}
 }
 
-// 将所有 md5 放入 redis
-func putMd5ListToCache() {
-	issues := service.NewIssuesService()
-	md5s := issues.GetAllMd5()
-	if len(md5s) > 0 {
-		redis.SetAdd(constant.Md5ListHas, md5s)
-	} else {
-		logx.Infof("none issues md5 values")
+func createDocMapping() {
+	enable := config.GetLogStore().Enable
+	if enable == "elastic" {
+		es := elastic.GetClient()
+
+		conf := config.GetElastic()
+		doc := conf.Index
+
+		exists, _ := es.Indices.Exists([]string{doc})
+		fmt.Printf("%v \n", exists)
+
+		if exists != nil && exists.StatusCode == 200 {
+			fmt.Printf("%v \n", "")
+			logx.Infof("elastic docs %v has exists", doc)
+			return
+		}
+
+		logx.Infof("elastic need create doc %s", doc)
+
+		_, err := es.Indices.Create(doc,
+			es.Indices.Create.WithBody(strings.NewReader(elasticMapping)))
+		if err != nil {
+			logx.Fatalf("elastic docs create error %s", err)
+		}
+		logx.Infof("elastic docs %v has created", doc)
 	}
 }

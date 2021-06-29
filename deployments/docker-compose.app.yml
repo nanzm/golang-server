@@ -1,19 +1,6 @@
 version: "3"
 
 services:
-  # transit 根据需要扩展 可部署多个
-  transit:
-    image: nancode/dora-transit:latest
-    container_name: transit
-    command: /cmd/transit -f /cmd/etc/config.yml
-    ports:
-      - "8221:8221"
-    volumes:
-      - ./etc:/cmd/etc
-    networks:
-      - default
-      - dora_net
-
   # manage
   manage:
     image: nancode/dora-manage:latest
@@ -26,6 +13,21 @@ services:
     networks:
       - default
       - dora_net
+
+  # transit 根据需要扩展 可部署多个
+  transit:
+    image: nancode/dora-transit:latest
+    container_name: transit
+    command: /cmd/transit -f /cmd/etc/config.yml
+    ports:
+      - "8221:8221"
+    volumes:
+      - ./etc:/cmd/etc
+    networks:
+      - default
+      - dora_net
+    depends_on:
+      - manage
 
   # webapp
   webapp:
