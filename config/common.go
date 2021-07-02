@@ -61,7 +61,7 @@ func GetMail() MailConfig {
 	}
 }
 
-func GetRobot() DingDingRobot {
+func GetDingTalkRobot() DingDingRobot {
 	return DingDingRobot{
 		AccessToken: viper.GetString("datasource.dingding.accessToken"),
 		Secret:      viper.GetString("datasource.dingding.secret"),

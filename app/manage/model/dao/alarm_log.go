@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"dora/app/manage/model/dto"
 	"dora/app/manage/model/entity"
 	dataGorm "dora/modules/datasource/gorm"
 	"gorm.io/gorm"
@@ -25,9 +24,9 @@ func (a *AlarmLog) Create(data *entity.AlarmLog) (*entity.AlarmLog, error) {
 	return data, nil
 }
 
-func (a *AlarmLog) List() (result []dto.AlarmLog, e error) {
-	list := make([]dto.AlarmLog, 0)
-	err := a.db.Debug().Model(dto.AlarmLog{}).
+func (a *AlarmLog) List() (result []entity.AlarmLog, e error) {
+	list := make([]entity.AlarmLog, 0)
+	err := a.db.Debug().Model(entity.AlarmLog{}).
 		Preload("AlarmProject").Find(&list).Error
 
 	if err != nil {

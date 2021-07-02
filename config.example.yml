@@ -14,20 +14,12 @@ datasource:
     topic: "event"
     channel: "dev-ch"
   logStore:
-    enable: "slsLog"
+    enable: "elastic"
     elastic:
       addresses: ""
       username: ""
       password: ""
       index: ""
-    slsLog:
-      accesskey: ""
-      secret: ""
-      endpoint: ""
-      project: ""
-      logStore: ""
-      topic: ""
-      source: ""
   gorm:
     driver: "mysql"
     dsn: "demo:demo@tcp(127.0.0.1:3306)/dora?charset=utf8mb4&parseTime=True&loc=Local"

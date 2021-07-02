@@ -23,10 +23,10 @@ func NewElasticQuery() core.Api {
 
 func (e elasticQuery) GetLogByMd5(appId string, from, to int64, md5 string) (*response.LogsResponse, error) {
 	r := strings.NewReplacer(
-		"<APPID>", appId,
-		"<FORM>", strconv.Itoa(int(from)),
-		"<TO>", strconv.Itoa(int(to)),
-		"<MD5>", md5,
+		core.TplAppId, appId,
+		core.TplFrom, strconv.Itoa(int(from)),
+		core.TplTo, strconv.Itoa(int(to)),
+		core.TplMD5, md5,
 	)
 	tpl := r.Replace(getLogsByMd5)
 

@@ -22,6 +22,7 @@ func Register(g *gin.Engine) {
 		handler.NewIssueResource(),
 		handler.NewProjectResource(),
 		handler.NewSyslogResource(),
+		handler.NewAlarmResource(),
 		handler.NewUserResource(),
 	)
 }

@@ -1,177 +1,164 @@
 package service
 
 import (
-	"bytes"
-	"crypto/hmac"
-	"crypto/sha256"
 	"dora/app/manage/model/dao"
-	"dora/app/manage/model/dto"
+	"dora/app/manage/model/entity"
+	"dora/config"
+	mailRes "dora/modules/datasource/mail"
+	"dora/modules/logstore"
+	"dora/pkg/utils"
+	"dora/pkg/utils/dingTalk"
 	"dora/pkg/utils/logx"
-
-	"dora/config/constant"
-
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"strconv"
+	"strings"
 	"time"
 )
 
-type Content struct {
-	Content string `json:"content"`
-}
+const (
+	AlarmApiError  = "AlarmApiError"
+	AlarmApiTimout = "AlarmApiTimout"
+	AlarmJsError   = "AlarmJsError"
+	AlarmResError  = "AlarmResError"
+	AlarmPv        = "AlarmPv"
+	AlarmUv        = "AlarmUv"
+)
 
-type Payload struct {
-	MsgType string  `json:"msgtype"`
-	Text    Content `json:"text"`
-}
+const (
+	TimeUnitHour   = "hour"
+	TimeUnitMinute = "minute"
+)
 
-func NewDingTalkMsg(content string) *Payload {
-	return &Payload{
-		MsgType: "text",
-		Text: Content{
-			Content: content,
-		},
-	}
-}
+const (
+	ContactTypeEmail    = "email"
+	ContactTypeDingTalk = "dingTalk"
+	ContactTypeUser     = "user"
+)
 
-func SendDingDing(payload *Payload, secret, accessToken string) error {
-	payloadBytes, err := json.Marshal(payload)
+func ScanAllAlarms() {
+	alarmDao := dao.NewAlarmDao()
+
+	// todo 过滤 status
+	list, err := alarmDao.List()
 	if err != nil {
-		return err
-	}
-	body := bytes.NewReader(payloadBytes)
-
-	timestamp := strconv.FormatInt(time.Now().Unix()*1000, 10)
-	signed, err := urlSign(timestamp, secret)
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest("POST",
-		fmt.Sprintf("https://oapi.dingtalk.com/robot/send?access_token=%v&sign=%v&timestamp=%v", accessToken, signed, timestamp), body)
-	if err != nil {
-		return err
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-
-	defer resp.Body.Close()
-	return nil
-}
-
-func urlSign(timestamp string, secret string) (string, error) {
-	stringToSign := fmt.Sprintf("%s\n%s", timestamp, secret)
-	h := hmac.New(sha256.New, []byte(secret))
-	if _, err := io.WriteString(h, stringToSign); err != nil {
-		return "", err
-	}
-	return base64.StdEncoding.EncodeToString(h.Sum(nil)), nil
-}
-
-func alarmDingDing() {
-
-}
-
-func alarmEmail() {
-
-}
-
-func isAchieved(left int, Operator string, right int) bool {
-	switch Operator {
-	case constant.OperatorGt:
-		return left > right
-	case constant.OperatorLt:
-		return left < right
-	case constant.OperatorEq:
-		return left == right
-	case constant.OperatorGte:
-		return left >= right
-	case constant.OperatorLte:
-		return left <= right
-	default:
-		logx.Error("未知操作符")
-		return false
-	}
-
-}
-
-func CornCheckAllProjectAlarm() {
-	projectDao := dao.NewAlarmProjectDao()
-	projectList, err := projectDao.List()
-	if err != nil {
-		logx.Error(err)
+		logx.Errorf("scan alarms query list get err: %v", err)
 		return
 	}
 
-	for _, project := range projectList {
-		//if len(project.AlarmRules) > 0 && len(project.AlarmTargets) > 0 {
-		//	matchRules(project)
-		//}
-		fmt.Println("p", project)
+	for _, alarm := range list {
+		isAchieved, currentValue := checkAchieveCond(alarm)
+		if isAchieved {
+			sendAlarmMsg(alarm, currentValue)
+		} else {
+			logx.Infof("alarm scan %v not achieved, current: %v", alarm.RuleType, currentValue)
+		}
 	}
 }
 
-// 检查是否满足规则
-func matchRules(project dto.AlarmProject) {
-	//for _, rule := range project.AlarmRules {
-	//
-	//	f, t := utils.GetFormToRecently(time.Minute * time.Duration(rule.Period))
-	//
-	//	switch rule.Measure {
-	//	case constant.MeasureApi:
-	//		res, err := logstore.GetClient().QueryMethods().ApiErrorCount(project.ProjectInfo.AppId, f, t)
-	//		if err != nil {
-	//			logx.Error(err)
-	//			return
-	//		}
-	//		if isAchieved(res.Count, rule.Operator, rule.Value) {
-	//			msg := fmt.Sprintf("项目：%v api 错误数%v分钟内数量大于%v，共发生%v次，影响%v位用户",
-	//				project.ProjectInfo.Name, rule.Period, rule.Value, res.Count, res.EffectUser)
-	//
-	//			logx.Warnf("告警：%v", msg)
-	//			triggerAlarm(msg, project)
-	//		}
-	//
-	//	case constant.MeasureError:
-	//		res, err := logstore.GetClient().QueryMethods().ErrorCount(project.ProjectInfo.AppId, f, t)
-	//		if err != nil {
-	//			logx.Error(err)
-	//			return
-	//		}
-	//		if isAchieved(res.Count, rule.Operator, rule.Value) {
-	//			msg := fmt.Sprintf("项目：%v error 错误数%v分钟内数量大于%v，共发生%v次，影响%v位用户",
-	//				project.ProjectInfo.Name, rule.Period, rule.Value, res.Count, res.EffectUser)
-	//
-	//			logx.Warnf("告警：%v", msg)
-	//			triggerAlarm(msg, project)
-	//		}
-	//
-	//	case constant.MeasureRes:
-	//		res, err := logstore.GetClient().QueryMethods().ResLoadFailTotal(project.ProjectInfo.AppId, f, t)
-	//		if err != nil {
-	//			logx.Error(err)
-	//			return
-	//		}
-	//		if isAchieved(res.Count, rule.Operator, rule.Value) {
-	//			msg := fmt.Sprintf("项目：%v res 资源加载失败数%v分钟内数量大于%v，共发生%v次，影响%v位用户",
-	//				project.ProjectInfo.Name, rule.Period, rule.Value, res.Count, res.EffectUser)
-	//
-	//			logx.Warnf("告警：%v", msg)
-	//			triggerAlarm(msg, project)
-	//		}
-	//	default:
-	//		logx.Errorf("未实现的告警指标， 请修改")
-	//	}
-	//}
+// todo 其它规则是实现
+func checkAchieveCond(alarm *entity.Alarm) (bool, float64) {
+	switch alarm.RuleType {
+	case AlarmApiError:
+		return false, 0
+
+	case AlarmApiTimout:
+		return false, 0
+
+	case AlarmJsError:
+		var unit time.Duration
+		if alarm.TimeUnit == TimeUnitHour {
+			unit = time.Hour
+		}
+		if alarm.TimeUnit == TimeUnitMinute {
+			unit = time.Minute
+		}
+		period := time.Duration(alarm.Time) * unit
+
+		f, t := utils.GetFormToRecently(period)
+		count, err := logstore.GetClient().QueryMethods().ErrorCount(alarm.AppId, f, t)
+		if err != nil {
+			logx.Errorf("corn alarm checkAchieveCond ErrorCount happen err: %v", err)
+			return false, 0
+		}
+		// todo  使用 alarm.Operator
+		if count.Count >= alarm.Quota {
+			return true, float64(count.Count)
+		}
+
+		return false, float64(count.Count)
+
+	case AlarmResError:
+		return false, 0
+
+	case AlarmPv:
+		return false, 0
+
+	case AlarmUv:
+		return false, 0
+
+	default:
+		logx.Errorf("unknown alarm rule type %s", alarm.RuleType)
+	}
+	return false, 0
 }
 
-func triggerAlarm(msg string, project dto.AlarmProject) {
+func sendAlarmMsg(alarm *entity.Alarm, nowValues float64) {
+	contactDao := dao.NewAlarmContactDao()
+	list, err := contactDao.List(alarm.ID, 1)
+	if err != nil {
+		logx.Errorf("corn alarm sendAlarmMsg contactDao.List err: %s", err)
+		return
+	}
+
+	// todo 通知用户  按 p0 p1 分类通知
+	for _, contact := range list {
+		replacedContent := strings.Replace(alarm.Content, "{@num}", fmt.Sprintf("%v", nowValues), 1)
+
+		if contact.Type == ContactTypeUser {
+		}
+
+		if contact.Type == ContactTypeEmail {
+			if contact.Email != "" {
+				conf := config.GetMail()
+
+				to := contact.Email
+				fr := fmt.Sprintf("Dora Robot <%s>", conf.Username)
+				sub := replacedContent
+				con := replacedContent
+
+				m := mailRes.BuilderEmail(to, fr, sub, con)
+				err := mailRes.GetPool().Send(m, 10*time.Second)
+				if err != nil {
+					logx.Errorf("corn alarm dingTalk.SendDingDing err: %s", err)
+					return
+				}
+				saveAlarmLogs(alarm, contact, replacedContent)
+			}
+		}
+
+		if contact.Type == ContactTypeDingTalk {
+			fmt.Println("------------------------------------")
+			if contact.DingTalkAT != "" && contact.DingTalkSecret != "" {
+				msg := dingTalk.NewDingTalkMsg(replacedContent)
+				err := dingTalk.SendDingDing(msg, contact.DingTalkAT, contact.DingTalkSecret)
+				if err != nil {
+					logx.Errorf("corn alarm dingTalk.SendDingDing err: %s", err)
+					return
+				}
+				saveAlarmLogs(alarm, contact, replacedContent)
+			}
+		}
+	}
+}
+
+func saveAlarmLogs(alarm *entity.Alarm, contact *entity.AlarmContact, content string) {
+	logDao := dao.NewAlarmLogDao()
+	_, err := logDao.Create(&entity.AlarmLog{
+		AlarmId:        alarm.ID,
+		AlarmContactId: contact.ID,
+		Content:        content,
+	})
+	if err != nil {
+		logx.Errorf("corn alarm saveAlarmLogs err: %s", err)
+		return
+	}
 }

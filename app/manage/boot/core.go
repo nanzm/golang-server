@@ -30,11 +30,11 @@ func Setup() {
 
 	// 启动定时任务
 	// 1：告警监控
-	// 2：创建issues
 	schedule.Cron()
 }
 
 func TearDown() {
+	schedule.Stop()
 	slslog.ClientTearDown()
 	redis.StopClient()
 	gorm.TearDown()

@@ -7,7 +7,6 @@ import (
 	"dora/modules/datasource/elastic"
 	"dora/modules/datasource/gorm"
 	"dora/pkg/utils/logx"
-	"fmt"
 	"strings"
 )
 
@@ -30,10 +29,13 @@ func dbMigrate() {
 
 		&entity.Issue{},
 		&entity.IssueUserStatus{},
-		&entity.SourceMap{},
 
-		&entity.Artifact{},
+		&entity.Alarm{},
+		&entity.AlarmContact{},
 		&entity.AlarmLog{},
+
+		&entity.SourceMap{},
+		&entity.Artifact{},
 	)
 	if err != nil {
 		panic(err)
@@ -127,21 +129,26 @@ func createDocMapping() {
 		doc := conf.Index
 
 		exists, _ := es.Indices.Exists([]string{doc})
-		fmt.Printf("%v \n", exists)
 
 		if exists != nil && exists.StatusCode == 200 {
-			fmt.Printf("%v \n", "")
 			logx.Infof("elastic docs %v has exists", doc)
 			return
 		}
 
 		logx.Infof("elastic need create doc %s", doc)
 
-		_, err := es.Indices.Create(doc,
-			es.Indices.Create.WithBody(strings.NewReader(elasticMapping)))
+		res, err := es.Indices.Create(doc,
+			es.Indices.Create.WithBody(strings.NewReader(elasticMapping)),
+			es.Indices.Create.WithPretty(),
+		)
 		if err != nil {
 			logx.Fatalf("elastic docs create error %s", err)
 		}
-		logx.Infof("elastic docs %v has created", doc)
+		// 创建失败
+		if res.StatusCode != 200 {
+			logx.Fatalf("elastic docs create error %s", res)
+		}
+
+		logx.Infof("elastic docs %v has created", res)
 	}
 }

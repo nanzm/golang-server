@@ -66,54 +66,56 @@ func (e elkLog) PutListData(logList []map[string]interface{}) error {
 func (e elkLog) DefaultQuery(appId string, from, to, interval int64, dataType string) (interface{}, error) {
 	m := NewElasticQuery()
 	switch dataType {
-	case "pvUvTotal":
+	case core.PvUvTotal:
 		return m.PvUvTotal(appId, from, to)
-	case "pvUvTrend":
+	case core.PvUvTrend:
 		return m.PvUvTrend(appId, from, to, interval)
-	case "sdkVersionCount":
-		return m.SdkVersionCount(appId, from, to)
-	case "categoryCount":
-		return m.CategoryCount(appId, from, to)
-	case "entryPage":
-		return m.PagesCount(appId, from, to)
 
 	// 错误
-	case "errorCount":
+	case core.ErrorCount:
 		return m.ErrorCount(appId, from, to)
-	case "errorCountTrend":
+	case core.ErrorCountTrend:
 		return m.ErrorCountTrend(appId, from, to, interval)
 
 	//	api
-	case "apiErrorCount":
+	case core.ApiErrorCount:
 		return m.ApiErrorCount(appId, from, to)
-	case "apiErrorTrend":
+	case core.ApiErrorTrend:
 		return m.ApiErrorTrend(appId, from, to, interval)
-	case "apiErrorList":
+	case core.ApiErrorList:
 		return m.ApiErrorList(appId, from, to)
 
 	// 资源加载错误
-	case "resLoadFailTotalTrend":
+	case core.ResLoadFailTotalTrend:
 		return m.ResLoadFailTotalTrend(appId, from, to, interval)
-	case "resLoadFailTotal":
+	case core.ResLoadFailTotal:
 		return m.ResLoadFailTotal(appId, from, to)
-	case "resLoadFailList":
+	case core.ResLoadFailList:
 		return m.ResLoadFailList(appId, from, to)
 
 	// 性能
-	case "perfMetrics":
+	case core.PerfMetrics:
 		return m.PerfMetricsBucket(appId, from, to)
 
-	case "projectEventCount":
+
+	case core.SdkVersionCount:
+		return m.SdkVersionCount(appId, from, to)
+	case core.CategoryCount:
+		return m.CategoryCount(appId, from, to)
+	case core.EntryPage:
+		return m.PagesCount(appId, from, to)
+
+	case core.ProjectEventCount:
 		return m.ProjectEventCount(appId, from, to)
-	case "projectSendMode":
+	case core.ProjectSendMode:
 		return m.ProjectSendMode(appId, from, to)
-	case "projectEnv":
+	case core.ProjectEnv:
 		return m.ProjectEnv(appId, from, to)
-	case "projectVersion":
+	case core.ProjectVersion:
 		return m.ProjectVersion(appId, from, to)
-	case "projectUserScreen":
+	case core.ProjectUserScreen:
 		return m.ProjectUserScreen(appId, from, to)
-	case "projectCategory":
+	case core.ProjectCategory:
 		return m.ProjectCategory(appId, from, to)
 	}
 
@@ -122,14 +124,13 @@ func (e elkLog) DefaultQuery(appId string, from, to, interval int64, dataType st
 
 func (e elkLog) QueryMethods() core.Api {
 	return NewElasticQuery()
-	//return nil
 }
 
 func buildQueryTpl(tpl string, appId string, from, to int64) string {
 	r := strings.NewReplacer(
-		"<APPID>", appId,
-		"<FORM>", strconv.Itoa(int(from)),
-		"<TO>", strconv.Itoa(int(to)),
+		core.TplAppId, appId,
+		core.TplFrom, strconv.Itoa(int(from)),
+		core.TplTo, strconv.Itoa(int(to)),
 	)
 	// 替换
 	res := r.Replace(tpl)
@@ -138,10 +139,10 @@ func buildQueryTpl(tpl string, appId string, from, to int64) string {
 
 func buildQueryTrendTpl(tpl string, appId string, from, to, interval int64) string {
 	r := strings.NewReplacer(
-		"<APPID>", appId,
-		"<FORM>", strconv.Itoa(int(from)),
-		"<TO>", strconv.Itoa(int(to)),
-		"<INTERVAL>", strconv.Itoa(int(interval)),
+		core.TplAppId, appId,
+		core.TplFrom, strconv.Itoa(int(from)),
+		core.TplTo, strconv.Itoa(int(to)),
+		core.TplInterval, strconv.Itoa(int(interval)),
 	)
 	// 替换
 	res := r.Replace(tpl)

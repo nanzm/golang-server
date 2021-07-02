@@ -32,6 +32,3 @@ datasource:
     port: "587"
     username: ""
     password: ""
-  dingding:
-    accessToken:
-    secret:
