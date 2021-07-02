@@ -64,27 +64,7 @@ func checkAchieveCond(alarm *entity.Alarm) (bool, float64) {
 		return false, 0
 
 	case AlarmJsError:
-		var unit time.Duration
-		if alarm.TimeUnit == TimeUnitHour {
-			unit = time.Hour
-		}
-		if alarm.TimeUnit == TimeUnitMinute {
-			unit = time.Minute
-		}
-		period := time.Duration(alarm.Time) * unit
-
-		f, t := utils.GetFormToRecently(period)
-		count, err := logstore.GetClient().QueryMethods().ErrorCount(alarm.AppId, f, t)
-		if err != nil {
-			logx.Errorf("corn alarm checkAchieveCond ErrorCount happen err: %v", err)
-			return false, 0
-		}
-		// todo  使用 alarm.Operator
-		if count.Count >= alarm.Quota {
-			return true, float64(count.Count)
-		}
-
-		return false, float64(count.Count)
+		return checkAlarmJsError(alarm.AppId, alarm.Time, alarm.TimeUnit, alarm.Operator, alarm.Quota)
 
 	case AlarmResError:
 		return false, 0
@@ -101,6 +81,30 @@ func checkAchieveCond(alarm *entity.Alarm) (bool, float64) {
 	return false, 0
 }
 
+func checkAlarmJsError(appId string, timeVal int, timeUnit string, operator string, quota int) (bool, float64) {
+	var unit time.Duration
+	if timeUnit == TimeUnitHour {
+		unit = time.Hour
+	}
+	if timeUnit == TimeUnitMinute {
+		unit = time.Minute
+	}
+	period := time.Duration(timeVal) * unit
+
+	f, t := utils.GetFormToRecently(period)
+	count, err := logstore.GetClient().QueryMethods().ErrorCount(appId, f, t)
+	if err != nil {
+		logx.Errorf("corn alarm checkAchieveCond ErrorCount happen err: %v", err)
+		return false, 0
+	}
+
+	// todo  使用 operator
+	if count.Count >= quota {
+		return true, float64(count.Count)
+	}
+	return false, 0
+}
+
 func sendAlarmMsg(alarm *entity.Alarm, nowValues float64) {
 	contactDao := dao.NewAlarmContactDao()
 	list, err := contactDao.List(alarm.ID, 1)
@@ -111,51 +115,63 @@ func sendAlarmMsg(alarm *entity.Alarm, nowValues float64) {
 
 	// todo 通知用户  按 p0 p1 分类通知
 	for _, contact := range list {
-		replacedContent := strings.Replace(alarm.Content, "{@num}", fmt.Sprintf("%v", nowValues), 1)
+		// 获取项目详情
+
+		// 组装告警详情
+		message := strings.Replace(alarm.Content, "{@num}", fmt.Sprintf("%v", nowValues), 1)
 
 		if contact.Type == ContactTypeUser {
 		}
 
 		if contact.Type == ContactTypeEmail {
 			if contact.Email != "" {
-				conf := config.GetMail()
-
-				to := contact.Email
-				fr := fmt.Sprintf("Dora Robot <%s>", conf.Username)
-				sub := replacedContent
-				con := replacedContent
-
-				m := mailRes.BuilderEmail(to, fr, sub, con)
-				err := mailRes.GetPool().Send(m, 10*time.Second)
-				if err != nil {
-					logx.Errorf("corn alarm dingTalk.SendDingDing err: %s", err)
-					return
-				}
-				saveAlarmLogs(alarm, contact, replacedContent)
+				sendEmail(contact.Email, message)
+				saveAlarmLogs(alarm, contact, message)
+				// 设置静默标记
 			}
 		}
 
 		if contact.Type == ContactTypeDingTalk {
-			fmt.Println("------------------------------------")
 			if contact.DingTalkAT != "" && contact.DingTalkSecret != "" {
-				msg := dingTalk.NewDingTalkMsg(replacedContent)
-				err := dingTalk.SendDingDing(msg, contact.DingTalkAT, contact.DingTalkSecret)
-				if err != nil {
-					logx.Errorf("corn alarm dingTalk.SendDingDing err: %s", err)
-					return
-				}
-				saveAlarmLogs(alarm, contact, replacedContent)
+				sendDingTalk(contact.DingTalkAT, contact.DingTalkSecret, message)
+				saveAlarmLogs(alarm, contact, message)
+				// 设置静默标记
 			}
 		}
 	}
 }
 
-func saveAlarmLogs(alarm *entity.Alarm, contact *entity.AlarmContact, content string) {
+func sendEmail(toEmail string, message string) {
+	conf := config.GetMail()
+
+	to := toEmail
+	fr := fmt.Sprintf("Dora Robot <%s>", conf.Username)
+	sub := message
+	con := message
+
+	m := mailRes.BuilderEmail(to, fr, sub, con)
+	err := mailRes.GetPool().Send(m, 10*time.Second)
+	if err != nil {
+		logx.Errorf("corn alarm dingTalk.SendDingDing err: %s", err)
+		return
+	}
+}
+
+func sendDingTalk(accessToken, secret, message string) {
+	dingMsg := dingTalk.NewDingTalkMsg(message)
+	err := dingTalk.SendDingDing(dingMsg, accessToken, secret)
+	if err != nil {
+		logx.Errorf("corn alarm dingTalk.SendDingDing err: %s", err)
+		return
+	}
+}
+
+func saveAlarmLogs(alarm *entity.Alarm, contact *entity.AlarmContact, message string) {
 	logDao := dao.NewAlarmLogDao()
 	_, err := logDao.Create(&entity.AlarmLog{
 		AlarmId:        alarm.ID,
 		AlarmContactId: contact.ID,
-		Content:        content,
+		Content:        message,
 	})
 	if err != nil {
 		logx.Errorf("corn alarm saveAlarmLogs err: %s", err)
