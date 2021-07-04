@@ -79,7 +79,7 @@ services:
     volumes:
       - ./elastic/data:/usr/share/elasticsearch/data:delegated
     environment:
-      - "cluster.name=go-elasticsearch-instrumentation"
+      - "cluster.name=dora-elasticsearch-cluster"
       - "cluster.routing.allocation.disk.threshold_enabled=false"
       - "discovery.type=single-node"
       - "bootstrap.memory_lock=true"

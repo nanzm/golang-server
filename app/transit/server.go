@@ -30,6 +30,10 @@ func Serve() {
 
 	gin.SetMode(gin.ReleaseMode)
 	app := gin.New()
+
+	// pprof
+	middleware.DebugRegister(app)
+
 	app.Use(middleware.GinZap(), middleware.Recovery(false))
 
 	// session

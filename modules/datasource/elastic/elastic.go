@@ -45,13 +45,13 @@ func GetClient() *elasticsearch.Client {
 			return
 		}
 
-		_, err = client.Info()
+		info, err := client.Info()
 		if err != nil {
 			logx.Fatal(err)
 			return
 		}
 
-		logx.Infof("elasticsearch is ready!")
+		logx.Infof("elasticsearch is ready: %s", info)
 	})
 
 	return client
