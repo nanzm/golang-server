@@ -2,11 +2,6 @@ package config
 
 import "github.com/spf13/viper"
 
-func GetLogStore() LogStore {
-	return LogStore{
-		Enable: viper.GetString("datasource.logStore.enable"),
-	}
-}
 
 func GetSlsLog() SlsLog {
 	return SlsLog{

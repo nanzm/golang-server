@@ -11,14 +11,14 @@ import (
 )
 
 func Run() {
-	dbMigrate()
-	createRoles()
-	createUser()
-	createDocMapping()
+	InitMigrate()
+	InitRoles()
+	InitUser()
+	InitElasticIndex()
 }
 
 // 表同步
-func dbMigrate() {
+func InitMigrate() {
 	err := gorm.Instance().AutoMigrate(
 		&entity.SysLog{},
 
@@ -43,7 +43,7 @@ func dbMigrate() {
 }
 
 // 创建 roles
-func createRoles() {
+func InitRoles() {
 	var roles = make([]entity.Role, 0)
 	err := gorm.Instance().Limit(10).Find(&roles).Error
 	if err != nil {
@@ -76,7 +76,7 @@ func createRoles() {
 }
 
 // 创建 admin
-func createUser() {
+func InitUser() {
 	var user entity.User
 	err := gorm.Instance().Where("email = ?", "demo@dora.com").Find(&user).Error
 	if err != nil {
@@ -120,35 +120,29 @@ func createUser() {
 	}
 }
 
-func createDocMapping() {
-	enable := config.GetLogStore().Enable
-	if enable == "elastic" {
-		es := elastic.GetClient()
+func InitElasticIndex() {
+	es := elastic.GetClient()
+	conf := config.GetElastic()
+	doc := conf.Index
 
-		conf := config.GetElastic()
-		doc := conf.Index
-
-		exists, _ := es.Indices.Exists([]string{doc})
-
-		if exists != nil && exists.StatusCode == 200 {
-			logx.Infof("elastic docs %v has exists", doc)
-			return
-		}
-
-		logx.Infof("elastic need create doc %s", doc)
-
-		res, err := es.Indices.Create(doc,
-			es.Indices.Create.WithBody(strings.NewReader(elasticMapping)),
-			es.Indices.Create.WithPretty(),
-		)
-		if err != nil {
-			logx.Fatalf("elastic docs create error %s", err)
-		}
-		// 创建失败
-		if res.StatusCode != 200 {
-			logx.Fatalf("elastic docs create error %s", res)
-		}
-
-		logx.Infof("elastic docs %v has created", res)
+	exists, _ := es.Indices.Exists([]string{doc})
+	if exists != nil && exists.StatusCode == 200 {
+		logx.Infof("elastic docs %v has exists", doc)
+		return
 	}
+	logx.Infof("elastic need create doc %s", doc)
+
+	res, err := es.Indices.Create(doc,
+		es.Indices.Create.WithBody(strings.NewReader(elasticMapping)),
+		es.Indices.Create.WithPretty(),
+	)
+	if err != nil {
+		logx.Fatalf("elastic docs create error %s", err)
+	}
+
+	// 创建失败
+	if res.StatusCode != 200 {
+		logx.Fatalf("elastic docs create error %s", res)
+	}
+	logx.Infof("elastic docs %v has created", res)
 }

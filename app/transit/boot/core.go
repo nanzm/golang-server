@@ -4,6 +4,7 @@ import (
 	"dora/app/transit/mqConsumer"
 	"dora/config"
 	"dora/modules/datasource/nsq"
+	"dora/modules/initialize"
 	"dora/modules/logstore"
 	"dora/pkg/utils/logx"
 )
@@ -15,6 +16,9 @@ func Setup() {
 
 	// logStore
 	logstore.GetClient()
+
+	// use mapping create index
+	initialize.InitElasticIndex()
 
 	// nsq
 	nsq.ProducerInstance()

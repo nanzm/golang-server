@@ -6,8 +6,9 @@ require (
 	github.com/aliyun/aliyun-log-go-sdk v0.1.17
 	github.com/aliyun/aliyun-oss-go-sdk v2.1.4+incompatible
 	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
+	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/elastic/go-elasticsearch/v7 v7.11.0
+	github.com/elastic/go-elasticsearch/v7 v7.13.1
 	github.com/fatih/color v1.10.0
 	github.com/gin-contrib/sessions v0.0.3
 	github.com/gin-gonic/gin v1.6.3
@@ -26,7 +27,6 @@ require (
 	github.com/pelletier/go-toml v1.8.1 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	github.com/tidwall/gjson v1.7.4

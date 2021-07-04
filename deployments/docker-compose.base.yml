@@ -64,14 +64,14 @@ services:
       - default
       - dora_net
 
-#  nsqadmin:
-#    image: nsqio/nsq
-#    container_name: dora-nsqadmin
-#    command: /nsqadmin --lookupd-http-address=nsqlookupd:4161 --log-level warn
-#    depends_on:
-#      - nsqlookupd
-#    ports:
-#      - "4171:4171"
+  nsqadmin:
+    image: nsqio/nsq
+    container_name: dora-nsqadmin
+    command: /nsqadmin --lookupd-http-address=nsqlookupd:4161 --log-level warn
+    depends_on:
+      - nsqlookupd
+    ports:
+      - "4171:4171"
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.13.2

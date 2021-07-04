@@ -2,6 +2,7 @@ package elasticComponent
 
 import (
 	"bytes"
+	"context"
 	"dora/config"
 	"dora/modules/datasource/elastic"
 	"dora/modules/logstore/core"
@@ -9,10 +10,13 @@ import (
 	"errors"
 	"fmt"
 	"github.com/elastic/go-elasticsearch/v7"
+	"github.com/elastic/go-elasticsearch/v7/esutil"
 	jsoniter "github.com/json-iterator/go"
 	"io/ioutil"
+	"runtime"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type elkLog struct {
@@ -52,14 +56,60 @@ func (e elkLog) PutData(logData map[string]interface{}) error {
 	return nil
 }
 
+// 批量插入
 func (e elkLog) PutListData(logList []map[string]interface{}) error {
-	// todo bulk 批量插入api
+	bi, err := esutil.NewBulkIndexer(esutil.BulkIndexerConfig{
+		Index:         e.config.Index,   // The default index name
+		Client:        e.client,         // The Elasticsearch client
+		NumWorkers:    runtime.NumCPU(), // The number of worker goroutines
+		FlushBytes:    int(5e+6),        // The flush threshold in bytes
+		FlushInterval: 30 * time.Second, // The periodic flush interval
+	})
+
+	if err != nil {
+		logx.Errorf("Error bulk creating the indexer: %s", err)
+		return err
+	}
+
 	for _, log := range logList {
-		err := e.PutData(log)
+		// to byte
+		data, err := jsoniter.Marshal(log)
 		if err != nil {
+			logx.Errorf("Cannot encode log: %s", err)
+			return err
+		}
+		// add item to the BulkIndexer
+		err = bi.Add(
+			context.Background(),
+			esutil.BulkIndexerItem{
+				Action: "create",
+				Body:   bytes.NewReader(data),
+				OnSuccess: func(ctx context.Context, item esutil.BulkIndexerItem, res esutil.BulkIndexerResponseItem) {
+				},
+				OnFailure: func(ctx context.Context, item esutil.BulkIndexerItem, res esutil.BulkIndexerResponseItem, err error) {
+					if err != nil {
+						logx.Errorf("BulkIndexerItem OnFailure ERROR: %s", err)
+					} else {
+						logx.Errorf("BulkIndexerItem OnFailure ERROR: %s: %s", res.Error.Type, res.Error.Reason)
+					}
+				},
+			},
+		)
+		if err != nil {
+			logx.Errorf("bi.Add error: %s", err)
 			return err
 		}
 	}
+
+	if err := bi.Close(context.Background()); err != nil {
+		logx.Errorf("Unexpected close error: %s", err)
+		return err
+	}
+
+	biStats := bi.Stats()
+	s, _ := jsoniter.Marshal(biStats)
+	logx.Infof("bulk index item stats: %v", string(s))
+
 	return nil
 }
 
@@ -96,7 +146,6 @@ func (e elkLog) DefaultQuery(appId string, from, to, interval int64, dataType st
 	// 性能
 	case core.PerfMetrics:
 		return m.PerfMetricsBucket(appId, from, to)
-
 
 	case core.SdkVersionCount:
 		return m.SdkVersionCount(appId, from, to)

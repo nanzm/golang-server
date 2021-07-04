@@ -30,6 +30,9 @@ dora.yml
 test
 
 config.yml
+config.prod.yml
+config.dev.yml
+config.local.yml
 !deployments/etc/config.yml
 
 manage.log

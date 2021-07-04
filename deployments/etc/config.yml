@@ -14,7 +14,6 @@ datasource:
     topic: "event"
     channel: "dev-ch"
   logStore:
-    enable: "elastic"
     elastic:
       addresses: "http://elasticsearch:9200"
       username: ""

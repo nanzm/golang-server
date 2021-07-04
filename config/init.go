@@ -3,6 +3,7 @@ package config
 import (
 	"dora/pkg/utils/fs"
 	"errors"
+	"fmt"
 	"github.com/spf13/viper"
 	"log"
 )
@@ -16,7 +17,7 @@ func MustLoad(configPath string) {
 
 	// load env file for local test
 	if !exists {
-		log.Fatal(errors.New("config path is not exists"))
+		log.Fatal(errors.New(fmt.Sprintf("config is not exists: %s", configPath)))
 	}
 
 	viper.SetConfigFile(configPath)
