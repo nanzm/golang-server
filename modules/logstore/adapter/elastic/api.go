@@ -401,7 +401,34 @@ func (e elasticQuery) PerfScriptTiming(appId string, from, to int64) (*response.
 }
 
 func (e elasticQuery) ResLoadFailTotalTrend(appId string, from, to, interval int64) (*response.ResLoadFailTotalTrendRes, error) {
-	panic("implement me")
+	res, err := baseSearch(e.config.Index, buildQueryTrendTpl(resLoadFailTrend, appId, from, to, interval))
+	if err != nil {
+		logx.Error(err)
+		return nil, err
+	}
+
+	logs := make([]*response.ResLoadFailTotalTrendItemRes, 0)
+
+	// 遍历
+	buckets := gjson.Get(string(res), "aggregations.trend.buckets")
+	buckets.ForEach(func(key, value gjson.Result) bool {
+		count := gjson.Get(value.Raw, "doc_count").Num
+		eUser := gjson.Get(value.Raw, "uv.value").Num
+		ts := gjson.Get(value.Raw, "key_as_string").String()
+		item := &response.ResLoadFailTotalTrendItemRes{
+			Count:      int(count),
+			EffectUser: int(eUser),
+			Ts:         ts,
+		}
+		logs = append(logs, item)
+		return true
+	})
+
+	result := &response.ResLoadFailTotalTrendRes{
+		Total: len(logs),
+		List:  logs,
+	}
+	return result, nil
 }
 
 func (e elasticQuery) ResLoadFailTotal(appId string, from, to int64) (*response.ResLoadFailTotalRes, error) {
@@ -409,7 +436,34 @@ func (e elasticQuery) ResLoadFailTotal(appId string, from, to int64) (*response.
 }
 
 func (e elasticQuery) ResLoadFailList(appId string, from, to int64) (*response.ResLoadFailListRes, error) {
-	panic("implement me")
+	res, err := baseSearch(e.config.Index, buildQueryTpl(resLoadFailList, appId, from, to))
+	if err != nil {
+		logx.Error(err)
+		return nil, err
+	}
+
+	logs := make([]*response.ResLoadFailItemRes, 0)
+
+	buckets := gjson.Get(string(res), "aggregations.url.buckets")
+	buckets.ForEach(func(key, value gjson.Result) bool {
+		url := gjson.Get(value.Raw, "key").String()
+		count := gjson.Get(value.Raw, "count.value").Num
+		effectUser := gjson.Get(value.Raw, "effectUser.value").Num
+
+		item := &response.ResLoadFailItemRes{
+			Src:        url,
+			Count:      int(count),
+			EffectUser: int(effectUser),
+		}
+		logs = append(logs, item)
+		return true
+	})
+
+	result := &response.ResLoadFailListRes{
+		Total: len(logs),
+		List:  logs,
+	}
+	return result, nil
 }
 
 func (e elasticQuery) ProjectIpToCountry(appId string, from, to int64) (*response.ProjectIpToCountryRes, error) {

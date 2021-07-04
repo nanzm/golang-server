@@ -805,6 +805,107 @@ const apiErrorList = `{
   }
 }`
 
+const resLoadFailTrend =`{
+  "size": 0,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "match": {
+            "appId": "<APPID>"
+          }
+        },
+        {
+          "match": {
+            "type": "resource"
+          }
+        },
+        {
+          "range": {
+            "ts": {
+              "gte": <FORM>,
+              "lte": <TO>
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggregations": {
+    "trend": {
+      "date_histogram": {
+        "field": "ts",
+        "interval": "<INTERVAL>m",
+        "time_zone": "+08:00",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      },
+      "aggregations": {
+        "count": {
+          "value_count": {
+            "field": "type.keyword"
+          }
+        },
+        "effectUser": {
+          "cardinality": {
+            "field": "uid.keyword"
+          }
+        }
+      }
+    }
+  }
+}`
+
+const resLoadFailList =`{
+  "size": 0,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "match": {
+            "appId": "<APPID>"
+          }
+        },
+        {
+          "match": {
+            "type": "resource"
+          }
+        },
+        {
+          "range": {
+            "ts": {
+              "gte": <FORM>,
+              "lte": <TO>
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggregations": {
+    "url": {
+      "terms": {
+        "field": "resource.src.keyword",
+        "size": 50,
+        "order": {
+          "count": "desc"
+        }
+      },
+      "aggregations": {
+        "count": {
+          "value_count": {
+            "field": "type.keyword"
+          }
+        },
+        "effectUser": {
+          "cardinality": {
+            "field": "uid.keyword"
+          }
+        }
+      }
+    }
+  }
+}`
+
 const sdkVersionList = `{
   "size": 0,
   "query": {

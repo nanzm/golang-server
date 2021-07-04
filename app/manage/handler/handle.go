@@ -6,10 +6,8 @@ import (
 	"dora/pkg/utils/ginutil"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"time"
 )
 
-var uptime = time.Now()
 
 type PublicResource struct{}
 
@@ -29,7 +27,7 @@ func (pub *PublicResource) Info(c *gin.Context) {
 		"build":   config.Build,
 		"compile": config.Compile,
 		"version": config.Version,
-		"uptime":  utils.TimeFromNow(uptime),
+		"uptime":  utils.TimeFromNow(config.Uptime),
 		"now":     utils.CurrentTime(),
 	})
 }

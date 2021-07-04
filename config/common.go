@@ -1,7 +1,11 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"github.com/spf13/viper"
+	"time"
+)
 
+var Uptime = time.Now()
 
 func GetSlsLog() SlsLog {
 	return SlsLog{

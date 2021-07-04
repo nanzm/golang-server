@@ -1,17 +1,15 @@
 package handler
 
 import (
-	"context"
-	dataRedis "dora/modules/datasource/redis"
-
 	"dora/app/manage/model/dto"
+	"dora/config"
 	"dora/modules/logstore"
 	"dora/modules/middleware"
+	"dora/pkg/utils"
+	"net/http"
 
 	"dora/pkg/utils/ginutil"
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis/v8"
-	"time"
 )
 
 type DashboardResource struct {
@@ -21,14 +19,14 @@ func NewDashboardResource() ginutil.Resource {
 	return &DashboardResource{}
 }
 
-func (issue *DashboardResource) Register(router *gin.RouterGroup) {
-	router.GET("/dashboard/events", middleware.JWTAuthMiddleware(), issue.QueryEventsByMd5)
-	router.GET("/dashboard/events/chart/:type", issue.QueryChartData)
+func (da *DashboardResource) Register(router *gin.RouterGroup) {
+	router.GET("/dashboard/events", middleware.JWTAuthMiddleware(), da.QueryEventsByMd5)
+	router.GET("/dashboard/events/chart/:type", da.QueryChartData)
 
-	router.GET("/logstore/switch", issue.SwitchLogStore)
+	router.GET("/system", da.SystemInfo)
 }
 
-func (issue *DashboardResource) QueryEventsByMd5(c *gin.Context) {
+func (da *DashboardResource) QueryEventsByMd5(c *gin.Context) {
 	var u dto.QueryEventsByMd5Param
 	if err := c.ShouldBind(&u); err != nil {
 		ginutil.ErrorTrans(c, err)
@@ -45,7 +43,7 @@ func (issue *DashboardResource) QueryEventsByMd5(c *gin.Context) {
 }
 
 // 查询图表 数据
-func (issue *DashboardResource) QueryChartData(c *gin.Context) {
+func (da *DashboardResource) QueryChartData(c *gin.Context) {
 	var u dto.ChartData
 	if err := c.ShouldBind(&u); err != nil {
 		ginutil.ErrorTrans(c, err)
@@ -63,32 +61,13 @@ func (issue *DashboardResource) QueryChartData(c *gin.Context) {
 	ginutil.JSONOk(c, data)
 }
 
-func (issue *DashboardResource) SwitchLogStore(c *gin.Context) {
-	const StoreSwitch = "logStoreSwitch"
-
-	result, err := dataRedis.Instance().Get(context.Background(), StoreSwitch).Result()
-	if err != nil && err != redis.Nil {
-		ginutil.JSONServerError(c, err)
-		return
-	}
-
-	if result == "" {
-		result, err := dataRedis.Instance().Set(context.Background(), StoreSwitch, time.Now(), time.Hour*24).Result()
-		if err != nil {
-			ginutil.JSONServerError(c, err)
-			return
-		}
-		ginutil.JSONOk(c, result, "已切换为 elastic")
-		return
-
-	} else {
-		result, err := dataRedis.Instance().Del(context.Background(), StoreSwitch).Result()
-		if err != nil {
-			ginutil.JSONServerError(c, err)
-			return
-		}
-		ginutil.JSONOk(c, result, "已切换为 阿里云sls")
-		return
-
-	}
+func (da *DashboardResource) SystemInfo(c *gin.Context) {
+	c.JSON(http.StatusOK, map[string]string{
+		"name":    "dora-manage",
+		"build":   config.Build,
+		"compile": config.Compile,
+		"version": config.Version,
+		"uptime":  utils.TimeFromNow(config.Uptime),
+		"now":     utils.CurrentTime(),
+	})
 }
