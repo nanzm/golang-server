@@ -31,7 +31,7 @@ func NewDingTalkMsg(content string) *Payload {
 	}
 }
 
-func SendDingDing(payload *Payload, secret, accessToken string) error {
+func SendDingDing(payload *Payload, accessToken, secret string) error {
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
 		return err
@@ -56,7 +56,6 @@ func SendDingDing(payload *Payload, secret, accessToken string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%v \n", resp)
 
 	defer resp.Body.Close()
 	return nil

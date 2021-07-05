@@ -16,7 +16,7 @@ func ConsumerRegister(handler nsq.Handler) {
 	if err != nil {
 		logx.Panic(err)
 	}
-	c.SetLogger(&customLog{}, nsq.LogLevelError)
+	c.SetLogger(&customLog{}, nsq.LogLevelWarning)
 
 	c.AddHandler(handler)
 	err = c.ConnectToNSQD(conf.Address)

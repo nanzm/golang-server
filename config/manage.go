@@ -2,6 +2,17 @@ package config
 
 import "github.com/spf13/viper"
 
+const (
+	// 上传文件路劲
+	UploadDir = "storage/upload"
+
+	// 项目制品 文件路径
+	BackupDir = "storage/backup"
+
+	// sourcemap
+	SourcemapCompressDir   = "storage/sourcemap/compress"
+	SourcemapDecompressDir = "storage/sourcemap/decompress"
+)
 
 func GetManageSecret() SecretConfig {
 	return SecretConfig{

@@ -52,7 +52,18 @@ func (d *ProjectDao) Get(projectId uint) (project *entity.Project, error error) 
 	var p entity.Project
 	p.ID = projectId
 
-	error = d.db.First(&p).Error
+	error = d.db.Find(&p).Error
+	if error != nil {
+		return nil, error
+	}
+	return &p, nil
+}
+
+func (d *ProjectDao) GetByAppId(appId string) (project *entity.Project, error error) {
+	var p entity.Project
+	p.AppId = appId
+
+	error = d.db.Find(&p).Error
 	if error != nil {
 		return nil, error
 	}

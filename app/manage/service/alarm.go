@@ -1,10 +1,12 @@
 package service
 
 import (
+	"context"
 	"dora/app/manage/model/dao"
 	"dora/app/manage/model/entity"
 	"dora/config"
 	mailRes "dora/modules/datasource/mail"
+	"dora/modules/datasource/redis"
 	"dora/modules/logstore"
 	"dora/pkg/utils"
 	"dora/pkg/utils/dingTalk"
@@ -54,7 +56,7 @@ func ScanAllAlarms() {
 	}
 }
 
-// todo 其它规则是实现
+// todo 其它规则实现
 func checkAchieveCond(alarm *entity.Alarm) (bool, float64) {
 	switch alarm.RuleType {
 	case AlarmApiError:
@@ -113,30 +115,62 @@ func sendAlarmMsg(alarm *entity.Alarm, nowValues float64) {
 		return
 	}
 
-	// todo 通知用户  按 p0 p1 分类通知
+	productDao := dao.NewProjectDao()
+	cache := redis.Instance()
+
 	for _, contact := range list {
 		// 获取项目详情
+		ProjectInfo, err := productDao.GetByAppId(alarm.AppId)
+		if err != nil {
+			logx.Errorf("corn alarm GetByAppId err: %s", err)
+			continue
+		}
 
 		// 组装告警详情
-		message := strings.Replace(alarm.Content, "{@num}", fmt.Sprintf("%v", nowValues), 1)
+		content := strings.Replace(alarm.Content, "{@num}", fmt.Sprintf("%v", nowValues), 1)
+		message := fmt.Sprintf("%s 项目告警: %s 请及时修复！", ProjectInfo.Name, content)
 
-		if contact.Type == ContactTypeUser {
-		}
-
-		if contact.Type == ContactTypeEmail {
-			if contact.Email != "" {
-				sendEmail(contact.Email, message)
-				saveAlarmLogs(alarm, contact, message)
-				// 设置静默标记
+		switch contact.Type {
+		case ContactTypeUser:
+			// todo 通知用户
+		case ContactTypeEmail:
+			if contact.Email == "" {
+				break
 			}
-		}
-
-		if contact.Type == ContactTypeDingTalk {
-			if contact.DingTalkAT != "" && contact.DingTalkSecret != "" {
-				sendDingTalk(contact.DingTalkAT, contact.DingTalkSecret, message)
-				saveAlarmLogs(alarm, contact, message)
-				// 设置静默标记
+			// 静默标记检查
+			key := fmt.Sprintf("alarm_email_silence_%v", alarm.ID)
+			val := cache.Get(context.Background(), key).Val()
+			if val != "" {
+				break
 			}
+
+			// email 告警
+			sendEmail(contact.Email, message)
+			saveAlarmLogs(alarm, contact, message)
+
+			// 设置静默标记
+			cache.Set(context.Background(), key, message, time.Hour*3)
+
+		case ContactTypeDingTalk:
+			if contact.DingTalkAT == "" || contact.DingTalkSecret == "" {
+				logx.Warnf("钉钉告警 access_token 或 secret 未配置，alarm id：%v", alarm.ID)
+				break
+			}
+
+			// 静默标记检查
+			key := fmt.Sprintf("alarm_dingtalk_silence_%v", alarm.ID)
+			val := cache.Get(context.Background(), key).Val()
+			if val != "" {
+				break
+			}
+
+			// ding ding 告警
+			sendDingTalk(contact.DingTalkAT, contact.DingTalkSecret, message)
+			saveAlarmLogs(alarm, contact, message)
+
+			// 设置静默标记
+			cache.Set(context.Background(), key, message, time.Minute*5)
+		default:
 		}
 	}
 }
@@ -155,6 +189,7 @@ func sendEmail(toEmail string, message string) {
 		logx.Errorf("corn alarm dingTalk.SendDingDing err: %s", err)
 		return
 	}
+	logx.Infof("success send alarm email : %s", message)
 }
 
 func sendDingTalk(accessToken, secret, message string) {
@@ -164,6 +199,7 @@ func sendDingTalk(accessToken, secret, message string) {
 		logx.Errorf("corn alarm dingTalk.SendDingDing err: %s", err)
 		return
 	}
+	logx.Infof("success send alarm dingtalk message : %s", message)
 }
 
 func saveAlarmLogs(alarm *entity.Alarm, contact *entity.AlarmContact, message string) {

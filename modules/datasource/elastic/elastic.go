@@ -5,8 +5,6 @@ import (
 	"dora/pkg/utils/logx"
 	"github.com/cenkalti/backoff"
 	"github.com/elastic/go-elasticsearch/v7"
-	"github.com/elastic/go-elasticsearch/v7/estransport"
-	"os"
 	"sync"
 	"time"
 )
@@ -21,14 +19,12 @@ func GetClient() *elasticsearch.Client {
 		retryBackoff := backoff.NewExponentialBackOff()
 
 		cfg := elasticsearch.Config{
-			Addresses:     conf.Addresses,
-			Username:      conf.Username,
-			Password:      conf.Password,
-			RetryOnStatus: []int{502, 503, 504, 429},
-			Logger: &estransport.ColorLogger{
-				Output: os.Stdout,
-			},
-			EnableDebugLogger: true,
+			Addresses:         conf.Addresses,
+			Username:          conf.Username,
+			Password:          conf.Password,
+			RetryOnStatus:     []int{502, 503, 504, 429},
+			Logger:            &customLog{},
+			EnableDebugLogger: false,
 			MaxRetries:        5,
 			RetryBackoff: func(i int) time.Duration {
 				if i == 1 {
@@ -51,7 +47,7 @@ func GetClient() *elasticsearch.Client {
 			return
 		}
 
-		logx.Infof("elasticsearch is ready: %s", info)
+		logx.Infof("elasticsearch is ready status code: %v", info.StatusCode)
 	})
 
 	return client

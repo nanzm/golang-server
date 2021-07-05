@@ -22,7 +22,7 @@ func ProducerInstance() *nsq.Producer {
 			logx.Panic(err)
 		}
 
-		p.SetLogger(&customLog{}, nsq.LogLevelError)
+		p.SetLogger(&customLog{}, nsq.LogLevelWarning)
 
 		logx.Info("nsq producer ready")
 		nsqProducer = p
