@@ -7,9 +7,13 @@ import (
 	"dora/app/manage/model/dao"
 	"dora/app/manage/model/dto"
 	"dora/app/manage/model/entity"
+	"dora/config"
 	"dora/modules/middleware"
 	"dora/pkg/utils"
 	"dora/pkg/utils/ginutil"
+	"fmt"
+	"strconv"
+	"time"
 
 	"encoding/json"
 	"errors"
@@ -36,8 +40,15 @@ func (pro *ProjectResource) Register(router *gin.RouterGroup) {
 	router.POST("/project", middleware.JWTAuthMiddleware(), pro.Create)
 	router.GET("/project/users", middleware.JWTAuthMiddleware(), pro.GetProjectUsers)
 
+	// 备份项目
+	// 1、 xx.all.zip
+	// 2、 xx.prod.zip
+	// 3、 xx.sourcemap.zip
+	router.POST("/project/upload/backup", pro.UploadBackup)
+
+	// sourcemap 上传
 	router.POST("/project/upload/sourcemap", pro.UploadSourcemap)
-	router.POST("/project/upload/bak", pro.UploadBackup)
+
 	router.POST("/project/sourcemap/parse", pro.SourcemapParse)
 }
 
@@ -120,7 +131,7 @@ func (pro *ProjectResource) UploadBackup(c *gin.Context) {
 	}
 
 	// 文件存储目录
-	destDir := "tmp/bak/" + u.AppId
+	destDir := config.BackupDir + "/" + u.AppId
 	_, err := os.Stat(destDir)
 	if err != nil {
 		err = os.MkdirAll(destDir, os.ModePerm)
@@ -129,11 +140,38 @@ func (pro *ProjectResource) UploadBackup(c *gin.Context) {
 			return
 		}
 	}
-	fileURL := destDir + "/" + u.ProjectName + u.File.Filename
+	nowUnixStr := strconv.FormatInt(time.Now().Unix(), 10)
+	fileName := fmt.Sprintf("%s_%s_%s", u.ProjectName, nowUnixStr, u.File.Filename)
+	fileURL := fmt.Sprintf("%v/%v", destDir, fileName)
+
 	if err = c.SaveUploadedFile(u.File, fileURL); err != nil {
 		ginutil.JSONServerError(c, err)
 		return
 	}
+
+	// 记录到 db
+	artifactDao := dao.NewArtifactDao()
+	_, err = artifactDao.Create(&entity.Artifact{
+		AppId:       u.AppId,
+		ProjectName: u.ProjectName,
+
+		FileName: fileName,
+		FileType: u.FileType,
+		FilePath: fileURL,
+
+		GitName:   u.GitName,
+		GitEmail:  u.GitEmail,
+		GitBranch: u.GitBranch,
+
+		Commit:    u.Commit,
+		CommitSha: u.CommitSha,
+		CommitTs:  u.CommitTs,
+	})
+	if err != nil {
+		ginutil.JSONServerError(c, err)
+		return
+	}
+
 	ginutil.JSONOk(c, fileURL)
 }
 

@@ -26,13 +26,20 @@ type UploadSourcemapParam struct {
 
 // 备份
 type BackUpParam struct {
-	AppId       string                `form:"appId" binding:"required"`
-	ProjectName string                `form:"project_name" binding:"required"`
-	Commit      string                `form:"commit" binding:"required"`
-	CommitSha   string                `form:"commit_sha" binding:"required"`
-	CommitTs    string                `form:"commit_ts" binding:"required"`
-	File        *multipart.FileHeader `form:"file" binding:"required"`
-	FileType    string                `form:"file_type" binding:"required"`
+	AppId       string `form:"appId" binding:"required"`
+	ProjectName string `form:"project_name" binding:"required"`
+
+	File     *multipart.FileHeader `form:"file" binding:"required"`
+	FileName string                `form:"file_name" binding:"required"`
+	FileType string                `form:"file_type" binding:"required"`
+
+	GitName   string `form:"git_name"`
+	GitEmail  string `form:"git_email"`
+	GitBranch string `form:"git_branch"`
+
+	Commit    string `form:"commit" binding:"required"`
+	CommitSha string `form:"commit_sha" binding:"required"`
+	CommitTs  string `form:"commit_ts" binding:"required"`
 }
 
 // 管理平台调用

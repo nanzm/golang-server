@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	config.MustLoad("/Users/neil/Desktop/dora-platform/dora-server/config.yml")
+	config.MustLoad("/Users/neil/Desktop/dora-platform/dora-server/config.local.yml")
 	logx.Init("./dora.log")
 }
 

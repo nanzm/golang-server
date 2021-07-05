@@ -8,13 +8,20 @@ import (
 type Artifact struct {
 	ID uint `gorm:"primaryKey" json:"id"`
 
-	Project  string `gorm:"type:string;size:100;comment:项目名" json:"project"`
-	Link     string `gorm:"type:string;size:500;comment:文件链接" json:"link"`
-	GitName  string `gorm:"type:string;size:300;comment:git用户名" json:"username"`
-	GitEmail string `gorm:"type:string;size:20;comment:邮箱" json:"email"`
-	GitRef   string `gorm:"type:string;size:100;comment:分支" json:"ref"`
-	GitSha   string `gorm:"type:string;size:200;comment:sha" json:"sha"`
-	GitMsg   string `gorm:"type:string;size:300;comment:commit" json:"commit"`
+	AppId       string `gorm:"type:string;size:100;" json:"appId"`
+	ProjectName string `gorm:"type:string;size:100;comment:项目名" json:"project_name"`
+
+	FileName string `gorm:"type:string;size:300;comment:文件名" json:"file_name"`
+	FileType string `gorm:"type:string;size:50;comment:文件类型" json:"file_type"`
+	FilePath string `gorm:"type:string;size:300;comment:文件路径" json:"file_path"`
+
+	GitName   string `gorm:"type:string;size:30;comment:git用户名" json:"git_username"`
+	GitEmail  string `gorm:"type:string;size:30;comment:git邮箱" json:"git_email"`
+	GitBranch string `gorm:"type:string;size:30;comment:git分支" json:"git_branch"`
+
+	Commit    string `gorm:"type:string;size:200;comment:git sha" json:"commit"`
+	CommitSha string `gorm:"type:string;size:300;comment:git commit" json:"commit_sha"`
+	CommitTs  string `gorm:"type:string;size:300;comment:git commit" json:"commit_ts"`
 
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`

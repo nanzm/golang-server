@@ -25,7 +25,7 @@ func GetClient() *elasticsearch.Client {
 			RetryOnStatus:     []int{502, 503, 504, 429},
 			Logger:            &customLog{},
 			EnableDebugLogger: false,
-			MaxRetries:        5,
+			MaxRetries:        3,
 			RetryBackoff: func(i int) time.Duration {
 				if i == 1 {
 					retryBackoff.Reset()

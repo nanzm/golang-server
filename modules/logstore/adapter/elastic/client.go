@@ -205,6 +205,7 @@ func baseSearch(Index string, queryTpl string) ([]byte, error) {
 	res, err := es.Search(
 		es.Search.WithIndex(Index),
 		es.Search.WithBody(strings.NewReader(queryTpl)),
+		es.Search.WithPretty(),
 	)
 	if err != nil {
 		return nil, err

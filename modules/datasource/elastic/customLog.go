@@ -4,7 +4,6 @@ import (
 	"dora/pkg/utils/logx"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 )
 
@@ -35,24 +34,23 @@ func (l *customLog) LogRoundTrip(req *http.Request, res *http.Response, err erro
 		color = "\x1b[31;4m"
 	}
 
-	logx.Infof("%6s \x1b[1;4m%s://%s%s\x1b[0m%s %s%s\x1b[0m \x1b[2m%s\x1b[0m",
-		req.Method,
-		req.URL.Scheme,
-		req.URL.Host,
-		req.URL.Path,
-		query,
-		color,
-		status,
-		dur.Truncate(time.Millisecond),
-	)
+	if res.StatusCode > 299 {
+		logx.Infof("%6s \x1b[1;4m%s://%s%s\x1b[0m%s %s%s\x1b[0m \x1b[2m%s\x1b[0m",
+			req.Method,
+			req.URL.Scheme,
+			req.URL.Host,
+			req.URL.Path,
+			query,
+			color,
+			status,
+			dur.Truncate(time.Millisecond),
+		)
+	}
 
 	if err != nil {
 		logx.Infof("\x1b[31;1m» ERROR \x1b[31m%v\x1b[0m", err)
 	}
 
-	if l.RequestBodyEnabled() || l.ResponseBodyEnabled() {
-		logx.Infof("\x1b[2m%s\x1b[0m", strings.Repeat("─", 80))
-	}
 	return nil
 }
 

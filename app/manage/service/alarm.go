@@ -50,8 +50,6 @@ func ScanAllAlarms() {
 		isAchieved, currentValue := checkAchieveCond(alarm)
 		if isAchieved {
 			sendAlarmMsg(alarm, currentValue)
-		} else {
-			logx.Infof("alarm scan %v not achieved, current: %v", alarm.RuleType, currentValue)
 		}
 	}
 }
