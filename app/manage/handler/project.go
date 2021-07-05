@@ -11,12 +11,9 @@ import (
 	"dora/modules/middleware"
 	"dora/pkg/utils"
 	"dora/pkg/utils/ginutil"
-	"fmt"
-	"strconv"
-	"time"
-
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/mholt/archiver/v3"
@@ -140,8 +137,8 @@ func (pro *ProjectResource) UploadBackup(c *gin.Context) {
 			return
 		}
 	}
-	nowUnixStr := strconv.FormatInt(time.Now().Unix(), 10)
-	fileName := fmt.Sprintf("%s_%s_%s", u.ProjectName, nowUnixStr, u.File.Filename)
+	nowTimeStr := utils.CurrentTimePathFriendly()
+	fileName := fmt.Sprintf("%s_%s_%s", u.ProjectName, nowTimeStr, u.FileName)
 	fileURL := fmt.Sprintf("%v/%v", destDir, fileName)
 
 	if err = c.SaveUploadedFile(u.File, fileURL); err != nil {

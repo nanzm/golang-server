@@ -5,6 +5,7 @@ import (
 )
 
 const sysTimeFmt = "2006-01-02 15:04:05"
+const sysTimePathFmt = "20060102-150405"
 const sysTimeFmtShort = "2006-01-02"
 
 var sysTimeLocation, _ = time.LoadLocation("Asia/Chongqing")
@@ -34,5 +35,10 @@ func GetDayFromNowRange(n int) (from, to int64) {
 
 func CurrentTime() string {
 	format := time.Now().Format(sysTimeFmt)
+	return format
+}
+
+func CurrentTimePathFriendly() string {
+	format := time.Now().Format(sysTimePathFmt)
 	return format
 }

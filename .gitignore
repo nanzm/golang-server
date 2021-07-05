@@ -22,6 +22,7 @@ tmp/build
 # vendor/
 deployments/mysql/data
 deployments/redis/data
+storage
 data
 build
 dora.db
