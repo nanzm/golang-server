@@ -2,8 +2,6 @@ package handler
 
 import (
 	"bytes"
-	"compress/flate"
-	"compress/gzip"
 	"dora/app/manage/model/dao"
 	"dora/app/manage/model/dto"
 	"dora/app/manage/model/entity"
@@ -11,17 +9,16 @@ import (
 	"dora/modules/middleware"
 	"dora/pkg/utils"
 	"dora/pkg/utils/ginutil"
+	"dora/pkg/utils/unarchive"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/mholt/archiver/v3"
 	"gorm.io/gorm"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path"
 )
 
 type ProjectResource struct {
@@ -179,11 +176,8 @@ func (pro *ProjectResource) UploadSourcemap(c *gin.Context) {
 		return
 	}
 
-	// 文件存储目录
-	destDir := "tmp/sourcemap/" + u.AppId
-	// 文件解压存储目录
-	decompressDestDir := "tmp/sourcemap/" + u.AppId + "/decompress"
-
+	// 保存文件
+	destDir := config.SourcemapCompressDir + "/" + u.AppId
 	_, err := os.Stat(destDir)
 	if err != nil {
 		err = os.MkdirAll(destDir, os.ModePerm)
@@ -193,41 +187,21 @@ func (pro *ProjectResource) UploadSourcemap(c *gin.Context) {
 		}
 	}
 
-	fileURL := destDir + "/" + u.File.Filename
+	nowTimeStr := utils.CurrentTimePathFriendly()
+	fileName := fmt.Sprintf("%s_%s_%s", u.ProjectName, nowTimeStr, u.FileName)
+	fileURL := fmt.Sprintf("%v/%v", destDir, fileName)
+
 	if err = c.SaveUploadedFile(u.File, fileURL); err != nil {
 		ginutil.JSONServerError(c, err)
 		return
 	}
 
 	// 解压
-	if path.Ext(fileURL) == ".zip" {
-		z := archiver.Zip{
-			OverwriteExisting:    true,
-			MkdirAll:             true,
-			SelectiveCompression: true,
-			CompressionLevel:     flate.DefaultCompression,
-			FileMethod:           archiver.Deflate,
-		}
-		err := z.Unarchive(fileURL, decompressDestDir)
-		if err != nil {
-			ginutil.JSONServerError(c, err)
-			return
-		}
-	}
-
-	if path.Ext(fileURL) == ".gz" {
-		gz := archiver.TarGz{
-			CompressionLevel: gzip.DefaultCompression,
-			Tar: &archiver.Tar{
-				OverwriteExisting: true,
-				MkdirAll:          true,
-			},
-		}
-		err := gz.Unarchive(fileURL, decompressDestDir)
-		if err != nil {
-			ginutil.JSONServerError(c, err)
-			return
-		}
+	decompressDestDir := config.SourcemapDecompressDir + "/" + u.AppId
+	err = unarchive.Save(fileURL, decompressDestDir)
+	if err != nil {
+		ginutil.JSONServerError(c, err)
+		return
 	}
 
 	ginutil.JSONOk(c, fileURL)

@@ -20,8 +20,11 @@ type ReqOrganizationProjectsList struct {
 
 // 上传
 type UploadSourcemapParam struct {
-	AppId string                `form:"appId" binding:"required"`
-	File  *multipart.FileHeader `form:"file" binding:"required"`
+	AppId       string                `form:"appId" binding:"required"`
+	ProjectName string                `form:"project_name" binding:"required"`
+
+	File        *multipart.FileHeader `form:"file" binding:"required"`
+	FileName string                `form:"file_name" binding:"required"`
 }
 
 // 备份
