@@ -18,15 +18,6 @@ type ReqOrganizationProjectsList struct {
 	OrganizationId uint `form:"organizationId"  binding:"required"`
 }
 
-// 上传
-type UploadSourcemapParam struct {
-	AppId       string                `form:"appId" binding:"required"`
-	ProjectName string                `form:"project_name" binding:"required"`
-
-	File        *multipart.FileHeader `form:"file" binding:"required"`
-	FileName string                `form:"file_name" binding:"required"`
-}
-
 // 备份
 type BackUpParam struct {
 	AppId       string `form:"appId" binding:"required"`
@@ -45,10 +36,40 @@ type BackUpParam struct {
 	CommitTs  string `form:"commit_ts" binding:"required"`
 }
 
-// 管理平台调用
+type BackUpListParam struct {
+	Current  int64  `form:"current" binding:"number"`
+	PageSize int64  `form:"pageSize" binding:"number"`
+	FileType string `form:"file_type"`
+	AppId    string `form:"appId"`
+	//Start    int64  `form:"start" binding:"required"`
+	//End      int64  `form:"end" binding:"required"`
+}
+
 type SourcemapParseParam struct {
 	AppId string `json:"appId" binding:"required"`
 	Stack string `json:"stack" binding:"required"`
+}
+
+type SourcemapDeleteParam struct {
+	Id uint `json:"id" binding:"required"`
+}
+
+// 上传
+type UploadSourcemapParam struct {
+	AppId       string `form:"appId" binding:"required"`
+	AppVersion  string `form:"appVersion"`
+	ProjectName string `form:"project_name" binding:"required"`
+
+	File     *multipart.FileHeader `form:"file" binding:"required"`
+	FileName string                `form:"file_name" binding:"required"`
+}
+
+type SourcemapListParam struct {
+	Current  int64  `form:"current" binding:"number"`
+	PageSize int64  `form:"pageSize" binding:"number"`
+	AppId    string `form:"appId"`
+	//Start    int64  `form:"start" binding:"required"`
+	//End      int64  `form:"end" binding:"required"`
 }
 
 // 访问 node 解析服务时的参数

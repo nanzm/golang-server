@@ -8,6 +8,7 @@ import (
 	"dora/config"
 	"dora/modules/middleware"
 	"dora/pkg/utils"
+	"dora/pkg/utils/fs"
 	"dora/pkg/utils/ginutil"
 	"dora/pkg/utils/unarchive"
 	"encoding/json"
@@ -18,7 +19,8 @@ import (
 	"gorm.io/gorm"
 	"io/ioutil"
 	"net/http"
-	"os"
+	"path/filepath"
+	"strings"
 )
 
 type ProjectResource struct {
@@ -38,10 +40,13 @@ func (pro *ProjectResource) Register(router *gin.RouterGroup) {
 	// 1、 xx.all.zip
 	// 2、 xx.prod.zip
 	// 3、 xx.sourcemap.zip
-	router.POST("/project/upload/backup", pro.UploadBackup)
+	router.POST("/project/upload/backup", pro.BackupUpload)
+	router.GET("/project/backup", pro.BackupList)
 
 	// sourcemap 上传
-	router.POST("/project/upload/sourcemap", pro.UploadSourcemap)
+	router.POST("/project/upload/sourcemap", pro.SourcemapUpload)
+	router.GET("/project/sourcemap", pro.SourcemapList)
+	router.DELETE("/project/sourcemap", pro.SourcemapDelete)
 
 	router.POST("/project/sourcemap/parse", pro.SourcemapParse)
 }
@@ -117,7 +122,7 @@ func (pro *ProjectResource) Create(c *gin.Context) {
 	ginutil.JSONOk(c, result)
 }
 
-func (pro *ProjectResource) UploadBackup(c *gin.Context) {
+func (pro *ProjectResource) BackupUpload(c *gin.Context) {
 	var u dto.BackUpParam
 	if err := c.ShouldBind(&u); err != nil {
 		ginutil.JSONBadRequest(c, err)
@@ -126,19 +131,17 @@ func (pro *ProjectResource) UploadBackup(c *gin.Context) {
 
 	// 文件存储目录
 	destDir := config.BackupDir + "/" + u.AppId
-	_, err := os.Stat(destDir)
+	err := fs.EnsureDir(destDir)
 	if err != nil {
-		err = os.MkdirAll(destDir, os.ModePerm)
-		if err != nil {
-			ginutil.JSONServerError(c, err)
-			return
-		}
+		ginutil.JSONServerError(c, err)
+		return
 	}
+
 	nowTimeStr := utils.CurrentTimePathFriendly()
 	fileName := fmt.Sprintf("%s_%s_%s", u.ProjectName, nowTimeStr, u.FileName)
-	fileURL := fmt.Sprintf("%v/%v", destDir, fileName)
+	fileDest := fmt.Sprintf("%v/%v", destDir, fileName)
 
-	if err = c.SaveUploadedFile(u.File, fileURL); err != nil {
+	if err = c.SaveUploadedFile(u.File, fileDest); err != nil {
 		ginutil.JSONServerError(c, err)
 		return
 	}
@@ -151,7 +154,7 @@ func (pro *ProjectResource) UploadBackup(c *gin.Context) {
 
 		FileName: fileName,
 		FileType: u.FileType,
-		FilePath: fileURL,
+		FilePath: fileDest,
 
 		GitName:   u.GitName,
 		GitEmail:  u.GitEmail,
@@ -166,45 +169,104 @@ func (pro *ProjectResource) UploadBackup(c *gin.Context) {
 		return
 	}
 
-	ginutil.JSONOk(c, fileURL)
+	ginutil.JSONOk(c, fileDest)
 }
 
-func (pro *ProjectResource) UploadSourcemap(c *gin.Context) {
+func (pro *ProjectResource) BackupList(c *gin.Context) {
+	var u dto.BackUpListParam
+	if err := c.ShouldBind(&u); err != nil {
+		ginutil.JSONBadRequest(c, err)
+		return
+	}
+
+	artifactDao := dao.NewArtifactDao()
+	list, count, err := artifactDao.List(u.Current, u.PageSize, u.AppId, u.FileType)
+	if err != nil {
+		ginutil.JSONServerError(c, err)
+		return
+	}
+
+	ginutil.JSONListPages(c, list, u.Current, u.PageSize, count)
+}
+
+func (pro *ProjectResource) SourcemapUpload(c *gin.Context) {
 	var u dto.UploadSourcemapParam
 	if err := c.ShouldBind(&u); err != nil {
 		ginutil.JSONBadRequest(c, err)
 		return
 	}
 
-	// 保存文件
-	destDir := config.SourcemapCompressDir + "/" + u.AppId
-	_, err := os.Stat(destDir)
+	destDir := config.SourcemapDir + "/" + u.AppId
+	err := fs.EnsureDir(destDir)
 	if err != nil {
-		err = os.MkdirAll(destDir, os.ModePerm)
-		if err != nil {
-			ginutil.JSONServerError(c, err)
-			return
-		}
+		ginutil.JSONServerError(c, err)
+		return
 	}
 
 	nowTimeStr := utils.CurrentTimePathFriendly()
 	fileName := fmt.Sprintf("%s_%s_%s", u.ProjectName, nowTimeStr, u.FileName)
-	fileURL := fmt.Sprintf("%v/%v", destDir, fileName)
+	fileDest := fmt.Sprintf("%v/%v", destDir, fileName)
 
-	if err = c.SaveUploadedFile(u.File, fileURL); err != nil {
+	// 保存
+	if err := c.SaveUploadedFile(u.File, fileDest); err != nil {
 		ginutil.JSONServerError(c, err)
 		return
 	}
 
 	// 解压
-	decompressDestDir := config.SourcemapDecompressDir + "/" + u.AppId
-	err = unarchive.Save(fileURL, decompressDestDir)
+	err = unarchive.Save(fileDest, strings.TrimSuffix(fileDest, filepath.Ext(fileDest)))
 	if err != nil {
 		ginutil.JSONServerError(c, err)
 		return
 	}
 
-	ginutil.JSONOk(c, fileURL)
+	// 记录到 db
+	sourcemapDao := dao.NewSourcemapDao()
+	_, err = sourcemapDao.Create(&entity.Sourcemap{
+		AppId:      u.AppId,
+		AppVersion: u.AppVersion,
+		Path:       fileDest,
+		Size:       fs.FileSize(fileDest),
+	})
+	if err != nil {
+		ginutil.JSONServerError(c, err)
+		return
+	}
+
+	ginutil.JSONOk(c, fileDest)
+}
+
+func (pro *ProjectResource) SourcemapList(c *gin.Context) {
+	var u dto.SourcemapListParam
+	if err := c.ShouldBind(&u); err != nil {
+		ginutil.JSONBadRequest(c, err)
+		return
+	}
+
+	sourcemapDao := dao.NewSourcemapDao()
+	list, total, err := sourcemapDao.List(u.Current, u.PageSize, u.AppId)
+	if err != nil {
+		ginutil.JSONServerError(c, err)
+		return
+	}
+
+	ginutil.JSONListPages(c, list, u.Current, u.PageSize, total)
+}
+
+func (pro *ProjectResource) SourcemapDelete(c *gin.Context) {
+	var u dto.SourcemapDeleteParam
+	if err := c.ShouldBind(&u); err != nil {
+		ginutil.JSONBadRequest(c, err)
+		return
+	}
+
+	sourcemapDao := dao.NewSourcemapDao()
+	err := sourcemapDao.Delete(u.Id)
+	if err != nil {
+		ginutil.JSONServerError(c, err)
+		return
+	}
+	ginutil.JSONOk(c, "ok")
 }
 
 func (pro *ProjectResource) SourcemapParse(c *gin.Context) {

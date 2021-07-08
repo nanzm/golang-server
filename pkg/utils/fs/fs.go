@@ -20,3 +20,23 @@ func FileExists(filePath string) (bool, error) {
 
 	return true, nil
 }
+
+func EnsureDir(dirPath string) error {
+	var err error
+	if _, err = os.Stat(dirPath); err != nil && os.IsNotExist(err) {
+		e := os.MkdirAll(dirPath, os.ModePerm)
+		if e != nil {
+			return e
+		}
+		return nil
+	}
+	return err
+}
+
+func FileSize(filePath string) int64 {
+	s, err := os.Stat(filePath)
+	if err != nil {
+		return 0
+	}
+	return s.Size()
+}

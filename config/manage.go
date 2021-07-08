@@ -10,8 +10,7 @@ const (
 	BackupDir = "storage/backup"
 
 	// sourcemap
-	SourcemapCompressDir   = "storage/sourcemap/compress"
-	SourcemapDecompressDir = "storage/sourcemap/decompress"
+	SourcemapDir = "storage/sourcemap"
 )
 
 func GetManageSecret() SecretConfig {

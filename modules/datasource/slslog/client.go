@@ -24,9 +24,11 @@ func initClient(c config.SlsLog) sls.ClientInterface {
 }
 
 func ClientTearDown() {
-	err := GetClient().Close()
-	logx.Println("slsLog client closed")
-	if err != nil {
-		logx.Errorf("%v \n", err)
+	if client != nil {
+		err := client.Close()
+		if err != nil {
+			logx.Errorf("%v \n", err)
+		}
+		logx.Println("slsLog client closed")
 	}
 }

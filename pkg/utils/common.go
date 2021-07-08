@@ -6,16 +6,16 @@ import (
 	"reflect"
 )
 
-func Paginate(current, pageSize int) func(db *gorm.DB) *gorm.DB {
+func Paginate(current, pageSize int64) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		c := 1
 		if current > 0 {
-			c = current
+			c = int(current)
 		}
 
 		s := 10
 		if pageSize > 0 {
-			s = pageSize
+			s = int(pageSize)
 		}
 
 		return db.Limit(s).Offset((c - 1) * s).Order("id desc")

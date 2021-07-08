@@ -2,7 +2,6 @@ package ginutil
 
 import (
 	"dora/pkg/utils/httputil"
-	"dora/pkg/utils/logx"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -22,10 +21,7 @@ func JSONValidatorFail(c *gin.Context, bizCode int, validate interface{}, messag
 
 func JSONError(c *gin.Context, httpStatus int, err error, msg ...string) {
 	c.AbortWithStatusJSON(httpStatus, httputil.NewErrorJSON(-1, err.Error(), msg...))
-	e := c.Error(err)
-	if e != nil {
-		logx.Printf("err: %v", e)
-	}
+	_ = c.Error(err)
 }
 
 // 不分页
@@ -37,7 +33,7 @@ func JSONList(c *gin.Context, list interface{}, total int) {
 }
 
 // 分页
-func JSONListPages(c *gin.Context, list interface{}, current, pageSize int, total int64) {
+func JSONListPages(c *gin.Context, list interface{}, current, pageSize, total int64) {
 	if current == 0 {
 		current = 1
 	}

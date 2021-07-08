@@ -3,6 +3,7 @@ package dao
 import (
 	"dora/app/manage/model/entity"
 	dataGorm "dora/modules/datasource/gorm"
+	"dora/pkg/utils"
 	"gorm.io/gorm"
 )
 
@@ -24,13 +25,27 @@ func (a *Artifact) Create(data *entity.Artifact) (*entity.Artifact, error) {
 	return data, nil
 }
 
-func (a *Artifact) List() (result []*entity.Artifact, e error) {
+func (a *Artifact) List(current, pageSize int64, appId, fileType string) (result []*entity.Artifact, Count int64, e error) {
 	list := make([]*entity.Artifact, 0)
-	err := a.db.Model(&entity.Artifact{}).Find(&list).Error
-	if err != nil {
-		return nil, err
+	var total int64
+
+	db := a.db.Model(&entity.Artifact{})
+	if appId != "" {
+		db = db.Where("app_id = ?", appId)
 	}
-	return list, nil
+	if fileType != "" {
+		db = db.Where("file_type = ?", fileType)
+	}
+	err := db.
+		Scopes(utils.Paginate(current, pageSize)).
+		Find(&list).
+		Count(&total).
+		Order("id desc").Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return list, total, nil
 }
 
 func (a *Artifact) Delete(artifactId uint) error {

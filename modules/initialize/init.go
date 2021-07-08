@@ -34,7 +34,7 @@ func InitMigrate() {
 		&entity.AlarmContact{},
 		&entity.AlarmLog{},
 
-		&entity.SourceMap{},
+		&entity.Sourcemap{},
 		&entity.Artifact{},
 	)
 	if err != nil {
