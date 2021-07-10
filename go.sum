@@ -502,6 +502,10 @@ github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223 h1:F9x/1yl3T2
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
 github.com/nanzm/sourcemap v0.0.1 h1:XRbcjQUPa9ZgQRL+4tIftUHRveDYlqdZT0x/gS5iD9k=
 github.com/nanzm/sourcemap v0.0.1/go.mod h1:unZg7P3Woffu3ZqG0p+/4wzFtGVj13PU0Ex7eTOOwbw=
+github.com/nanzm/sourcemap v0.0.2 h1:3vNBPJW7994AEWj0AaedpGguFlf8JLjygIoHhWm4Yc8=
+github.com/nanzm/sourcemap v0.0.2/go.mod h1:unZg7P3Woffu3ZqG0p+/4wzFtGVj13PU0Ex7eTOOwbw=
+github.com/nanzm/sourcemap v0.0.3 h1:Sx4oL3UDzco689lAnsX7iaQMHRxuhy7bYUnb7toYN3w=
+github.com/nanzm/sourcemap v0.0.3/go.mod h1:unZg7P3Woffu3ZqG0p+/4wzFtGVj13PU0Ex7eTOOwbw=
 github.com/nats-io/jwt v0.3.0/go.mod h1:fRYCDE99xlTsqUzISS1Bi75UBJ6ljOJQOAAu5VglpSg=
 github.com/nats-io/jwt v0.3.2 h1:+RB5hMpXUUA2dfxuhBTEkMOrYmM+gKIZYS1KjSostMI=
 github.com/nats-io/jwt v0.3.2/go.mod h1:/euKqTS1ZD+zzjYrY7pseZrTtWQSjujC7xjPc8wL6eU=

@@ -5,6 +5,7 @@ import (
 	"dora/app/manage/model/dto"
 	"dora/app/manage/model/entity"
 	"dora/config"
+	"dora/config/constant"
 	"dora/modules/middleware"
 	"dora/pkg/utils"
 	"dora/pkg/utils/fs"
@@ -284,26 +285,27 @@ func (pro *ProjectResource) SourcemapParse(c *gin.Context) {
 	// 取得行列
 	line, col, e := utils.MatchStackLineCol(firstLine)
 	if e != nil {
-		ginutil.JSONFail(c, -1, e.Error())
+		ginutil.JSONFail(c, constant.BizMsg, e.Error())
+		return
 	}
 
 	// 找到 map 文件
 	destDir := config.SourcemapDir + "/" + u.AppId
 	sm, err := utils.GetStackSourceMap(destDir, firstLine)
 	if err != nil {
-		ginutil.JSONFail(c, -1, err.Error())
+		ginutil.JSONFail(c, constant.BizMsg, err.Error())
 		return
 	}
 
 	// 获取源代码行列
 	parse, e := sourcemap.Parse("", sm)
 	if e != nil {
-		ginutil.JSONFail(c, -1, e.Error())
+		ginutil.JSONFail(c, constant.BizMsg, e.Error())
 		return
 	}
 	source, _, originLine, originCol, ok := parse.Source(line, col)
 	if !ok {
-		ginutil.JSONFail(c, -1, "can`t parse origin line column")
+		ginutil.JSONFail(c, constant.BizMsg, "无法解析出源代码中的行列号")
 		return
 	}
 

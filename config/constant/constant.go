@@ -1,6 +1,5 @@
 package constant
 
-
 const (
 	AggregatesAvg = "avg"
 	AggregatesSum = "sum"
@@ -16,4 +15,10 @@ const (
 	MeasureError = "error"
 	MeasureApi   = "api"
 	MeasureRes   = "res"
+)
+
+const (
+	Fail    = -1
+	Success = 0
+	BizMsg  = 3000
 )

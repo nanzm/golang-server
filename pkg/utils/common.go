@@ -59,10 +59,10 @@ func stringToFloatCheckHookFunc() mapstructure.DecodeHookFunc {
 }
 
 func MatchStackLineCol(stackLine string) (line, col int, e error) {
-	r := regexp.MustCompile(".+\\.js:(\\d+):(\\d+).+")
+	r := regexp.MustCompile(".+:(\\d+):(\\d+).+")
 	sub := r.FindStringSubmatch(stackLine)
 	if len(sub) < 3 {
-		return 0, 0, errors.New("regexp can`t match line col")
+		return 0, 0, errors.New("无法从堆栈中获得行列号")
 	}
 
 	var err error
