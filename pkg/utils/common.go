@@ -1,9 +1,12 @@
 package utils
 
 import (
+	"errors"
 	"github.com/mitchellh/mapstructure"
 	"gorm.io/gorm"
 	"reflect"
+	"regexp"
+	"strconv"
 )
 
 func Paginate(current, pageSize int64) func(db *gorm.DB) *gorm.DB {
@@ -53,4 +56,20 @@ func stringToFloatCheckHookFunc() mapstructure.DecodeHookFunc {
 			return data, nil
 		}
 	}
+}
+
+func MatchStackLineCol(stackLine string) (line, col int, e error) {
+	r := regexp.MustCompile(".+\\.js:(\\d+):(\\d+).+")
+	sub := r.FindStringSubmatch(stackLine)
+	if len(sub) < 3 {
+		return 0, 0, errors.New("regexp can`t match line col")
+	}
+
+	var err error
+	l, err := strconv.Atoi(sub[1])
+	c, err := strconv.Atoi(sub[2])
+	if err != nil {
+		return 0, 0, err
+	}
+	return l, c, nil
 }

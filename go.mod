@@ -24,6 +24,7 @@ require (
 	github.com/mholt/archiver/v3 v3.5.0
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/nsqio/go-nsq v1.0.8
+	github.com/nanzm/sourcemap v0.0.1
 	github.com/pelletier/go-toml v1.8.1 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron/v3 v3.0.1

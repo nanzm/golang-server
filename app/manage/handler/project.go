@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"bytes"
 	"dora/app/manage/model/dao"
 	"dora/app/manage/model/dto"
 	"dora/app/manage/model/entity"
@@ -11,13 +10,12 @@ import (
 	"dora/pkg/utils/fs"
 	"dora/pkg/utils/ginutil"
 	"dora/pkg/utils/unarchive"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/nanzm/sourcemap"
 	"gorm.io/gorm"
-	"io/ioutil"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -276,49 +274,42 @@ func (pro *ProjectResource) SourcemapParse(c *gin.Context) {
 		return
 	}
 
-	sourcemap, err := utils.GetStackSourceMap("tmp/sourcemap/"+u.AppId+"/decompress", u.Stack)
+	// 第一行
+	stackLines := strings.Split(u.Stack, "\n")
+	var firstLine string
+	if len(stackLines) > 2 {
+		firstLine = stackLines[1]
+	}
+
+	// 取得行列
+	line, col, e := utils.MatchStackLineCol(firstLine)
+	if e != nil {
+		ginutil.JSONFail(c, -1, e.Error())
+	}
+
+	// 找到 map 文件
+	destDir := config.SourcemapDir + "/" + u.AppId
+	sm, err := utils.GetStackSourceMap(destDir, firstLine)
 	if err != nil {
-		ginutil.JSONServerError(c, err)
+		ginutil.JSONFail(c, -1, err.Error())
 		return
 	}
 
-	body := dto.ReqPostParseData{
-		Stack:        u.Stack,
-		RawSourcemap: string(sourcemap),
-	}
-	marshal, err := json.Marshal(body)
-	if err != nil {
-		ginutil.JSONServerError(c, err)
+	// 获取源代码行列
+	parse, e := sourcemap.Parse("", sm)
+	if e != nil {
+		ginutil.JSONFail(c, -1, e.Error())
 		return
 	}
-	req, err := http.NewRequest("POST", "http://localhost:8220", bytes.NewBuffer(marshal))
-	if err != nil {
-		ginutil.JSONServerError(c, err)
-		return
-	}
-	defer req.Body.Close()
-	req.Header.Set("Content-Type", "application/json")
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		ginutil.JSONServerError(c, err)
+	source, _, originLine, originCol, ok := parse.Source(line, col)
+	if !ok {
+		ginutil.JSONFail(c, -1, "can`t parse origin line column")
 		return
 	}
 
-	// 解析响应
-	s, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		ginutil.JSONServerError(c, err)
-		return
-	}
-
-	// 返回
-	var result map[string]interface{}
-	err = json.Unmarshal(s, &result)
-	if err != nil {
-		ginutil.JSONServerError(c, err)
-		return
-	}
-	ginutil.JSONOk(c, result)
+	// 获取原始堆栈
+	originSource := parse.OriginSource(source, originLine, originCol)
+	ginutil.JSONOk(c, originSource)
 }
 
 func (pro *ProjectResource) GetProjectUsers(c *gin.Context) {
