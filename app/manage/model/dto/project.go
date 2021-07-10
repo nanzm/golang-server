@@ -18,6 +18,15 @@ type ReqOrganizationProjectsList struct {
 	OrganizationId uint `form:"organizationId"  binding:"required"`
 }
 
+//
+type AlarmListParam struct {
+	Current  int64  `form:"current" binding:"number"`
+	PageSize int64  `form:"pageSize" binding:"number"`
+	AppId    string `form:"appId"`
+	//Start    int64  `form:"start" binding:"required"`
+	//End      int64  `form:"end" binding:"required"`
+}
+
 // 备份
 type BackUpParam struct {
 	AppId       string `form:"appId" binding:"required"`

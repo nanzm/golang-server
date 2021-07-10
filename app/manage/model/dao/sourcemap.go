@@ -33,9 +33,10 @@ func (a *Sourcemap) List(current, pageSize int64, appId string) (result []*entit
 	if appId != "" {
 		db = db.Where("app_id = ?", appId)
 	}
-	err := db.Scopes(utils.Paginate(current, pageSize)).
-		Find(&list).
+	err := db.
 		Count(&total).
+		Scopes(utils.Paginate(current, pageSize)).
+		Find(&list).
 		Order("id desc").Error
 
 	if err != nil {

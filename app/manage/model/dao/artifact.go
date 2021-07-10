@@ -29,7 +29,7 @@ func (a *Artifact) List(current, pageSize int64, appId, fileType string) (result
 	list := make([]*entity.Artifact, 0)
 	var total int64
 
-	db := a.db.Model(&entity.Artifact{})
+	db := a.db.Debug().Model(&entity.Artifact{})
 	if appId != "" {
 		db = db.Where("app_id = ?", appId)
 	}
@@ -37,9 +37,9 @@ func (a *Artifact) List(current, pageSize int64, appId, fileType string) (result
 		db = db.Where("file_type = ?", fileType)
 	}
 	err := db.
+		Count(&total).
 		Scopes(utils.Paginate(current, pageSize)).
 		Find(&list).
-		Count(&total).
 		Order("id desc").Error
 	if err != nil {
 		return nil, 0, err
