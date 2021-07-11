@@ -7,10 +7,10 @@ type Client interface {
 	PutListData(listLogData []map[string]interface{}) error
 
 	DefaultQuery(appId string, from, to, interval int64, dataType string) (result interface{}, err error)
-	QueryMethods() Api
+	QueryMethods() Query
 }
 
-type Api interface {
+type Query interface {
 	GetLogByMd5(appId string, from, to int64, md5 string) (*response.LogsResponse, error)
 	LogCountByMd5(appId string, from, to int64, md5 string) (*response.LogCountByMd5Res, error)
 	GetErrorList(appId string, from, to int64) (*response.ErrorListRes, error)
@@ -31,6 +31,9 @@ type Api interface {
 	ApiErrorTrend(appId string, from, to int64, interval int64) (*response.ApiErrorTrendRes, error)
 	ApiErrorList(appId string, from, to int64) (*response.ApiErrorListRes, error)
 
+	ApiDuration(appId string, from, to int64) (*response.ApiDurationRes, error)
+	ApiDurationTrend(appId string, from, to int64, interval int64) (*response.ApiDurationTrendRes, error)
+
 	// 性能
 	PerfMetricsBucket(appId string, from, to int64) (*response.PerfMetricsBucket, error)
 	PerfXhrTiming(appId string, from, to int64) (*response.PerfDataConsumptionTrendRes, error)
@@ -40,6 +43,9 @@ type Api interface {
 	ResLoadFailTotalTrend(appId string, from, to, interval int64) (*response.ResLoadFailTotalTrendRes, error)
 	ResLoadFailTotal(appId string, from, to int64) (*response.ResLoadFailTotalRes, error)
 	ResLoadFailList(appId string, from, to int64) (*response.ResLoadFailListRes, error)
+
+	ResDuration(appId string, from, to int64) (*response.ResLoadFailListRes, error)
+	ResDurationTrend(appId string, from, to, interval int64) (*response.ResLoadFailListRes, error)
 
 	ProjectIpToCountry(appId string, from, to int64) (*response.ProjectIpToCountryRes, error)
 	ProjectIpToProvince(appId string, from, to int64) (*response.ProjectIpToProvinceRes, error)

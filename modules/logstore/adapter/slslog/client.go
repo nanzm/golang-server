@@ -45,62 +45,63 @@ func (s slsLog) PutListData(logList []map[string]interface{}) error {
 }
 
 func (s slsLog) DefaultQuery(appId string, from, to, interval int64, dataType string) (interface{}, error) {
-	m := NewSlsQuery()
-	switch dataType {
-	case "pvUvTotal":
-		return m.PvUvTotal(appId, from, to)
-	case "pvUvTrend":
-		return m.PvUvTrend(appId, from, to, interval)
-	case "sdkVersionCount":
-		return m.SdkVersionCount(appId, from, to)
-	case "categoryCount":
-		return m.CategoryCount(appId, from, to)
-	case "entryPage":
-		return m.PagesCount(appId, from, to)
-
-	// 错误
-	case "errorCount":
-		return m.ErrorCount(appId, from, to)
-	case "errorCountTrend":
-		return m.ErrorCountTrend(appId, from, to, interval)
-	case "apiErrorCount":
-		return m.ApiErrorCount(appId, from, to)
-	case "apiErrorTrend":
-		return m.ApiErrorTrend(appId, from, to, interval)
-	case "apiErrorList":
-		return m.ApiErrorList(appId, from, to)
-
-	// 资源加载错误
-	case "resLoadFailTotalTrend":
-		return m.ResLoadFailTotalTrend(appId, from, to, interval)
-	case "resLoadFailTotal":
-		return m.ResLoadFailTotal(appId, from, to)
-	case "resLoadFailList":
-		return m.ResLoadFailList(appId, from, to)
-
-	// 性能
-	case "perfMetrics":
-		return m.PerfMetricsBucket(appId, from, to)
-
-	case "projectEventCount":
-		return m.ProjectEventCount(appId, from, to)
-	case "projectSendMode":
-		return m.ProjectSendMode(appId, from, to)
-	case "projectEnv":
-		return m.ProjectEnv(appId, from, to)
-	case "projectVersion":
-		return m.ProjectVersion(appId, from, to)
-	case "projectUserScreen":
-		return m.ProjectUserScreen(appId, from, to)
-	case "projectCategory":
-		return m.ProjectCategory(appId, from, to)
-	}
+	//m := NewSlsQuery()
+	//switch dataType {
+	//case "pvUvTotal":
+	//	return m.PvUvTotal(appId, from, to)
+	//case "pvUvTrend":
+	//	return m.PvUvTrend(appId, from, to, interval)
+	//case "sdkVersionCount":
+	//	return m.SdkVersionCount(appId, from, to)
+	//case "categoryCount":
+	//	return m.CategoryCount(appId, from, to)
+	//case "entryPage":
+	//	return m.PagesCount(appId, from, to)
+	//
+	//// 错误
+	//case "errorCount":
+	//	return m.ErrorCount(appId, from, to)
+	//case "errorCountTrend":
+	//	return m.ErrorCountTrend(appId, from, to, interval)
+	//case "apiErrorCount":
+	//	return m.ApiErrorCount(appId, from, to)
+	//case "apiErrorTrend":
+	//	return m.ApiErrorTrend(appId, from, to, interval)
+	//case "apiErrorList":
+	//	return m.ApiErrorList(appId, from, to)
+	//
+	//// 资源加载错误
+	//case "resLoadFailTotalTrend":
+	//	return m.ResLoadFailTotalTrend(appId, from, to, interval)
+	//case "resLoadFailTotal":
+	//	return m.ResLoadFailTotal(appId, from, to)
+	//case "resLoadFailList":
+	//	return m.ResLoadFailList(appId, from, to)
+	//
+	//// 性能
+	//case "perfMetrics":
+	//	return m.PerfMetricsBucket(appId, from, to)
+	//
+	//case "projectEventCount":
+	//	return m.ProjectEventCount(appId, from, to)
+	//case "projectSendMode":
+	//	return m.ProjectSendMode(appId, from, to)
+	//case "projectEnv":
+	//	return m.ProjectEnv(appId, from, to)
+	//case "projectVersion":
+	//	return m.ProjectVersion(appId, from, to)
+	//case "projectUserScreen":
+	//	return m.ProjectUserScreen(appId, from, to)
+	//case "projectCategory":
+	//	return m.ProjectCategory(appId, from, to)
+	//}
 
 	return nil, errors.New("暂无该指标")
 }
 
 func (s slsLog) QueryMethods() core.Api {
-	return NewSlsQuery()
+	//return NewSlsQuery()
+	return nil
 }
 
 func buildQueryExp(appId string, queryTpl string) (tpl string, err error) {

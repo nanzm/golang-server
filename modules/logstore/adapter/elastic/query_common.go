@@ -1,5 +1,27 @@
 package elasticComponent
 
+import (
+	"dora/config"
+	"dora/modules/logstore/core"
+	"dora/modules/logstore/response"
+	"dora/pkg/utils/logx"
+	jsoniter "github.com/json-iterator/go"
+	"github.com/tidwall/gjson"
+	"strconv"
+	"strings"
+)
+
+type elasticQuery struct {
+	config config.Elastic
+}
+
+func NewElasticQuery() core.Query {
+	return &elasticQuery{
+		config: config.GetElastic(),
+	}
+}
+
+
 const pvUvTotal = `{
   "size": 0,
   "query": {
@@ -134,159 +156,6 @@ const urlPVUv = `{
         "uv": {
           "cardinality": {
             "field": "uid.keyword"
-          }
-        }
-      }
-    }
-  }
-}`
-
-const errorCount = `{
-  "size": 0,
-  "query": {
-    "bool": {
-      "filter": [
-        {
-          "match": {
-            "appId": "<APPID>"
-          }
-        },
-        {
-          "match": {
-            "type": "error"
-          }
-        },
-        {
-          "range": {
-            "ts": {
-              "gte": <FORM>,
-              "lte": <TO>
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggregations": {
-    "count": {
-      "value_count": {
-        "field": "type.keyword"
-      }
-    },
-    "effectUser": {
-      "cardinality": {
-        "field": "uid.keyword"
-      }
-    }
-  }
-}`
-
-const errorCountTrend = `{
-  "size": 0,
-  "query": {
-    "bool": {
-      "filter": [
-        {
-          "match": {
-            "appId": "<APPID>"
-          }
-        },
-        {
-          "match": {
-            "type": "error"
-          }
-        },
-        {
-          "range": {
-            "ts": {
-              "gte": <FORM>,
-              "lte": <TO>
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggregations": {
-    "trend": {
-      "date_histogram": {
-        "field": "ts",
-        "interval": "<INTERVAL>m",
-        "time_zone": "+08:00",
-        "format": "yyyy-MM-dd HH:mm:ss"
-      },
-      "aggregations": {
-        "count": {
-          "value_count": {
-            "field": "type.keyword"
-          }
-        },
-        "effectUser": {
-          "cardinality": {
-            "field": "uid.keyword"
-          }
-        }
-      }
-    }
-  }
-}`
-
-const errorList=`{
-  "size": 0,
-  "query": {
-    "bool": {
-      "filter": [
-        {
-          "match": {
-            "appId": "<APPID>"
-          }
-        },
-        {
-          "match": {
-            "type": "error"
-          }
-        },
-        {
-          "range": {
-            "ts": {
-              "gte": <FORM>,
-              "lte": <TO>
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggregations": {
-    "md5": {
-      "terms": {
-        "field": "md5.keyword",
-        "size": 100
-      },
-      "aggregations": {
-        "msg": {
-          "terms": {
-            "field": "error.msg.keyword"
-          }
-        },
-        "error": {
-          "terms": {
-            "field": "error.error.keyword"
-          }
-        },
-        "count": {
-          "value_count": {
-            "field": "type.keyword"
-          }
-        },
-        "effectUser": {
-          "cardinality": {
-            "field": "uid.keyword"
-          }
-        },
-        "ts": {
-          "terms": {
-            "field": "ts"
           }
         }
       }
@@ -639,273 +508,6 @@ const performanceBucket = `{
   }
 }`
 
-const apiErrorCount = `{
-  "size": 0,
-  "query": {
-    "bool": {
-      "filter": [
-        {
-          "match": {
-            "appId": "<APPID>"
-          }
-        },
-        {
-          "match": {
-            "type": "api"
-          }
-        },
-        {
-          "match": {
-            "subType": "xhr"
-          }
-        },
-        {
-          "range": {
-            "ts": {
-              "gte": <FORM>,
-              "lte": <TO>
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggregations": {
-    "count": {
-      "value_count": {
-        "field": "type.keyword"
-      }
-    },
-    "effectUser": {
-      "cardinality": {
-        "field": "uid.keyword"
-      }
-    }
-  }
-}`
-
-const apiErrorTrend = `{
-  "size": 0,
-  "query": {
-    "bool": {
-      "filter": [
-        {
-          "match": {
-            "appId": "<APPID>"
-          }
-        },
-        {
-          "match": {
-            "type": "api"
-          }
-        },
-        {
-          "match": {
-            "subType": "xhr"
-          }
-        },
-        {
-          "range": {
-            "ts": {
-              "gte": <FORM>,
-              "lte": <TO>
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggregations": {
-    "trend": {
-      "date_histogram": {
-        "field": "ts",
-        "interval": "<INTERVAL>m",
-        "time_zone": "+08:00",
-        "format": "yyyy-MM-dd HH:mm:ss"
-      },
-      "aggregations": {
-        "count": {
-          "value_count": {
-            "field": "type.keyword"
-          }
-        },
-        "effectUser": {
-          "cardinality": {
-            "field": "uid.keyword"
-          }
-        }
-      }
-    }
-  }
-}`
-
-const apiErrorList = `{
-  "size": 0,
-  "query": {
-    "bool": {
-      "filter": [
-        {
-          "match": {
-            "appId": "<APPID>"
-          }
-        },
-        {
-          "match": {
-            "type": "api"
-          }
-        },
-        {
-          "match": {
-            "subType": "xhr"
-          }
-        },
-        {
-          "range": {
-            "ts": {
-              "gte": <FORM>,
-              "lte": <TO>
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggregations": {
-    "url": {
-      "terms": {
-        "field": "api.url.keyword",
-        "size": 50,
-        "order": {
-          "count": "desc"
-        }
-      },
-      "aggregations": {
-        "count": {
-          "value_count": {
-            "field": "type.keyword"
-          }
-        },
-        "effectUser": {
-          "cardinality": {
-            "field": "uid.keyword"
-          }
-        },
-        "method": {
-          "terms": {
-            "field": "api.method.keyword"
-          }
-        },
-        "type": {
-          "terms": {
-            "field": "api.type.keyword"
-          }
-        }
-      }
-    }
-  }
-}`
-
-const resLoadFailTrend =`{
-  "size": 0,
-  "query": {
-    "bool": {
-      "filter": [
-        {
-          "match": {
-            "appId": "<APPID>"
-          }
-        },
-        {
-          "match": {
-            "type": "resource"
-          }
-        },
-        {
-          "range": {
-            "ts": {
-              "gte": <FORM>,
-              "lte": <TO>
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggregations": {
-    "trend": {
-      "date_histogram": {
-        "field": "ts",
-        "interval": "<INTERVAL>m",
-        "time_zone": "+08:00",
-        "format": "yyyy-MM-dd HH:mm:ss"
-      },
-      "aggregations": {
-        "count": {
-          "value_count": {
-            "field": "type.keyword"
-          }
-        },
-        "effectUser": {
-          "cardinality": {
-            "field": "uid.keyword"
-          }
-        }
-      }
-    }
-  }
-}`
-
-const resLoadFailList =`{
-  "size": 0,
-  "query": {
-    "bool": {
-      "filter": [
-        {
-          "match": {
-            "appId": "<APPID>"
-          }
-        },
-        {
-          "match": {
-            "type": "resource"
-          }
-        },
-        {
-          "range": {
-            "ts": {
-              "gte": <FORM>,
-              "lte": <TO>
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggregations": {
-    "url": {
-      "terms": {
-        "field": "resource.src.keyword",
-        "size": 50,
-        "order": {
-          "count": "desc"
-        }
-      },
-      "aggregations": {
-        "count": {
-          "value_count": {
-            "field": "type.keyword"
-          }
-        },
-        "effectUser": {
-          "cardinality": {
-            "field": "uid.keyword"
-          }
-        }
-      }
-    }
-  }
-}`
-
 const sdkVersionList = `{
   "size": 0,
   "query": {
@@ -991,3 +593,191 @@ const getLogsByMd5=`{
     }
   }
 }`
+
+func (e elasticQuery) GetLogByMd5(appId string, from, to int64, md5 string) (*response.LogsResponse, error) {
+	r := strings.NewReplacer(
+		core.TplAppId, appId,
+		core.TplFrom, strconv.Itoa(int(from)),
+		core.TplTo, strconv.Itoa(int(to)),
+		core.TplMD5, md5,
+	)
+	tpl := r.Replace(getLogsByMd5)
+
+	res, err := baseSearch(e.config.Index, tpl)
+	if err != nil {
+		logx.Error(err)
+		return nil, err
+	}
+
+	// 转
+	count := gjson.Get(string(res), "aggregations.count.value").Num
+	effectUser := gjson.Get(string(res), "aggregations.effectUser.value").Num
+
+	l := gjson.Get(string(res), "hits.hits").String()
+
+	var logs []map[string]interface{}
+	err = jsoniter.Unmarshal([]byte(l), &logs)
+	if err != nil {
+		return nil, err
+	}
+
+	result := &response.LogsResponse{
+		Count:      int(count),
+		EffectUser: int(effectUser),
+		Logs:       logs,
+	}
+	return result, nil
+}
+
+func (e elasticQuery) LogCountByMd5(appId string, from, to int64, md5 string) (*response.LogCountByMd5Res, error) {
+	panic("implement me")
+}
+
+func (e elasticQuery) GetErrorList(appId string, from, to int64) (*response.ErrorListRes, error) {
+	res, err := baseSearch(e.config.Index, buildQueryTpl(errorList, appId, from, to))
+	if err != nil {
+		logx.Error(err)
+		return nil, err
+	}
+
+	logs := make([]*response.ErrorItem, 0)
+
+	buckets := gjson.Get(string(res), "aggregations.md5.buckets")
+	buckets.ForEach(func(key, value gjson.Result) bool {
+		md5 := gjson.Get(value.Raw, "key").String()
+		msg := gjson.Get(value.Raw, "msg.buckets.0.key").String()
+		errorStr := gjson.Get(value.Raw, "error.buckets.0.key").String()
+		count := gjson.Get(value.Raw, "count.value").Num
+		effectUser := gjson.Get(value.Raw, "effectUser.value").Num
+		times := gjson.Get(value.Raw, "ts.buckets.#.key").Array()
+		first, last := GetFirstAndLastTime(times)
+
+		item := &response.ErrorItem{
+			Md5:        md5,
+			Msg:        msg,
+			Error:      errorStr,
+			Count:      int(count),
+			EffectUser: int(effectUser),
+			FirstAt:    first,
+			LastAt:     last,
+		}
+		logs = append(logs, item)
+		return true
+	})
+
+	result := &response.ErrorListRes{
+		Total: len(logs),
+		List:  logs,
+	}
+	return result, nil
+}
+
+func (e elasticQuery) PvUvTotal(appId string, from, to int64) (*response.PvUvTotalRes, error) {
+	res, err := baseSearch(e.config.Index, buildQueryTpl(pvUvTotal, appId, from, to))
+	if err != nil {
+		logx.Error(err)
+		return nil, err
+	}
+
+	pv := gjson.Get(string(res), "aggregations.pv.value").Num
+	uv := gjson.Get(string(res), "aggregations.uv.value").Num
+
+	result := &response.PvUvTotalRes{
+		Pv: int(pv),
+		Uv: int(uv),
+	}
+	return result, nil
+}
+
+func (e elasticQuery) PvUvTrend(appId string, from, to, interval int64) (*response.PvUvTrendRes, error) {
+	res, err := baseSearch(e.config.Index, buildQueryTrendTpl(pvUvTotalTrend, appId, from, to, interval))
+	if err != nil {
+		logx.Error(err)
+		return nil, err
+	}
+
+	logs := make([]*response.PvUvTrendItemRes, 0)
+
+	// 遍历
+	buckets := gjson.Get(string(res), "aggregations.trend.buckets")
+	buckets.ForEach(func(key, value gjson.Result) bool {
+		pv := gjson.Get(value.Raw, "doc_count").Num
+		uv := gjson.Get(value.Raw, "uv.value").Num
+		ts := gjson.Get(value.Raw, "key_as_string").String()
+		item := &response.PvUvTrendItemRes{
+			Pv: int(pv),
+			Uv: int(uv),
+			Ts: ts,
+		}
+		logs = append(logs, item)
+		return true // keep iterating
+	})
+
+	result := &response.PvUvTrendRes{
+		Total: 0,
+		List:  logs,
+	}
+	return result, nil
+}
+
+func (e elasticQuery) SdkVersionCount(appId string, from, to int64) (*response.SdkVersionCountRes, error) {
+	res, err := baseSearch(e.config.Index, buildQueryTpl(sdkVersionList, appId, from, to))
+	if err != nil {
+		logx.Error(err)
+		return nil, err
+	}
+
+	logs := make([]*response.SdkVersionItem, 0)
+	buckets := gjson.Get(string(res), "aggregations.sdk.buckets")
+	buckets.ForEach(func(key, value gjson.Result) bool {
+		version := gjson.Get(value.Raw, "key").String()
+		count := gjson.Get(value.Raw, "count.value").Num
+
+		item := &response.SdkVersionItem{
+			Version: version,
+			Count:   int(count),
+		}
+		logs = append(logs, item)
+		return true
+	})
+
+	result := &response.SdkVersionCountRes{
+		Total: 0,
+		List:  logs,
+	}
+	return result, nil
+}
+
+func (e elasticQuery) CategoryCount(appId string, from, to int64) (*response.CategoryCountRes, error) {
+	panic("implement me")
+}
+
+func (e elasticQuery) PagesCount(appId string, from, to int64) (*response.PageTotalRes, error) {
+	res, err := baseSearch(e.config.Index, buildQueryTpl(urlPVUv, appId, from, to))
+	if err != nil {
+		logx.Error(err)
+		return nil, err
+	}
+
+	logs := make([]*response.PageTotalItemRes, 0)
+	buckets := gjson.Get(string(res), "aggregations.url.buckets")
+	buckets.ForEach(func(key, value gjson.Result) bool {
+		url := gjson.Get(value.Raw, "key").String()
+		pv := gjson.Get(value.Raw, "pv.value").Num
+		uv := gjson.Get(value.Raw, "uv.value").Num
+
+		item := &response.PageTotalItemRes{
+			Url: url,
+			Pv:  int(pv),
+			Uv:  int(uv),
+		}
+		logs = append(logs, item)
+		return true
+	})
+
+	result := &response.PageTotalRes{
+		Total: len(logs),
+		List:  logs,
+	}
+	return result, nil
+}

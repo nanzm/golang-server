@@ -11,13 +11,17 @@ const (
 	ErrorCount      = "errorCount"
 	ErrorCountTrend = "errorCountTrend"
 
-	ApiErrorCount = "apiErrorCount"
-	ApiErrorTrend = "apiErrorTrend"
-	ApiErrorList  = "apiErrorList"
+	ApiErrorCount    = "apiErrorCount"
+	ApiErrorTrend    = "apiErrorTrend"
+	ApiErrorList     = "apiErrorList"
+	ApiDuration      = "apiDuration"
+	ApiDurationTrend = "apiDurationTrend"
 
 	ResLoadFailTotalTrend = "resLoadFailTotalTrend"
 	ResLoadFailTotal      = "resLoadFailTotal"
 	ResLoadFailList       = "resLoadFailList"
+	ResDuration           = "resDuration"
+	ResDurationTrend      = "resDurationTrend"
 
 	PerfMetrics = "perfMetrics"
 

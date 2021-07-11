@@ -113,6 +113,45 @@ type ApiErrorTrendItemRes struct {
 	Ts         string `json:"ts"`
 }
 
+// 接口加载时间趋势
+type ApiDurationTrendRes struct {
+	Total int                        `json:"total"`
+	List  []*ApiDurationTrendItemRes `json:"list"`
+}
+
+type ApiDurationTrendItemRes struct {
+	Percent1  float64 `json:"p1"`
+	Percent5  float64 `json:"p5"`
+	Percent25 float64 `json:"p25"`
+	Percent50 float64 `json:"p50"`
+	Percent75 float64 `json:"p75"`
+	Percent95 float64 `json:"p95"`
+	Percent99 float64 `json:"p99"`
+	Ts        string  `json:"ts"`
+}
+
+// 接口时间加载
+type ApiDurationRes struct {
+	List    []*ApiDurationItemRes `json:"list"`
+	Percent *ApiDurationPercent   `json:"percent"`
+}
+
+type ApiDurationPercent struct {
+	Percent1  float64 `json:"p1"`
+	Percent5  float64 `json:"p5"`
+	Percent25 float64 `json:"p25"`
+	Percent50 float64 `json:"p50"`
+	Percent75 float64 `json:"p75"`
+	Percent95 float64 `json:"p95"`
+	Percent99 float64 `json:"p99"`
+}
+
+type ApiDurationItemRes struct {
+	Key   string `json:"key"`
+	Count int    `json:"count"`
+}
+
+// 接口错误
 type ApiErrorListRes struct {
 	Total int             `json:"total"`
 	List  []*ApiErrorItem `json:"list"`
@@ -244,6 +283,27 @@ type ResLoadFailItemRes struct {
 	Src        string `json:"src"`
 	Count      int    `json:"count"`
 	EffectUser int    `json:"effect_user"`
+}
+
+// 资源加载时间
+type ResDurationRes struct {
+	List    []*ResDurationItemRes `json:"list"`
+	Percent *ResDurationPercent   `json:"percent"`
+}
+
+type ResDurationPercent struct {
+	Percent1  float64 `json:"p1"`
+	Percent5  float64 `json:"p5"`
+	Percent25 float64 `json:"p25"`
+	Percent50 float64 `json:"p50"`
+	Percent75 float64 `json:"p75"`
+	Percent95 float64 `json:"p95"`
+	Percent99 float64 `json:"p99"`
+}
+
+type ResDurationItemRes struct {
+	Key   string `json:"key"`
+	Count int    `json:"count"`
 }
 
 // Ip  国家 省份 城市

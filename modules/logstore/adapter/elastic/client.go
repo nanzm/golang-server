@@ -134,6 +134,10 @@ func (e elkLog) DefaultQuery(appId string, from, to, interval int64, dataType st
 		return m.ApiErrorTrend(appId, from, to, interval)
 	case core.ApiErrorList:
 		return m.ApiErrorList(appId, from, to)
+	case core.ApiDuration:
+		return m.ApiDuration(appId, from, to)
+	case core.ApiDurationTrend:
+		return m.ApiDurationTrend(appId, from, to, interval)
 
 	// 资源加载错误
 	case core.ResLoadFailTotalTrend:
@@ -142,6 +146,10 @@ func (e elkLog) DefaultQuery(appId string, from, to, interval int64, dataType st
 		return m.ResLoadFailTotal(appId, from, to)
 	case core.ResLoadFailList:
 		return m.ResLoadFailList(appId, from, to)
+	case core.ResDuration:
+		return m.ResDuration(appId, from, to)
+	case core.ResDurationTrend:
+		return m.ResDurationTrend(appId, from, to, interval)
 
 	// 性能
 	case core.PerfMetrics:
@@ -171,7 +179,7 @@ func (e elkLog) DefaultQuery(appId string, from, to, interval int64, dataType st
 	return nil, errors.New("暂无该指标")
 }
 
-func (e elkLog) QueryMethods() core.Api {
+func (e elkLog) QueryMethods() core.Query {
 	return NewElasticQuery()
 }
 
@@ -199,7 +207,7 @@ func buildQueryTrendTpl(tpl string, appId string, from, to, interval int64) stri
 }
 
 func baseSearch(Index string, queryTpl string) ([]byte, error) {
-	//fmt.Printf("%v \n", queryTpl)
+	fmt.Printf("%v \n", queryTpl)
 	es := elastic.GetClient()
 
 	res, err := es.Search(
