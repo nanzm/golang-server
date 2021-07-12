@@ -8,6 +8,7 @@ import (
 	"dora/modules/middleware"
 	"dora/pkg/utils/ginutil"
 	"dora/pkg/utils/logx"
+	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -17,7 +18,20 @@ import (
 	"time"
 )
 
+// http://patorjk.com/software/taag/#p=display&f=ANSI%20Shadow&t=Dora%20manage
+const banner = `
+██████╗  ██████╗ ██████╗  █████╗     ███╗   ███╗ █████╗ ███╗   ██╗ █████╗  ██████╗ ███████╗
+██╔══██╗██╔═══██╗██╔══██╗██╔══██╗    ████╗ ████║██╔══██╗████╗  ██║██╔══██╗██╔════╝ ██╔════╝
+██║  ██║██║   ██║██████╔╝███████║    ██╔████╔██║███████║██╔██╗ ██║███████║██║  ███╗█████╗  
+██║  ██║██║   ██║██╔══██╗██╔══██║    ██║╚██╔╝██║██╔══██║██║╚██╗██║██╔══██║██║   ██║██╔══╝  
+██████╔╝╚██████╔╝██║  ██║██║  ██║    ██║ ╚═╝ ██║██║  ██║██║ ╚████║██║  ██║╚██████╔╝███████╗
+╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝    ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
+                                                                  
+`
+
 func Serve() {
+	fmt.Print(banner)
+
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 	defer cancel()
 
