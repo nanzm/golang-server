@@ -4,18 +4,15 @@ const (
 	PvUvTotal = "pvUvTotal"
 	PvUvTrend = "pvUvTrend"
 
-	SdkVersionCount = "sdkVersionCount"
-	CategoryCount   = "categoryCount"
-	EntryPage       = "entryPage"
-
 	ErrorCount      = "errorCount"
 	ErrorCountTrend = "errorCountTrend"
 
-	ApiErrorCount    = "apiErrorCount"
-	ApiErrorTrend    = "apiErrorTrend"
-	ApiErrorList     = "apiErrorList"
-	ApiDuration      = "apiDuration"
-	ApiDurationTrend = "apiDurationTrend"
+	ApiErrorCount      = "apiErrorCount"
+	ApiErrorTrend      = "apiErrorTrend"
+	ApiErrorList       = "apiErrorList"
+	ApiDuration        = "apiDuration"
+	ApiDurationTrend   = "apiDurationTrend"
+	ApiTopListDuration = "apiTopListDuration"
 
 	ResLoadFailTotalTrend = "resLoadFailTotalTrend"
 	ResLoadFailTotal      = "resLoadFailTotal"
@@ -25,18 +22,21 @@ const (
 
 	PerfMetrics = "perfMetrics"
 
-	ProjectEventCount = "projectEventCount"
-	ProjectSendMode   = "projectSendMode"
-	ProjectEnv        = "projectEnv"
-	ProjectVersion    = "projectVersion"
-	ProjectUserScreen = "projectUserScreen"
-	ProjectCategory   = "projectCategory"
+	ProjectSdkVersionList = "projectSdkVersionList"
+	ProjectLogTypeList    = "projectLogTypeList"
+	ProjectUrlVisitList   = "projectUrlVisitList"
+	ProjectLogCount       = "projectLogCount"
+	ProjectEnv            = "projectEnv"
+	ProjectVersion        = "projectVersion"
+	ProjectUserScreen     = "projectUserScreen"
+	ProjectLogType        = "ProjectLogType"
 )
 
 const (
-	TplAppId    = "<APPID>"
-	TplFrom     = "<FORM>"
-	TplTo       = "<TO>"
-	TplInterval = "<INTERVAL>"
-	TplMD5      = "<MD5>"
+	TplAppId       = "<APPID>"
+	TplFrom        = "<FORM>"
+	TplTo          = "<TO>"
+	TplInterval    = "<INTERVAL>"
+	TplMD5         = "<MD5>"
+	TplSearchError = "<SEARCH_ERROR>"
 )

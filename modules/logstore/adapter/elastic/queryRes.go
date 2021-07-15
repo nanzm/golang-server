@@ -6,7 +6,8 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-const apiErrorCount = `{
+// 资源加载失败统计 img script 等等
+const resLoadFailCount = `{
   "size": 0,
   "query": {
     "bool": {
@@ -18,12 +19,7 @@ const apiErrorCount = `{
         },
         {
           "match": {
-            "type": "api"
-          }
-        },
-        {
-          "match": {
-            "subType": "xhr"
+            "type": "resource"
           }
         },
         {
@@ -39,11 +35,11 @@ const apiErrorCount = `{
   },
   "aggregations": {
     "count": {
-      "value_count": {
-        "field": "type.keyword"
+      "cardinality": {
+        "field": "eid.keyword"
       }
     },
-    "effectUser": {
+    "user": {
       "cardinality": {
         "field": "uid.keyword"
       }
@@ -51,7 +47,7 @@ const apiErrorCount = `{
   }
 }`
 
-const apiErrorTrend = `{
+const resLoadFailTrend = `{
   "size": 0,
   "query": {
     "bool": {
@@ -63,12 +59,7 @@ const apiErrorTrend = `{
         },
         {
           "match": {
-            "type": "api"
-          }
-        },
-        {
-          "match": {
-            "subType": "xhr"
+            "type": "resource"
           }
         },
         {
@@ -86,17 +77,17 @@ const apiErrorTrend = `{
     "trend": {
       "date_histogram": {
         "field": "ts",
-        "interval": "<INTERVAL>m",
+        "fixed_interval": "<INTERVAL>m",
         "time_zone": "+08:00",
         "format": "yyyy-MM-dd HH:mm:ss"
       },
       "aggregations": {
         "count": {
-          "value_count": {
-            "field": "type.keyword"
+          "cardinality": {
+            "field": "eid.keyword"
           }
         },
-        "effectUser": {
+        "user": {
           "cardinality": {
             "field": "uid.keyword"
           }
@@ -106,7 +97,7 @@ const apiErrorTrend = `{
   }
 }`
 
-const apiErrorList = `{
+const resLoadFailList = `{
   "size": 0,
   "query": {
     "bool": {
@@ -118,12 +109,7 @@ const apiErrorList = `{
         },
         {
           "match": {
-            "type": "api"
-          }
-        },
-        {
-          "match": {
-            "subType": "xhr"
+            "type": "resource"
           }
         },
         {
@@ -140,7 +126,7 @@ const apiErrorList = `{
   "aggregations": {
     "url": {
       "terms": {
-        "field": "api.url.keyword",
+        "field": "resource.src.keyword",
         "size": 50,
         "order": {
           "count": "desc"
@@ -148,23 +134,13 @@ const apiErrorList = `{
       },
       "aggregations": {
         "count": {
-          "value_count": {
-            "field": "type.keyword"
+          "cardinality": {
+            "field": "eid.keyword"
           }
         },
-        "effectUser": {
+        "user": {
           "cardinality": {
             "field": "uid.keyword"
-          }
-        },
-        "method": {
-          "terms": {
-            "field": "api.method.keyword"
-          }
-        },
-        "type": {
-          "terms": {
-            "field": "api.type.keyword"
           }
         }
       }
@@ -172,7 +148,70 @@ const apiErrorList = `{
   }
 }`
 
-const apiDuration = `{
+// 资源加载排名前50 的响应时间
+const resTopListDuration = `{
+  "size": 0,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "match": {
+            "appId": "<APPID>"
+          }
+        },
+        {
+          "match": {
+            "type": "performance"
+          }
+        },
+        {
+          "match": {
+            "subType": "resource"
+          }
+        },
+        {
+          "range": {
+            "ts": {
+              "gte": <FORM>,
+              "lte": <TO>
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggregations": {
+    "url": {
+      "terms": {
+        "field": "performance.script.name.keyword",
+        "size": 50,
+        "order": {
+          "count": "desc"
+        }
+      },
+      "aggregations": {
+        "count": {
+          "cardinality": {
+            "field": "eid.keyword"
+          }
+        },
+        "user": {
+          "cardinality": {
+            "field": "uid.keyword"
+          }
+        },
+        "script_percent": {
+          "percentiles": {
+            "field": "performance.script.duration"
+          }
+        }
+      }
+    }
+  }
+}`
+
+// 单个资源 url
+const resDuration = `{
   "size": 0,
   "query": {
     "bool": {
@@ -287,7 +326,8 @@ const apiDuration = `{
   }
 }`
 
-const apiDurationTrend = `{
+// 单个资源 url 趋势
+const resDurationTrend = `{
   "size": 0,
   "query": {
     "bool": {
@@ -322,7 +362,7 @@ const apiDurationTrend = `{
     "trend": {
       "date_histogram": {
         "field": "ts",
-        "interval": "<INTERVAL>m",
+        "fixed_interval": "<INTERVAL>m",
         "time_zone": "+08:00",
         "format": "yyyy-MM-dd HH:mm:ss"
       },
@@ -337,151 +377,114 @@ const apiDurationTrend = `{
   }
 }`
 
-func (e elasticQuery) ApiErrorCount(appId string, from, to int64) (*response.ApiErrorCountRes, error) {
-	res, err := baseSearch(e.config.Index, buildQueryTpl(apiErrorCount, appId, from, to))
+func (e elasticQuery) ResLoadFailTotal(appId string, from, to int64) (*response.ResLoadFailTotalRes, error) {
+	res, err := baseSearch(e.config.Index, buildQueryTpl(resLoadFailCount, appId, from, to))
 	if err != nil {
 		logx.Error(err)
 		return nil, err
 	}
 
 	c := gjson.Get(string(res), "aggregations.count.value").Num
-	u := gjson.Get(string(res), "aggregations.effectUser.value").Num
+	u := gjson.Get(string(res), "aggregations.user.value").Num
 
-	result := &response.ApiErrorCountRes{
-		Count:      int(c),
-		EffectUser: int(u),
+	result := &response.ResLoadFailTotalRes{
+		Count: int(c),
+		User:  int(u),
 	}
 	return result, nil
 }
 
-func (e elasticQuery) ApiErrorTrend(appId string, from, to int64, interval int64) (*response.ApiErrorTrendRes, error) {
-	res, err := baseSearch(e.config.Index, buildQueryTrendTpl(apiErrorTrend, appId, from, to, interval))
+func (e elasticQuery) ResLoadFailTrend(appId string, from, to, interval int64) (*response.CountListRes, error) {
+	res, err := baseSearch(e.config.Index, buildQueryTrendTpl(resLoadFailTrend, appId, from, to, interval))
 	if err != nil {
 		logx.Error(err)
 		return nil, err
 	}
 
-	logs := make([]*response.ApiErrorTrendItemRes, 0)
+	logs := make([]*response.CountItem, 0)
 
 	// 遍历
 	buckets := gjson.Get(string(res), "aggregations.trend.buckets")
 	buckets.ForEach(func(key, value gjson.Result) bool {
-		count := gjson.Get(value.Raw, "doc_count").Num
-		eUser := gjson.Get(value.Raw, "uv.value").Num
+		count := gjson.Get(value.Raw, "count.value").Num
+		user := gjson.Get(value.Raw, "user.value").Num
 		ts := gjson.Get(value.Raw, "key_as_string").String()
-		item := &response.ApiErrorTrendItemRes{
-			Count:      int(count),
-			EffectUser: int(eUser),
-			Ts:         ts,
+		item := &response.CountItem{
+			Count: int64(count),
+			User:  int64(user),
+			Key:   ts,
 		}
 		logs = append(logs, item)
 		return true
 	})
 
-	result := &response.ApiErrorTrendRes{
+	result := &response.CountListRes{
 		Total: len(logs),
 		List:  logs,
 	}
 	return result, nil
 }
 
-func (e elasticQuery) ApiErrorList(appId string, from, to int64) (*response.ApiErrorListRes, error) {
-	res, err := baseSearch(e.config.Index, buildQueryTpl(apiErrorList, appId, from, to))
+func (e elasticQuery) ResLoadFailList(appId string, from, to int64) (*response.CountListRes, error) {
+	res, err := baseSearch(e.config.Index, buildQueryTpl(resLoadFailList, appId, from, to))
 	if err != nil {
 		logx.Error(err)
 		return nil, err
 	}
 
-	logs := make([]*response.ApiErrorItem, 0)
+	logs := make([]*response.CountItem, 0)
 
 	buckets := gjson.Get(string(res), "aggregations.url.buckets")
 	buckets.ForEach(func(key, value gjson.Result) bool {
-		url := gjson.Get(value.Raw, "key").String()
-		method := gjson.Get(value.Raw, "method.buckets.#.key").String()
-		et := gjson.Get(value.Raw, "type.buckets.#.key").String()
 		count := gjson.Get(value.Raw, "count.value").Num
-		effectUser := gjson.Get(value.Raw, "effectUser.value").Num
+		user := gjson.Get(value.Raw, "user.value").Num
+		url := gjson.Get(value.Raw, "key").String()
 
-		item := &response.ApiErrorItem{
-			Id:         value.Index,
-			Url:        url,
-			Method:     method,
-			ErrorType:  et,
-			Count:      int(count),
-			EffectUser: int(effectUser),
+		item := &response.CountItem{
+			Count: int64(count),
+			User:  int64(user),
+			Key:   url,
 		}
 		logs = append(logs, item)
 		return true
 	})
 
-	result := &response.ApiErrorListRes{
+	result := &response.CountListRes{
 		Total: len(logs),
 		List:  logs,
 	}
 	return result, nil
 }
 
-func (e elasticQuery) ApiDuration(appId string, from, to int64) (*response.ApiDurationRes, error) {
-	res, err := baseSearch(e.config.Index, buildQueryTpl(apiDuration, appId, from, to))
+func (e elasticQuery) ResTopListDuration(appId string, from, to int64) (*response.ResTopListDurationRes, error) {
+	res, err := baseSearch(e.config.Index, buildQueryTpl(resTopListDuration, appId, from, to))
 	if err != nil {
 		logx.Error(err)
 		return nil, err
 	}
 
-	logs := make([]*response.ApiDurationItemRes, 0)
+	logs := make([]*response.ResTopItem, 0)
 
 	// 遍历
-	buckets := gjson.Get(string(res), "aggregations.xhr.buckets")
+	buckets := gjson.Get(string(res), "aggregations.url.buckets")
 	buckets.ForEach(func(_, value gjson.Result) bool {
 		key := gjson.Get(value.Raw, "key").String()
-		count := gjson.Get(value.Raw, "doc_count").Num
+		count := gjson.Get(value.Raw, "count.value").Num
+		user := gjson.Get(value.Raw, "user.value").Num
 
-		item := &response.ApiDurationItemRes{
+		Percent1 := gjson.Get(value.Raw, "script_percent.values.1\\.0").Num
+		Percent5 := gjson.Get(value.Raw, "script_percent.values.5\\.0").Num
+		Percent25 := gjson.Get(value.Raw, "script_percent.values.25\\.0").Num
+		Percent50 := gjson.Get(value.Raw, "script_percent.values.50\\.0").Num
+		Percent75 := gjson.Get(value.Raw, "script_percent.values.75\\.0").Num
+		Percent95 := gjson.Get(value.Raw, "script_percent.values.95\\.0").Num
+		Percent99 := gjson.Get(value.Raw, "script_percent.values.99\\.0").Num
+
+		item := &response.ResTopItem{
 			Key:   key,
-			Count: int(count),
-		}
-		logs = append(logs, item)
-		return true
-	})
+			Count: int64(count),
+			User:  int64(user),
 
-	result := &response.ApiDurationRes{
-		List: logs,
-		Percent: &response.ApiDurationPercent{
-			Percent1:  gjson.Get(string(res), "aggregations.xhr_percent.values.1\\.0").Num,
-			Percent5:  gjson.Get(string(res), "aggregations.xhr_percent.values.5\\.0").Num,
-			Percent25: gjson.Get(string(res), "aggregations.xhr_percent.values.25\\.0").Num,
-			Percent50: gjson.Get(string(res), "aggregations.xhr_percent.values.50\\.0").Num,
-			Percent75: gjson.Get(string(res), "aggregations.xhr_percent.values.75\\.0").Num,
-			Percent95: gjson.Get(string(res), "aggregations.xhr_percent.values.95\\.0").Num,
-			Percent99: gjson.Get(string(res), "aggregations.xhr_percent.values.99\\.0").Num,
-		},
-	}
-
-	return result, err
-}
-
-func (e elasticQuery) ApiDurationTrend(appId string, from, to int64, interval int64) (*response.ApiDurationTrendRes, error) {
-	res, err := baseSearch(e.config.Index, buildQueryTrendTpl(apiDurationTrend, appId, from, to, interval))
-	if err != nil {
-		logx.Error(err)
-		return nil, err
-	}
-
-	logs := make([]*response.ApiDurationTrendItemRes, 0)
-
-	// 遍历
-	buckets := gjson.Get(string(res), "aggregations.trend.buckets")
-	buckets.ForEach(func(key, value gjson.Result) bool {
-		Percent1 := gjson.Get(value.Raw, "xhr_percent.values.1\\.0").Num
-		Percent5 := gjson.Get(value.Raw, "xhr_percent.values.5\\.0").Num
-		Percent25 := gjson.Get(value.Raw, "xhr_percent.values.25\\.0").Num
-		Percent50 := gjson.Get(value.Raw, "xhr_percent.values.50\\.0").Num
-		Percent75 := gjson.Get(value.Raw, "xhr_percent.values.75\\.0").Num
-		Percent95 := gjson.Get(value.Raw, "xhr_percent.values.95\\.0").Num
-		Percent99 := gjson.Get(value.Raw, "xhr_percent.values.99\\.0").Num
-		ts := gjson.Get(value.Raw, "key_as_string").String()
-
-		item := &response.ApiDurationTrendItemRes{
 			Percent1:  Percent1,
 			Percent5:  Percent5,
 			Percent25: Percent25,
@@ -489,15 +492,24 @@ func (e elasticQuery) ApiDurationTrend(appId string, from, to int64, interval in
 			Percent75: Percent75,
 			Percent95: Percent95,
 			Percent99: Percent99,
-			Ts:        ts,
 		}
 		logs = append(logs, item)
 		return true
 	})
 
-	result := &response.ApiDurationTrendRes{
+	result := &response.ResTopListDurationRes{
 		Total: len(logs),
 		List:  logs,
 	}
-	return result, nil
+
+	return result, err
 }
+
+func (e elasticQuery) ResDuration(appId string, from, to int64) (*response.ResDurationRes, error) {
+	panic("implement me")
+}
+
+func (e elasticQuery) ResDurationTrend(appId string, from, to, interval int64) (*response.CountListRes, error) {
+	panic("implement me")
+}
+

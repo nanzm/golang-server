@@ -19,14 +19,11 @@ type slsLog struct {
 	producer *producer.Producer
 	client sls.ClientInterface
 }
-
-func NewSlsLogStore() core.Client {
-	return &slsLog{
-		config:   config.GetSlsLog(),
-		producer: slslog.GetProducer(),
-		client:   slslog.GetClient(),
-	}
-}
+//
+//func NewSlsLogStore() core.Client {
+//	return &slsLog{
+//	}
+//}
 
 func (s slsLog) PutData(logItem map[string]interface{}) error {
 	logs := fmtLog(logItem)
@@ -99,7 +96,7 @@ func (s slsLog) DefaultQuery(appId string, from, to, interval int64, dataType st
 	return nil, errors.New("暂无该指标")
 }
 
-func (s slsLog) QueryMethods() core.Api {
+func (s slsLog) QueryMethods() core.Client {
 	//return NewSlsQuery()
 	return nil
 }

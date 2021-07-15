@@ -34,7 +34,7 @@ func (issue *IssueResource) List(c *gin.Context) {
 		return
 	}
 
-	list, err := logstore.GetClient().QueryMethods().GetErrorList(u.AppId, u.Start, u.End)
+	list, err := logstore.GetClient().QueryMethods().ErrorList(u.AppId, u.Start, u.End)
 	if err != nil {
 		ginutil.JSONError(c, http.StatusInternalServerError, err)
 		return

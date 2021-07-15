@@ -4,9 +4,11 @@ import (
 	"dora/modules/datasource/elastic"
 	"dora/pkg/utils"
 	"encoding/json"
+	"fmt"
 	"log"
 	"strings"
 	"testing"
+	"time"
 )
 
 func Test_elkPutErrorData(t *testing.T) {
@@ -87,4 +89,34 @@ func Test_removePrefix(t *testing.T) {
 	//	"a":  "12",
 	//	"_b": "12",
 	//}, "they should be equal")
+}
+
+func Test_buildQueryTpl(t *testing.T) {
+	fr, to := utils.GetFormToRecently(48 * time.Hour)
+	appId := "fca5deec-a9db-4dac-a4db-b0f4610d16a5"
+	tpl := buildQueryTpl(searchErrorLogs, appId, fr, to)
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Println(tpl)
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Println("")
+}
+
+func Test_buildQueryTrendTpl(t *testing.T) {
+	var interval int64
+	fr, to := utils.GetFormToRecently(60 * time.Hour)
+	appId := "fca5deec-a9db-4dac-a4db-b0f4610d16a5"
+	interval = 30
+
+
+	tpl := buildQueryTrendTpl(resLoadFailTrend, appId, fr, to, interval)
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Println(tpl)
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Println("")
 }

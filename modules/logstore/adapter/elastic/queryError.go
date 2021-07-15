@@ -34,8 +34,8 @@ const errorCount = `{
   },
   "aggregations": {
     "count": {
-      "value_count": {
-        "field": "type.keyword"
+      "cardinality": {
+        "field": "eid.keyword"
       }
     },
     "effectUser": {
@@ -76,14 +76,14 @@ const errorCountTrend = `{
     "trend": {
       "date_histogram": {
         "field": "ts",
-        "interval": "<INTERVAL>m",
+        "fixed_interval": "<INTERVAL>m",
         "time_zone": "+08:00",
         "format": "yyyy-MM-dd HH:mm:ss"
       },
       "aggregations": {
         "count": {
-          "value_count": {
-            "field": "type.keyword"
+          "cardinality": {
+            "field": "eid.keyword"
           }
         },
         "effectUser": {
@@ -96,7 +96,7 @@ const errorCountTrend = `{
   }
 }`
 
-const errorList=`{
+const errorList = `{
   "size": 0,
   "query": {
     "bool": {
@@ -140,8 +140,8 @@ const errorList=`{
           }
         },
         "count": {
-          "value_count": {
-            "field": "type.keyword"
+          "cardinality": {
+            "field": "eid.keyword"
           }
         },
         "effectUser": {
@@ -176,14 +176,14 @@ func (e elasticQuery) ErrorCount(appId string, from, to int64) (*response.ErrorC
 	return result, nil
 }
 
-func (e elasticQuery) ErrorCountTrend(appId string, from, to, interval int64) (*response.ErrorCountTrendRes, error) {
+func (e elasticQuery) ErrorCountTrend(appId string, from, to, interval int64) (*response.CountListRes, error) {
 	res, err := baseSearch(e.config.Index, buildQueryTrendTpl(errorCountTrend, appId, from, to, interval))
 	if err != nil {
 		logx.Error(err)
 		return nil, err
 	}
 
-	logs := make([]*response.ErrorCountTrendItemRes, 0)
+	logs := make([]*response.CountItem, 0)
 
 	// 遍历
 	buckets := gjson.Get(string(res), "aggregations.trend.buckets")
@@ -192,16 +192,55 @@ func (e elasticQuery) ErrorCountTrend(appId string, from, to, interval int64) (*
 		eUser := gjson.Get(value.Raw, "uv.value").Num
 		ts := gjson.Get(value.Raw, "key_as_string").String()
 
-		item := &response.ErrorCountTrendItemRes{
-			Count:      int(count),
-			EffectUser: int(eUser),
-			Ts:         ts,
+		item := &response.CountItem{
+			Count: int64(count),
+			User:  int64(eUser),
+			Key:   ts,
 		}
 		logs = append(logs, item)
 		return true
 	})
 
-	result := &response.ErrorCountTrendRes{
+	result := &response.CountListRes{
+		Total: len(logs),
+		List:  logs,
+	}
+	return result, nil
+}
+
+func (e elasticQuery) ErrorList(appId string, from, to int64) (*response.ErrorListRes, error) {
+	res, err := baseSearch(e.config.Index, buildQueryTpl(errorList, appId, from, to))
+	if err != nil {
+		logx.Error(err)
+		return nil, err
+	}
+
+	logs := make([]*response.ErrorItem, 0)
+
+	buckets := gjson.Get(string(res), "aggregations.md5.buckets")
+	buckets.ForEach(func(key, value gjson.Result) bool {
+		md5 := gjson.Get(value.Raw, "key").String()
+		msg := gjson.Get(value.Raw, "msg.buckets.0.key").String()
+		errorStr := gjson.Get(value.Raw, "error.buckets.0.key").String()
+		count := gjson.Get(value.Raw, "count.value").Num
+		effectUser := gjson.Get(value.Raw, "effectUser.value").Num
+		times := gjson.Get(value.Raw, "ts.buckets.#.key").Array()
+		first, last := GetFirstAndLastTime(times)
+
+		item := &response.ErrorItem{
+			Md5:        md5,
+			Msg:        msg,
+			Error:      errorStr,
+			Count:      int(count),
+			EffectUser: int(effectUser),
+			FirstAt:    first,
+			LastAt:     last,
+		}
+		logs = append(logs, item)
+		return true
+	})
+
+	result := &response.ErrorListRes{
 		Total: len(logs),
 		List:  logs,
 	}

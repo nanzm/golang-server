@@ -134,6 +134,8 @@ func (e elkLog) DefaultQuery(appId string, from, to, interval int64, dataType st
 		return m.ApiErrorTrend(appId, from, to, interval)
 	case core.ApiErrorList:
 		return m.ApiErrorList(appId, from, to)
+	case core.ApiTopListDuration:
+		return m.ApiTopListDuration(appId, from, to)
 	case core.ApiDuration:
 		return m.ApiDuration(appId, from, to)
 	case core.ApiDurationTrend:
@@ -141,7 +143,7 @@ func (e elkLog) DefaultQuery(appId string, from, to, interval int64, dataType st
 
 	// 资源加载错误
 	case core.ResLoadFailTotalTrend:
-		return m.ResLoadFailTotalTrend(appId, from, to, interval)
+		return m.ResLoadFailTrend(appId, from, to, interval)
 	case core.ResLoadFailTotal:
 		return m.ResLoadFailTotal(appId, from, to)
 	case core.ResLoadFailList:
@@ -155,25 +157,24 @@ func (e elkLog) DefaultQuery(appId string, from, to, interval int64, dataType st
 	case core.PerfMetrics:
 		return m.PerfMetricsBucket(appId, from, to)
 
-	case core.SdkVersionCount:
-		return m.SdkVersionCount(appId, from, to)
-	case core.CategoryCount:
-		return m.CategoryCount(appId, from, to)
-	case core.EntryPage:
-		return m.PagesCount(appId, from, to)
-
-	case core.ProjectEventCount:
-		return m.ProjectEventCount(appId, from, to)
-	case core.ProjectSendMode:
-		return m.ProjectSendMode(appId, from, to)
+	// 其它
+	case core.ProjectSdkVersionList:
+		return m.ProjectSdkVersionList(appId, from, to)
+	case core.ProjectLogTypeList:
+		return m.ProjectLogTypeList(appId, from, to)
+	case core.ProjectUrlVisitList:
+		return m.PagesUrlVisitList(appId, from, to)
+	case core.ProjectLogCount:
+		return m.ProjectLogCount(appId)
+	case core.ProjectLogType:
+		return m.ProjectLogTypeList(appId, from, to)
 	case core.ProjectEnv:
-		return m.ProjectEnv(appId, from, to)
+		return m.ProjectEnvList(appId, from, to)
 	case core.ProjectVersion:
-		return m.ProjectVersion(appId, from, to)
+		return m.ProjectVersionList(appId, from, to)
 	case core.ProjectUserScreen:
-		return m.ProjectUserScreen(appId, from, to)
-	case core.ProjectCategory:
-		return m.ProjectCategory(appId, from, to)
+		return m.ProjectUserScreenList(appId, from, to)
+
 	}
 
 	return nil, errors.New("暂无该指标")
