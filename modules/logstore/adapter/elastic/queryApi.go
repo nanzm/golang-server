@@ -212,7 +212,7 @@ const apiTopListDuration = `{
         "field": "performance.xmlhttprequest.name.keyword",
         "size": 50,
         "order": {
-          "count": "desc"
+          "user": "desc"
         }
       },
       "aggregations": {

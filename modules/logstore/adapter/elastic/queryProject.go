@@ -141,7 +141,12 @@ const pageUrlPVUvList = `{
           "cardinality": {
             "field": "uid.keyword"
           }
-        }
+        },
+		"bu": {
+		  "cardinality": {
+			"field": "buid.keyword"
+		  }
+		}
       }
     }
   }
@@ -469,11 +474,13 @@ func (e elasticQuery) PagesUrlVisitList(appId string, from, to int64) (*response
 	buckets.ForEach(func(key, value gjson.Result) bool {
 		pv := gjson.Get(value.Raw, "pv.value").Num
 		uv := gjson.Get(value.Raw, "uv.value").Num
+		bu := gjson.Get(value.Raw, "bu.value").Num
 		url := gjson.Get(value.Raw, "key").String()
 
 		item := &response.PageUrlVisitItem{
 			Pv:  int64(pv),
 			Uv:  int64(uv),
+			Bu:  int64(bu),
 			Url: url,
 		}
 		logs = append(logs, item)

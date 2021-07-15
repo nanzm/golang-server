@@ -43,7 +43,17 @@ const performanceBucket = `{
         "field": "performance.fp",
         "ranges": [
           {
-            "key": "<300",
+            "key": "<100",
+            "to": 100
+          },
+          {
+            "key": "100",
+            "from": 100,
+            "to": 200
+          },
+          {
+            "key": "200",
+            "from": 200,
             "to": 300
           },
           {
@@ -93,7 +103,17 @@ const performanceBucket = `{
         "field": "performance.fcp",
         "ranges": [
           {
-            "key": "<300",
+            "key": "<100",
+            "to": 100
+          },
+          {
+            "key": "100",
+            "from": 100,
+            "to": 200
+          },
+          {
+            "key": "200",
+            "from": 200,
             "to": 300
           },
           {
@@ -238,7 +258,17 @@ const performanceBucket = `{
         "field": "performance.fid",
         "ranges": [
           {
-            "key": "<30",
+            "key": "<10",
+            "to": 10
+          },
+          {
+            "key": "10",
+            "from": 10,
+            "to": 20
+          },
+          {
+            "key": "20",
+            "from": 20,
             "to": 30
           },
           {

@@ -19,7 +19,7 @@ type CountListRes struct {
 }
 
 type CountItem struct {
-	Key   string `json:"kye"`
+	Key   string `json:"key"`
 	Count int64  `json:"count"`
 	User  int64  `json:"user"`
 }
