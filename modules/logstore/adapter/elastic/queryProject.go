@@ -76,7 +76,7 @@ const pvUvTotalTrend = `{
     "trend": {
       "date_histogram": {
         "field": "ts",
-        "fixed_interval": "30m",
+      	"fixed_interval": "<INTERVAL>m",
         "time_zone": "+08:00",
         "format": "yyyy-MM-dd HH:mm:ss"
       },
