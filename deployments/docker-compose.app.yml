@@ -5,11 +5,11 @@ services:
   manage:
     image: nancode/dora-manage:latest
     container_name: manage
-    command: /cmd/manage -f /cmd/etc/config.yml
+    command: /cmd/manage -f /cmd/conf/config.yml
     ports:
       - "8222:8222"
     volumes:
-      - ./etc:/cmd/etc
+      - ./conf:/cmd/conf
     networks:
       - default
       - dora_net
@@ -18,11 +18,11 @@ services:
   transit:
     image: nancode/dora-transit:latest
     container_name: transit
-    command: /cmd/transit -f /cmd/etc/config.yml
+    command: /cmd/transit -f /cmd/conf/config.yml
     ports:
       - "8221:8221"
     volumes:
-      - ./etc:/cmd/etc
+      - ./conf:/cmd/conf
     networks:
       - default
       - dora_net

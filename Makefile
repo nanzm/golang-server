@@ -17,24 +17,6 @@ data-clean:
 	cd deployments  && rm -rf redis/data && rm -rf mysql/data
 
 
-# --- elasticsearch ---------------------------------------------------------
-elastic-up:
-	cd deployments  && docker-compose -f ./elasticstack.yml up -d
-
-elastic-down:
-	cd deployments  && docker-compose -f ./elasticstack.yml down
-
-elastic-logs:
-	cd deployments  && docker-compose -f ./elasticstack.yml logs
-
-
-# --- app ---------------------------------------------------------
-dev-transit:
-	go run cmd/transit/main.go
-
-dev-manage:
-	go run cmd/manage/main.go
-
 # --- app ---------------------------------------------------------
 build-transit:
 	go build -o transit cmd/transit/main.go
@@ -44,8 +26,8 @@ build-manage:
 
 # --- app ---------------------------------------------------------
 docker-transit:
-	docker build -f ./deployments/transit.Dockerfile -t nancode/dora-transit .
+	docker build -f ./build/transit.Dockerfile -t nancode/dora-transit .
 
 docker-manage:
-	docker build -f ./deployments/manage.Dockerfile -t nancode/dora-manage .
+	docker build -f ./build/manage.Dockerfile -t nancode/dora-manage .
 

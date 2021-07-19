@@ -24,13 +24,11 @@ deployments/mysql/data
 deployments/redis/data
 storage
 data
-build
 dora.db
 tmp
 dora.yml
 test
 
-config.yml
 config.prod.yml
 config.dev.yml
 config.local.yml
