@@ -9,7 +9,7 @@ COPY go.mod .
 COPY go.sum .
 RUN GOPROXY="https://goproxy.io,direct" go mod download
 
-COPY ../build .
+COPY . .
 RUN ["chmod", "+x", "/source/build/version.sh"]
 RUN ["sh", "/source/build/version.sh"]
 RUN cat config/version.go
