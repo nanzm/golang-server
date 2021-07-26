@@ -20,13 +20,32 @@ func NewDashboardResource() ginutil.Resource {
 }
 
 func (da *DashboardResource) Register(router *gin.RouterGroup) {
-	router.GET("/dashboard/events", middleware.JWTAuthMiddleware(), da.QueryEventsByMd5)
-	router.GET("/dashboard/events/chart/:type", da.QueryChartData)
+	router.POST("/dashboard/dsl-search", da.Search)
+	router.GET("/dashboard/logs", middleware.JWTAuthMiddleware(), da.QueryLogsByMd5)
+	router.GET("/dashboard/chart/:type", da.QueryChartData)
 
 	router.GET("/system", da.SystemInfo)
 }
 
-func (da *DashboardResource) QueryEventsByMd5(c *gin.Context) {
+// todo 校验数据安全性 不该看的东西不能看
+func (da *DashboardResource) Search(c *gin.Context) {
+	var u dto.SearchParam
+	if err := c.ShouldBind(&u); err != nil {
+		ginutil.ErrorTrans(c, err)
+		return
+	}
+
+	s := logstore.GetClient()
+	searchResult, err := s.DSLSearch(u.Body)
+	if err != nil {
+		ginutil.JSONBadRequest(c, err)
+		return
+	}
+
+	ginutil.JSONOk(c, searchResult)
+}
+
+func (da *DashboardResource) QueryLogsByMd5(c *gin.Context) {
 	var u dto.QueryEventsByMd5Param
 	if err := c.ShouldBind(&u); err != nil {
 		ginutil.ErrorTrans(c, err)
@@ -34,7 +53,7 @@ func (da *DashboardResource) QueryEventsByMd5(c *gin.Context) {
 	}
 
 	s := logstore.GetClient()
-	md5Log, err := s.QueryMethods().GetLogByMd5(u.AppId, u.Start, u.End, u.Md5)
+	md5Log, err := s.QueryMethods().GetErrorLogsByMd5(u.AppId, u.Start, u.End, u.Md5)
 	if err != nil {
 		ginutil.JSONBadRequest(c, err)
 		return

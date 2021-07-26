@@ -56,6 +56,39 @@ func (e elkLog) PutData(logData map[string]interface{}) error {
 	return nil
 }
 
+func (e elkLog) DSLSearch(queryDSL map[string]interface{}) (result map[string]interface{}, err error) {
+	query, err := jsoniter.Marshal(queryDSL)
+	if err != nil {
+		return nil, err
+	}
+
+	es := elastic.GetClient()
+
+	res, err := es.Search(
+		es.Search.WithIndex(e.config.Index),
+		es.Search.WithBody(bytes.NewReader(query)),
+		es.Search.WithPretty(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var resultData map[string]interface{}
+	err = jsoniter.Unmarshal(body, &resultData)
+	if err != nil {
+		return nil, err
+	}
+
+	return resultData, nil
+}
+
 // 批量插入
 func (e elkLog) PutListData(logList []map[string]interface{}) error {
 	bi, err := esutil.NewBulkIndexer(esutil.BulkIndexerConfig{
@@ -208,7 +241,6 @@ func buildQueryTrendTpl(tpl string, appId string, from, to, interval int64) stri
 }
 
 func baseSearch(Index string, queryTpl string) ([]byte, error) {
-	fmt.Printf("%v \n", queryTpl)
 	es := elastic.GetClient()
 
 	res, err := es.Search(

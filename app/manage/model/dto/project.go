@@ -18,6 +18,10 @@ type ReqOrganizationProjectsList struct {
 	OrganizationId uint `form:"organizationId"  binding:"required"`
 }
 
+type SearchParam struct {
+	Body map[string]interface{} `form:"body" binding:"required"`
+}
+
 //
 type AlarmListParam struct {
 	Current  int64  `form:"current" binding:"number"`

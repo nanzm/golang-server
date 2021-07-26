@@ -6,14 +6,12 @@ type Client interface {
 	PutData(logData map[string]interface{}) error
 	PutListData(listLogData []map[string]interface{}) error
 
+	DSLSearch(queryDSL map[string]interface{}) (result map[string]interface{}, err error)
 	DefaultQuery(appId string, from, to, interval int64, dataType string) (result interface{}, err error)
 	QueryMethods() Query
 }
 
 type Query interface {
-	GetLogByMd5(appId string, from, to int64, md5 string) (*response.LogsResponse, error)
-	SearchErrorLog(appId string, from, to int64, searchStr string) (*response.LogList, error)
-
 	PvUvTotal(appId string, from, to int64) (*response.PvUvTotalRes, error)
 	PvUvTrend(appId string, from, to, interval int64) (*response.PvUvTrendRes, error)
 
@@ -30,6 +28,8 @@ type Query interface {
 	ErrorCount(appId string, from, to int64) (*response.ErrorCountRes, error)
 	ErrorCountTrend(appId string, from, to, interval int64) (*response.CountListRes, error)
 	ErrorList(appId string, from, to int64) (*response.ErrorListRes, error)
+	SearchErrorLog(appId string, from, to int64, searchStr string) (*response.LogList, error)
+	GetErrorLogsByMd5(appId string, from, to int64, md5 string) (*response.LogsResponse, error)
 
 	// 接口错误
 	ApiErrorCount(appId string, from, to int64) (*response.ApiErrorCountRes, error)

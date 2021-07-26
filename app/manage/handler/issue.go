@@ -49,7 +49,7 @@ func (issue *IssueResource) DetailByMd5(c *gin.Context) {
 		return
 	}
 
-	result, err := logstore.GetClient().QueryMethods().GetLogByMd5(u.AppId, u.Start, u.End, u.Md5)
+	result, err := logstore.GetClient().QueryMethods().GetErrorLogsByMd5(u.AppId, u.Start, u.End, u.Md5)
 	if err != nil {
 		ginutil.JSONError(c, http.StatusInternalServerError, err)
 		return
