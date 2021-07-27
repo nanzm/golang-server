@@ -11,10 +11,10 @@ require (
 	github.com/elastic/go-elasticsearch/v7 v7.13.1
 	github.com/fatih/color v1.10.0
 	github.com/gin-contrib/sessions v0.0.3
-	github.com/gin-gonic/gin v1.6.3
+	github.com/gin-gonic/gin v1.7.0
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
-	github.com/go-playground/validator/v10 v10.2.0
+	github.com/go-playground/validator/v10 v10.4.1
 	github.com/go-redis/redis/v8 v8.4.0
 	github.com/go-redis/redis_rate/v9 v9.1.1
 	github.com/golang/protobuf v1.4.3 // indirect
@@ -23,8 +23,8 @@ require (
 	github.com/json-iterator/go v1.1.9
 	github.com/mholt/archiver/v3 v3.5.0
 	github.com/mitchellh/mapstructure v1.4.1
-	github.com/nsqio/go-nsq v1.0.8
 	github.com/nanzm/sourcemap v0.0.3
+	github.com/nsqio/go-nsq v1.0.8
 	github.com/pelletier/go-toml v1.8.1 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron/v3 v3.0.1
