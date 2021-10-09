@@ -1,8 +1,8 @@
 package main
 
 import (
-	"dora/app/transit"
-	"dora/config"
+	"dora/internal/apps/transit"
+	"dora/internal/config"
 	"flag"
 )
 

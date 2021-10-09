@@ -1,8 +1,8 @@
 package main
 
 import (
-	"dora/app/manage"
-	"dora/config"
+	"dora/internal/apps/manage"
+	"dora/internal/config"
 	"flag"
 )
 
