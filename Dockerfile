@@ -12,7 +12,8 @@ RUN GOPROXY="https://goproxy.io,direct" go mod download
 COPY . .
 RUN ["chmod", "+x", "/source/build/version.sh"]
 RUN ["sh", "/source/build/version.sh"]
-RUN cat config/version.go
+
+RUN go build -o transit cmd/transit/main.go
 RUN go build -o manage cmd/manage/main.go
 
 
@@ -23,6 +24,7 @@ RUN apk add --no-cache tzdata
 ENV TZ Asia/Shanghai
 
 WORKDIR /cmd
+COPY --from=builder /source/transit /cmd
 COPY --from=builder /source/manage /cmd
 
-CMD ["/cmd/manage", "-f", "/cmd/config.yml"]
+CMD ["/cmd/transit"]

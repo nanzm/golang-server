@@ -5,7 +5,7 @@ import (
 	"dora/internal/apps/manage/dto"
 	"dora/internal/apps/manage/entity"
 	"dora/internal/config"
-	"dora/internal/config/constant"
+	"dora/internal/constant"
 	"dora/internal/middleware"
 	"dora/pkg/utils"
 	"dora/pkg/utils/fs"

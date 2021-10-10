@@ -20,8 +20,11 @@ tmp/build
 .idea
 # Dependency directories (remove the comment below to include it)
 # vendor/
-deployments/mysql/data
-deployments/redis/data
+quickstart/mysql/data
+!quickstart/conf/config.yml
+
+quickstart/redis/data
+
 storage
 data
 dora.db
@@ -32,7 +35,6 @@ test
 config.prod.yml
 config.dev.yml
 config.local.yml
-!deployments/etc/config.yml
 
 manage.log
 transit.log

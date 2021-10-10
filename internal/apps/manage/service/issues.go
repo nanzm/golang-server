@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"dora/internal/apps/manage/entity"
-	"dora/internal/config/constant"
+	"dora/internal/constant"
 	"dora/internal/datasource/gorm"
 	"dora/internal/datasource/redis"
 	"dora/pkg/utils/logx"
