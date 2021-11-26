@@ -1,4 +1,4 @@
-# dora-server
+# dora-server (Deprecated)
 ## 启动依赖
 ```shell
 # 一键启动 mysql redis nsq  
